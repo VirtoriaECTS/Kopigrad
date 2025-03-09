@@ -1,10 +1,16 @@
 using Kopigrad.Components;
+using Kopigrad.Models;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddDbContext<KopigradContext>(options =>
+    options.UseMySql("server=localhost;database=kopigrad;user=viktoria;password=17092002Ol!",
+    new MySqlServerVersion(new Version(8, 0, 30))));
 
 var app = builder.Build();
 
