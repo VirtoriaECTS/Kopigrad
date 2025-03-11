@@ -1,0 +1,81 @@
+﻿html, body {
+    margin: 0;
+    padding: 0;
+}
+
+
+.ShapkaAdmin {
+    display: inline-block;
+    width: 100vw;
+    height: 5vw;
+    background: #E83939;
+    display: flex; /* Делаем flex-контейнер */
+    flex-direction: row; /* Располагаем элементы в строку */
+}
+
+@font-face {
+    font-family: 'DaysFronts';
+    src: url('/Fronts/DAYS.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.TextShapka {
+    width: 11vw;
+    vertical-align: central;
+    font-family: DaysFronts;
+    color: white;
+    font-size: 1vw;
+    margin: 1vw 1vw;
+}
+
+.TextShapkaTwo {
+    width: 11vw;
+    vertical-align: central;
+    font-family: DaysFronts;
+    color: white;
+    font-size: 1vw;
+    margin: 0vw 1vw;
+}
+
+.lineWhite {
+    width: 0.3vw;
+    height: 4vw;
+    background: white;
+    margin: 0.5vw 1vw;
+    border-radius: 0.5vw;
+}
+
+
+.LogoImage {
+    margin: 0.1vw 12vw 0vw 12vw;
+    width: auto; /* Автоматическая высота */
+    max-height: 5vw; /* Ограничение по высоте */
+}
+
+.DivImageContackt {
+    margin: 1vw 0vw 1vw 7vw;
+    display: flex; /* Делаем flex-контейнер */
+    flex-direction: row; /* Располагаем элементы в строку */
+}
+
+.ContactImage {
+    margin: 0vw 1vw;
+    width: auto; /* Автоматическая высота */
+    max-height: 5vw; /* Ограничение по высоте */
+}
+
+
+.Banner {
+    background-image: url('/Image/backBanner.png'); /* Путь к изображению */
+    background-size: cover; /* Растягиваем изображение на весь div */
+    width: 100vw;
+    height: 5vw;
+}
+.TextBanner {
+    font-size: 2.5vw;
+    font-family: DaysFronts;
+    text-align: center;
+
+    color: white;
+}
