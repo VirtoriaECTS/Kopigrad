@@ -1,0 +1,22 @@
+﻿@page "/"
+@using Kopigrad.Components.Layout
+@inject Models.KopigradContext DbContext
+
+<PageTitle>Home</PageTitle>
+
+<div class="Banner">
+    <h5 class="TextBanner">Панель админа</h5>
+</div>
+
+<div class="VhodAdmin">
+    <h5 class="TextVhodAdmin">Email:</h5>
+    <input type="email" class="InputAdmin" />
+    <h5 class="TextVhodAdmin">Пароль:</h5>
+    <input type="password" class="InputAdmin" />
+    <button class="BittonAdminVhod">Войти</button>
+    <h5 class="TextFindPassword">Забыли пароль</h5>
+</div>
+
+@code{
+
+}

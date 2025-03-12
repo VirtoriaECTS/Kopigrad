@@ -7,7 +7,7 @@
 .ShapkaAdmin {
     display: inline-block;
     width: 100vw;
-    height: 5vw;
+    height: 6.5vw;
     background: #E83939;
     display: flex; /* Делаем flex-контейнер */
     flex-direction: row; /* Располагаем элементы в строку */
@@ -47,35 +47,177 @@
 }
 
 
-.LogoImage {
-    margin: 0.1vw 12vw 0vw 12vw;
-    width: auto; /* Автоматическая высота */
-    max-height: 5vw; /* Ограничение по высоте */
-}
+
 
 .DivImageContackt {
-    margin: 1vw 0vw 1vw 7vw;
+    margin: 0vw 0vw 1vw 52vw;
     display: flex; /* Делаем flex-контейнер */
     flex-direction: row; /* Располагаем элементы в строку */
 }
 
 .ContactImage {
-    margin: 0vw 1vw;
+    margin: 0.7vw 1vw;
     width: auto; /* Автоматическая высота */
-    max-height: 5vw; /* Ограничение по высоте */
+    height: 3.6vw; /* Ограничение по высоте */
 }
 
+
+
+.LogoContainer {
+    position: absolute;
+    width: 100vw;
+    text-align: center;
+}
+
+.LogoImage {
+    width: auto; /* Автоматическая высота */
+    height: 5vw; /* Ограничение по высоте */
+}
 
 .Banner {
-    background-image: url('/Image/backBanner.png'); /* Путь к изображению */
-    background-size: cover; /* Растягиваем изображение на весь div */
+    margin: 0vw 0vw;
+    background-image: url('/Image/backBanner.png'); /* Фон */
+    background-size: cover; /* Растягиваем изображение */
+    background-position: center; /* Центрируем */
     width: 100vw;
-    height: 5vw;
+    height: 6.5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center; /* Горизонтальное центрирование */
+    align-items: center; /* Вертикальное центрирование */
 }
-.TextBanner {
-    font-size: 2.5vw;
-    font-family: DaysFronts;
-    text-align: center;
 
+.TextBanner {
+    font-size: 2vw;
+    font-family: DaysFronts;
     color: white;
+    text-align: center;
+}
+
+.VhodAdmin {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center; /* Горизонтальное центрирование */
+    align-items: center; /* Вертикальное центрирование */
+    height: 35vh;
+}
+
+.TextVhodAdmin {
+    width: 30vh;
+    font-size: 1.8vh;
+    font-family: DaysFronts;
+    color: black;
+}
+
+.InputAdmin {
+    text-align: center;
+    font-family: DaysFronts;
+    margin: 0vh 0vh 4vh 0vh;
+    font-size: 1.8vh;
+    color: black;
+    height: 3.5vh;
+    width: 30vh;
+    border: 0.15vh solid black;
+    border-radius: 1.3vh;
+}
+
+.BittonAdminVhod {
+    margin: 0vh 0vh 1vh 0vh;
+    font-size: 1.8vh;
+    background: black;
+    border-radius: 1.3vh;
+    height: 3.5vh;
+    width: 30vh;
+    font-family: DaysFronts;
+    color: white;
+    text-align: center;
+}
+
+.TextFindPassword {
+    text-decoration: underline;
+    text-decoration-thickness: 0.2vh; /* Увеличиваем толщину линии */
+    text-underline-offset: 0.2vh; /* Смещаем линию ниже */
+    color: black;
+    text-align: center;
+    width: 30vh;
+    font-family: DaysFronts;
+    font-size: 1.5vh;
+}
+
+.LowerShapkaAdmin {
+    background: #E83939;
+    display: flex; /* Делаем flex-контейнер */
+    flex-direction: row; /* Располагаем элементы в строку */
+    height: 3.5vw;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.ImageLowerLogo {
+
+    width: auto; /* Автоматическая высота */
+    height: 2.5vw; /* Ограничение по высоте */
+}
+
+.LogoContainerLower {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center; /* Горизонтальное центрирование */
+    align-items: center; /* Вертикальное центрирование */
+    height: 3.5vw;
+    vertical-align: central;
+    position: absolute;
+    width: 100vw;
+    text-align: center;
+}
+
+
+
+.TextShapkaTwoLower {
+    margin: 0.2vw 0.5vw;
+    vertical-align: central;
+    font-family: DaysFronts;
+    color: white;
+    font-size: 0.5vw;
+}
+.TextShapkaTwoLower {
+    margin: 0.2vw 0.5vw;
+    font-family: DaysFronts;
+    color: white;
+    font-size: 0.6vw;
+
+}
+
+.TextContainerLower {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center; /* Горизонтальное центрирование */
+  
+    height: 3.5vw;
+    width: 100vw;
+}
+.TextShapkaTwoLowerAdress {
+    text-align: left;
+    width: 7vw;
+    margin: 0.2vw 0.5vw;
+    font-family: DaysFronts;
+    color: white;
+    font-size: 0.6vw;
+}
+.TextContainerLowerAdress {
+    position: absolute;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Выравниваем текст вправо */
+    justify-content: center;
+    height: 3.5vw;
+    width: 100vw;
 }
