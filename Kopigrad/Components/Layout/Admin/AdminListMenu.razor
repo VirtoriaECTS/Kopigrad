@@ -1,0 +1,24 @@
+﻿@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<div class="TextContainerMenuAdmin">
+    <h5 @onclick="Servise" class="TextMenu">Услуги</h5>
+    <h5 @onclick="Requst" class="TextMenu">Заявки</h5>
+    <h5 @onclick="Pdf" class="TextMenu">PDF расчет</h5>
+</div>
+
+@code{
+    public void Servise(){
+        Navigation.NavigateTo("/Servise");
+    }
+
+    public void Requst()
+    {
+        Navigation.NavigateTo("/Requst");
+    }
+
+    public void Pdf()
+    {
+        Navigation.NavigateTo("/Pdf");
+    }
+}

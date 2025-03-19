@@ -1,0 +1,33 @@
+﻿@page "/Servise"
+@layout Layout.Menu.MenuAdmin;
+@rendermode InteractiveServer
+
+@inject NavigationManager Navigation
+<PageTitle>Admin</PageTitle>
+
+
+<div class="Banner">
+    <h5 class="TextBanner">Услуги</h5>
+</div>
+
+<div class="TextContainerMenuAdmin">
+    <button class="ButtonDesingAdd" @onclick="AddProductClick">
+        Добавить
+    </button>
+
+    <button class="ButtonDesingChange">
+        Изменить
+    </button>
+
+    <button class="ButtonDesingDelete">
+        Удалить
+    </button>
+</div>
+
+@code {
+
+    public void AddProductClick()
+    {
+        Navigation.NavigateTo("/ServiseAddProduct");
+    }
+}

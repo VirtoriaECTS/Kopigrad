@@ -1,8 +1,10 @@
 ﻿@page "/"
+@layout Layout.Menu.MenuAdminVhod;
 @using Kopigrad.Components.Layout
 @inject Models.KopigradContext DbContext
-
-<PageTitle>Home</PageTitle>
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+<PageTitle>Admin</PageTitle>
 
 <div class="Banner">
     <h5 class="TextBanner">Панель админа</h5>
@@ -13,10 +15,13 @@
     <input type="email" class="InputAdmin" />
     <h5 class="TextVhodAdmin">Пароль:</h5>
     <input type="password" class="InputAdmin" />
-    <button class="BittonAdminVhod">Войти</button>
+    <button @onclick="onClickVhod" class="BittonAdminVhod">Войти</button>
     <h5 class="TextFindPassword">Забыли пароль</h5>
 </div>
 
 @code{
 
+    public void onClickVhod(){
+        Navigation.NavigateTo("/Servise");
+    }
 }

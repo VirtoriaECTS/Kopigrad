@@ -1,13 +1,12 @@
 ﻿html, body {
+    height: 100%;
     margin: 0;
     padding: 0;
 }
-
-
 .ShapkaAdmin {
     display: inline-block;
     width: 100vw;
-    height: 6.5vw;
+    height: 3.5vw;
     background: #E83939;
     display: flex; /* Делаем flex-контейнер */
     flex-direction: row; /* Располагаем элементы в строку */
@@ -21,28 +20,28 @@
 }
 
 .TextShapka {
-    width: 11vw;
+    width: 7vw;
     vertical-align: central;
     font-family: DaysFronts;
     color: white;
-    font-size: 1vw;
-    margin: 1vw 1vw;
+    font-size: 0.6vw;
+    margin: 1vw 0.1vw;
 }
 
 .TextShapkaTwo {
-    width: 11vw;
+    width: 7vw;
     vertical-align: central;
     font-family: DaysFronts;
     color: white;
-    font-size: 1vw;
-    margin: 0vw 1vw;
+    font-size: 0.6vw;
+    margin: 1vw 0.1vw;
 }
 
 .lineWhite {
-    width: 0.3vw;
-    height: 4vw;
+    width: 0.1vw;
+    height: 2.5vw;
     background: white;
-    margin: 0.5vw 1vw;
+    margin: 0.5vw 0vw;
     border-radius: 0.5vw;
 }
 
@@ -58,12 +57,13 @@
 .ContactImage {
     margin: 0.7vw 1vw;
     width: auto; /* Автоматическая высота */
-    height: 3.6vw; /* Ограничение по высоте */
+    height: 2vw; /* Ограничение по высоте */
 }
 
 
 
 .LogoContainer {
+    vertical-align: central;
     position: absolute;
     width: 100vw;
     text-align: center;
@@ -71,7 +71,7 @@
 
 .LogoImage {
     width: auto; /* Автоматическая высота */
-    height: 5vw; /* Ограничение по высоте */
+    height: 2.5vw; /* Ограничение по высоте */
 }
 
 .Banner {
@@ -80,7 +80,7 @@
     background-size: cover; /* Растягиваем изображение */
     background-position: center; /* Центрируем */
     width: 100vw;
-    height: 6.5vw;
+    height: 3.5vw;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -148,8 +148,8 @@
 
 .LowerShapkaAdmin {
     background: #E83939;
-    display: flex; /* Делаем flex-контейнер */
-    flex-direction: row; /* Располагаем элементы в строку */
+    display: flex;  /*Делаем flex-контейнер */
+    flex-direction: row;  /*Располагаем элементы в строку */
     height: 3.5vw;
     position: fixed;
     bottom: 0;
@@ -172,7 +172,6 @@
     align-items: center; /* Вертикальное центрирование */
     height: 3.5vw;
     vertical-align: central;
-    position: absolute;
     width: 100vw;
     text-align: center;
 }
@@ -205,7 +204,7 @@
 }
 .TextShapkaTwoLowerAdress {
     text-align: left;
-    width: 7vw;
+    width: 8vw;
     margin: 0.2vw 0.5vw;
     font-family: DaysFronts;
     color: white;
@@ -220,4 +219,141 @@
     justify-content: center;
     height: 3.5vw;
     width: 100vw;
+}
+
+.TextContainerContact {
+    position: absolute;
+    right: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end; /* Выравниваем текст вправо */
+    justify-content: center;
+    height: 3.5vw;
+}
+
+
+.TextContainerMenuAdmin {
+    text-align: center;
+    width: 100vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.TextMenu {
+    text-align: center;
+    cursor: default;
+    font-family: DaysFronts;
+    font-size: 1.3vw;
+    margin: 0.3vw 10vw 0.3vw 0vw;
+}
+
+.ButtonDesingAdd {
+    font-family: DaysFronts;
+    width: 21vw;
+    height: 4vw;
+    background: #00660C;
+    font-size: 1.3vw;
+    margin: 2vw 8vw;
+    color: white;
+    border-radius: 1vw;
+    border: none;
+}
+
+
+.ButtonDesingChange {
+    font-family: DaysFronts;
+    width: 20vw;
+    height: 4vw;
+    background: #A88506;
+    font-size: 1.3vw;
+    margin: 2vw 8vw;
+    color: white;
+    border-radius: 1vw;
+    border: none;
+}
+
+
+.ButtonDesingDelete {
+    font-family: DaysFronts;
+    width: 20vw;
+    height: 4vw;
+    background: #890305;
+    font-size: 1.3vw;
+    margin: 2vw 8vw;
+    color: white;
+    border-radius: 1vw;
+    border: none;
+}
+
+.ContainerImage {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center; /* Горизонтальное центрирование */
+    text-align: center;
+    height: 40vh;
+    width: 40vh;
+    background: #101212;
+    margin: 3vw 0vw;
+    border-radius: 2vh;
+}
+
+.ButtonDesingAddPicture {
+    font-family: DaysFronts;
+    width: 20vw;
+    height: 4vw;
+    background: #4B5454;
+    font-size: 1.3vw;
+    color: white;
+    border-radius: 1vw;
+    border: none;
+}
+
+.CenterVertical {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center; /* Горизонтальное центрирование */
+    align-items: center; /* Вертикальное центрирование */
+    width: 100vw;
+}
+
+.TextNameService {
+    margin: 3vw 0vw;
+    font-family: DaysFronts;
+    font-size: 1.3vw;
+}
+
+    .hotisontal{
+        height: 3.5vw;
+        display: flex; /* Включаем Flexbox */
+        justify-content: space-between; /* Расставляем элементы по горизонтали */
+        align-items: center; /* Выравниваем элементы по вертикали */
+    }
+
+.ButtonDesingSavePicture {
+    margin: 0vw 3vw 10vw 2vw;
+    font-family: DaysFronts;
+    width: 10vw;
+    height: 5vw;
+    background: #00660C;
+    font-size: 1.3vw;
+    color: white;
+    border-radius: 0.5vw;
+    border: none;
+}
+
+.ButtonDesingNoSavePicture {
+    margin: 0vw 3vw 10vw 0vw;
+    font-family: DaysFronts;
+    width: 10vw;
+    height: 5vw;
+    background: #890305;
+    font-size: 1.3vw;
+    color: white;
+    border-radius: 0.5vw;
+    border: none;
 }
