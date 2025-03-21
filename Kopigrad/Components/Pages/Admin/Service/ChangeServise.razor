@@ -1,10 +1,10 @@
-﻿@page "/ServiseAddProduct"
+﻿@page "/ChangeServise/{id:int}"
 @layout Layout.Menu.MenuAdmin;
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
 
 <div class="Banner">
-    <h5 class="TextBanner">Добавление услуги</h5>
+    <h5 class="TextBanner">Изменение услуги</h5>
 </div>
 
 <div class="CenterVertical">
@@ -25,10 +25,10 @@
 
 
     <h5 class="TextNameService">Название услуги:</h5>
-    <input @bind="nameServise"  class="InputAdmin" />
+    <input @bind="nameServise" class="InputAdmin" />
 
     <div class="TextContainerMenuAdmin">
-        <button @onclick="ClickAdd" class="ButtonDesingSavePicture">Cохранить</button>
+        <button @onclick="ClickChange" class="ButtonDesingSavePicture">Cохранить изменения</button>
 
         <button @onclick="ClickExit" class="ButtonDesingNoSavePicture">Выход без сохранения</button>
 
@@ -40,6 +40,11 @@
 
 
 @code {
+    Classes.Admin.Servise.ManagmentServiseClasses managment = new Classes.Admin.Servise.ManagmentServiseClasses();
+
+    [Parameter]
+    public int? id { get; set; }
+
     private byte[]? imageData;
 
     private string nameServise;
@@ -78,14 +83,23 @@
         return Classes.All.ConvertImage.GetImageSrc(imageData);
     }
 
-
-    private void ClickAdd()
+    protected override void OnInitialized()
     {
-        Classes.Admin.Servise.ManagmentServiseClasses addServise = new Classes.Admin.Servise.ManagmentServiseClasses();
 
-        error =  addServise.Add(imageData, nameServise);
 
-        if(error == "")
+        var service = managment.Find(Convert.ToInt32(id));
+
+        imageData = service.Image;
+        nameServise = service.NameService;
+        StateHasChanged();
+    }
+
+    private void ClickChange()
+    {
+        error = managment.Change(Convert.ToInt32(id), imageData, nameServise);
+
+
+        if (error == "")
         {
             Navigation.NavigateTo("/Servise");
         }

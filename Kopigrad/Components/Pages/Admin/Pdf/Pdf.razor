@@ -1,9 +1,76 @@
 ﻿@page "/Pdf"
+@rendermode InteractiveServer
 
-
-<div class="Banner">
+@* <div class="Banner">
     <h5 class="TextBanner">PDF расчет</h5>
-</div>
-@code {
+</div> *@
 
+
+
+<h3>Загрузка PNG-изображения</h3>
+
+<InputFile OnChange="HandleFileSelected" accept=".png" />
+
+@if (imageData != null)
+{
+    <p>Загруженное изображение:</p>
+    <img src="@GetImageSrc()" alt="Изображение" style="max-width: 300px; border: 1px solid black;" />
+}
+else
+{
+    <p>Нет изображения.</p>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color: red;">Ошибка: @errorMessage</p>
+}
+
+@code {
+    private byte[]? imageData;
+    private string? errorMessage;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        errorMessage = null; // Очистка предыдущих ошибок
+
+        // Проверка размера файла (до 100 МБ)
+        if (file.Size > 100 * 1024 * 1024)
+        {
+            errorMessage = "Файл слишком большой. Максимальный размер: 100 MB.";
+            imageData = null;
+            return;
+        }
+
+        // Проверка на тип изображения
+        if (file.ContentType != "image/png")
+        {
+            errorMessage = "Выбран не PNG файл.";
+            imageData = null;
+            return;
+        }
+
+        // Чтение файла в byte[]
+        imageData = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(imageData);
+    }
+
+    private string? GetImageSrc()
+    {
+        if (imageData == null)
+            return null;
+
+        try
+        {
+            // Преобразование в строку Base64
+            var base64 = Convert.ToBase64String(imageData);
+            return $"data:image/png;base64,{base64}";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Ошибка при генерации Base64: " + ex.Message;
+            return null;
+        }
+    }
 }

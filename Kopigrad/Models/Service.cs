@@ -13,5 +13,7 @@ public partial class Service
 
     public string? Time { get; set; }
 
+    public byte[] Image { get; set; } = null!;
+
     public virtual ICollection<Categoryservice> Categoryservices { get; set; } = new List<Categoryservice>();
 }

@@ -1,10 +1,15 @@
 using Kopigrad.Components;
 using Kopigrad.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
-//builder.WebHost.UseUrls("http://192.168.3.9:5001");
 
+// Увеличиваем лимит для файлов (например, до 100 MB)
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 100 * 1024 * 1024;  // 100 MB
+});
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

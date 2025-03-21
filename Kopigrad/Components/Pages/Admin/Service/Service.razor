@@ -1,6 +1,9 @@
 ﻿@page "/Servise"
 @layout Layout.Menu.MenuAdmin;
 @rendermode InteractiveServer
+@using Kopigrad.Models;
+
+
 
 @inject NavigationManager Navigation
 <PageTitle>Admin</PageTitle>
@@ -10,24 +13,106 @@
     <h5 class="TextBanner">Услуги</h5>
 </div>
 
+<div class="CenterDiv">
+    <div class="DivService">
+        @foreach (var text in services)
+        {
+
+            <div class="divOneServise">
+                <button @onclick="() => ClickServiceChangeOne(text.IdService)" hidden="@buttonChange" class="ButtonChangeServise">
+                    <img class="ImageButtonChange" src="Image/changeIcon.png" />
+                </button>
+
+                <button @onclick="() => ClickServiceDeleteOne(text.IdService)" hidden="@buttonDelete" class="ButtonDeleteServise">
+                    <img class="ImageButtonChange" src="Image/deleteIcon.png" />
+                </button>
+
+                <img class="ImageStyleServiseAll" src="@GetImageSrc(text.Image)" alt="Изображение" />
+
+                <h1 class="TextServise">
+                    @text.NameService
+                </h1>
+            </div>
+        }
+    </div>
+</div>
+
+
 <div class="TextContainerMenuAdmin">
     <button class="ButtonDesingAdd" @onclick="AddProductClick">
         Добавить
     </button>
 
-    <button class="ButtonDesingChange">
+    <button @onclick="ClickChangeAll" class="ButtonDesingChange">
         Изменить
     </button>
 
-    <button class="ButtonDesingDelete">
+    <button @onclick=ClickDeleteAll class="ButtonDesingDelete">
         Удалить
     </button>
 </div>
 
 @code {
+    bool buttonChange = true;
+    bool buttonDelete= true;
 
+    private string? GetImageSrc(byte[] Image)
+    {
+
+        return Classes.All.ConvertImage.GetImageSrc(Image);
+    }
+
+
+    private List<Kopigrad.Models.Service> services = new List<Kopigrad.Models.Service>();
     public void AddProductClick()
     {
         Navigation.NavigateTo("/ServiseAddProduct");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var context = new KopigradContext())
+        {
+
+            services = context.Services.ToList();
+        }
+
+    }
+
+    public void ClickChangeAll()
+    {
+        if (buttonChange) buttonChange = false;
+        else buttonChange = true;
+    }
+
+    public void ClickDeleteAll()
+    {
+        if (buttonDelete) buttonDelete = false;
+        else buttonDelete = true;
+    }
+
+    public void ClickServiceChangeOne(int id)
+    {
+        Navigation.NavigateTo($"/ChangeServise/{id}");
+    }
+
+    public void ClickServiceDeleteOne(int id)
+    {
+        Classes.Admin.Servise.ManagmentServiseClasses addServise = new Classes.Admin.Servise.ManagmentServiseClasses();
+
+        addServise.Delete(id);
+
+        services.Clear();
+        using (var context = new KopigradContext())
+        {
+
+            services = context.Services.ToList();
+        }
+
+
+        buttonDelete = true;
+        StateHasChanged();
+
+
     }
 }

@@ -20,6 +20,8 @@ public partial class KopigradContext : DbContext
 
     public virtual DbSet<Categoryservice> Categoryservices { get; set; }
 
+    public virtual DbSet<Efmigrationshistory> Efmigrationshistories { get; set; }
+
     public virtual DbSet<Image> Images { get; set; }
 
     public virtual DbSet<Pagepdf> Pagepdfs { get; set; }
@@ -87,6 +89,16 @@ public partial class KopigradContext : DbContext
                 .HasForeignKey(d => d.IdServie)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("categoryservice_ibfk_2");
+        });
+
+        modelBuilder.Entity<Efmigrationshistory>(entity =>
+        {
+            entity.HasKey(e => e.MigrationId).HasName("PRIMARY");
+
+            entity.ToTable("__efmigrationshistory");
+
+            entity.Property(e => e.MigrationId).HasMaxLength(150);
+            entity.Property(e => e.ProductVersion).HasMaxLength(32);
         });
 
         modelBuilder.Entity<Image>(entity =>
@@ -192,6 +204,7 @@ public partial class KopigradContext : DbContext
                 .HasColumnType("int(11)")
                 .HasColumnName("idService");
             entity.Property(e => e.ConditionText).HasMaxLength(1000);
+            entity.Property(e => e.Image).HasColumnName("image");
             entity.Property(e => e.NameService)
                 .HasMaxLength(100)
                 .HasColumnName("nameService");

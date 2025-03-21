@@ -291,17 +291,44 @@
 .ContainerImage {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center; /* Горизонтальное центрирование */
+
     text-align: center;
     height: 40vh;
     width: 40vh;
     background: #101212;
     margin: 3vw 0vw;
     border-radius: 2vh;
+
+}
+
+.TextAdd {
+    font-family: DaysFronts;
+    color: white;
+    width: 40vh;
+    text-align: center;
+    font-size: 2.5vh;
+}
+
+.ImageStyle {
+    margin: 2vh 0vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center; /* Горизонтальное центрирование */
+    vertical-align: central;
+    text-align: center;
+    height: 25vh;
+    width: 25vh;
+    object-fit: contain;
 }
 
 .ButtonDesingAddPicture {
+    display: flex;
+    justify-content: center; /* Центрирование текста по горизонтали */
+    align-items: center; /* Центрирование текста по вертикали */
+    text-align: center;
     font-family: DaysFronts;
     width: 20vw;
     height: 4vw;
@@ -310,7 +337,17 @@
     color: white;
     border-radius: 1vw;
     border: none;
+    cursor: pointer;
+    position: relative; /* Добавляем позиционирование */
 }
+
+    .ButtonDesingAddPicture input {
+        position: absolute; /* Абсолютное позиционирование */
+        width: 100%;
+        height: 100%;
+        opacity: 0; /* Полностью скрываем */
+        cursor: pointer;
+    }
 
 .CenterVertical {
     display: flex;
@@ -335,7 +372,7 @@
     }
 
 .ButtonDesingSavePicture {
-    margin: 0vw 3vw 10vw 2vw;
+    margin: 0vw 3vw 3vw 2vw;
     font-family: DaysFronts;
     width: 10vw;
     height: 5vw;
@@ -347,7 +384,7 @@
 }
 
 .ButtonDesingNoSavePicture {
-    margin: 0vw 3vw 10vw 0vw;
+    margin: 0vw 3vw 3vw 0vw;
     font-family: DaysFronts;
     width: 10vw;
     height: 5vw;
@@ -357,3 +394,90 @@
     border-radius: 0.5vw;
     border: none;
 }
+
+.TextError {
+    color: #ff0000;
+    margin: 3vw 0vw;
+    font-family: DaysFronts;
+    font-size: 1.3vw;
+    margin: 0vw 0vw 10vw 0vw;
+}
+
+.DivService {
+    display: flex; /* Включаем Flexbox */
+    justify-content: space-between; /* Расставляем элементы по горизонтали */
+    width: 44vw;
+    height: auto;
+    flex-wrap: wrap;
+}
+
+.divOneServise {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-items: center; /* Выравниваем элементы по вертикали */
+    border-radius: 0.5vw;
+    margin: 4vw 0vw 0vw 0vw;
+    width: 12vw;
+    height: 12vw;
+    background: #101212;
+}
+
+.TextServise {
+    width: 12vw;
+    text-align: center;
+    color: white;
+    font-family: DaysFronts;
+    font-size: 1vw;
+    text-align: center;
+}
+
+.CenterDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-items: center; /* Выравниваем элементы по вертикали */
+    width: 100vw;
+}
+
+.ImageStyleServiseAll {
+    margin: 2vw 0vw;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center; /* Горизонтальное центрирование */
+    vertical-align: central;
+    text-align: center;
+    height: 6vw;
+    width: 6vw;
+    object-fit: contain;
+}
+
+.ButtonChangeServise {
+    position: absolute;
+    background: #0CC32A;
+    border-radius: 2vw;
+    width: 3vw;
+    height: 3vw;
+    border: none;
+    margin: -1vw 0vw 0vw 10vw;
+
+}
+
+.ButtonDeleteServise {
+    position: absolute;
+    background: #E83939;
+    border-radius: 2vw;
+    width: 3vw;
+    height: 3vw;
+    border: none;
+    margin: -1vw 0vw 0vw 10vw;
+}
+
+
+.ImageButtonChange {
+    width: 1.8vw;
+    height: 1.8vw;
+    object-fit: contain;
+}
+
