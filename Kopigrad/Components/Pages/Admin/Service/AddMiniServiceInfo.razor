@@ -1,0 +1,191 @@
+﻿@page "/AddMiniServiceInfo/{id:int}"
+
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
+
+<div class="Banner">
+    <h5 class="TextBanner">Редактирование содержания @nameBanner</h5>
+</div>
+<div class="CenterVertical">
+
+    <h1 class="TextNameMiniService">Название</h1>
+    <input class="InputNameMiniService" />
+
+
+    <table class="TableBorder">
+
+        @for (int i = 0; i < trSum; i++)
+        {
+
+            <tr class="TableBorderTr">
+
+
+                @for (int j = 0; j < tdSum; j++)
+                {
+
+                    if (i == 0 && j == 0)
+                    {
+                        <td class="TableBorderTd">
+                            <input @bind="topCategory" class="InputTable" />
+                            <br />
+                            <input @bind="bottomCategory" class="InputTable" />
+                        </td>
+                    }
+                    else if (i > 0 && j > 0)
+                    {
+                        <td class="TableBorderTd">
+                            <input type="number" class="InputTable" />
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="TableBorderTd">
+                            <input class="InputTable" />
+                        </td>
+                    }
+                }
+
+                @if (i == 0)
+                {
+                    <td rowspan="@(trSum)" class="TableBorderTd">
+
+
+                        <button @onclick="PlusTd" class="ButtonPlus">
+                        </button>
+                        <br />
+                        <button @onclick="MinusTd" class="ButtonMinus">
+                        </button>
+
+                    </td>
+                }
+
+            </tr>
+
+
+        }
+    </table>
+    <table class="TableBorderPlusMinusTr">
+
+        <tr>
+
+            <td>
+
+                <div class="divButtonTr">
+                    <button @onclick="PlusTr" class="ButtonPlus">
+                    </button>
+
+                    <button @onclick="MinusTr" class="ButtonMinus">
+                    </button>
+                </div>
+
+            </td>
+
+
+        </tr>
+    </table>
+
+   
+
+
+    <div class="TextContainerMenuAdmin">
+        <button @onclick="ClickChange" class="ButtonDesingSavePicture">Cохранить изменения</button>
+
+        <button @onclick="ClickExit" class="ButtonDesingNoSavePicture">Выход без сохранения</button>
+
+    </div>
+
+
+
+
+</div>
+
+
+
+
+
+
+@code {
+
+    [Parameter]
+    public int? id { get; set; }
+
+    string nameBanner = "";
+
+    int trSum = 3;
+    int tdSum = 2;
+
+    int countInfo = 0;
+
+    string topCategory = "";
+    string bottomCategory = "";
+
+    protected override void OnInitialized()
+    {
+        Classes.Admin.Servise.ManagmentServiseClasses managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
+        nameBanner = managmentServise.GetName(Convert.ToInt32(id));
+    }
+
+
+    public void PlusTr()
+    {
+        trSum++;
+        StateHasChanged();
+    }
+
+    public void MinusTr()
+    {
+        if (trSum - 1 > 1)
+        {
+            trSum--;
+            StateHasChanged();
+        }
+    }
+
+
+    public void PlusTd()
+    {
+        if (tdSum < 9)
+        {
+            tdSum++;
+            StateHasChanged();
+        }
+
+    }
+
+    public void MinusTd()
+    {
+        if (tdSum - 1 > 1)
+        {
+            tdSum--;
+            StateHasChanged();
+        }
+    }
+
+    public void PlusTable()
+    {
+        countInfo++;
+        StateHasChanged();
+    }
+
+    public void MinusTable()
+    {
+        if (countInfo >= 0)
+        {
+            countInfo--;
+            StateHasChanged();
+        }
+    }
+
+
+
+    private void ClickChange()
+    {
+
+    }
+
+    public void ClickExit()
+    {
+        Navigation.NavigateTo($"/AddInfoService/{id}");
+    }
+}

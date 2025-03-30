@@ -72,5 +72,17 @@ namespace Kopigrad.Components.Classes.Admin.Servise
 
             }
         }
+
+
+        public string GetName(int id)
+        {
+            string name = "";
+            using (var context = new KopigradContext())
+            {
+                name = context.Services.Where(x => x.IdService == id).Select(x => x.NameService).FirstOrDefault();
+
+            }
+            return name;
+        }
     }
 }

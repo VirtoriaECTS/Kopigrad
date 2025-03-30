@@ -1,0 +1,103 @@
+﻿@page "/ChangeMiniService/{id:int}"
+
+<table class="TableBorder">
+
+    @for (int i = 0; i < trSum; i++)
+    {
+
+        <tr class="TableBorderTr">
+
+
+            @for (int j = 0; j < tdSum; j++)
+            {
+
+                if (i == 0 && j == 0)
+                {
+                    <td class="TableBorderTd">
+                        <input  class="InputTable" />
+                        <br />
+                        <input class="InputTable" />
+                    </td>
+                }
+                else if (i > 0 && j > 0)
+                {
+                    <td class="TableBorderTd">
+                        <input type="number" class="InputTable" />
+                    </td>
+                }
+                else
+                {
+                    <td class="TableBorderTd">
+                        <input class="InputTable" />
+                    </td>
+                }
+            }
+
+            @if (i == 0)
+            {
+                <td rowspan="@(trSum)" class="TableBorderTd">
+
+
+                    <button @onclick="PlusTd" class="ButtonPlus">
+                    </button>
+                    <br />
+                    <button @onclick="MinusTd" class="ButtonMinus">
+                    </button>
+
+                </td>
+            }
+
+        </tr>
+
+
+    }
+</table>
+
+
+@code {
+    [Parameter]
+    public int? id { get; set; }
+
+    int trSum = 3;
+    int tdSum = 2;
+
+    private List<List<string>> TableData = new();
+
+
+    public void PlusTr()
+    {
+        trSum++;
+        StateHasChanged();
+    }
+
+    public void MinusTr()
+    {
+        if (trSum - 1 > 1)
+        {
+            trSum--;
+            StateHasChanged();
+        }
+    }
+
+
+    public void PlusTd()
+    {
+        if (tdSum < 9)
+        {
+            tdSum++;
+            StateHasChanged();
+        }
+
+    }
+
+    public void MinusTd()
+    {
+        if (tdSum - 1 > 1)
+        {
+            tdSum--;
+            StateHasChanged();
+        }
+    }
+
+
+}

@@ -1,0 +1,91 @@
+﻿@page "/AddInfoService/{id:int}"
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
+
+<div class="Banner">
+    <h5 class="TextBanner">Редактирование содержания @nameBanner</h5>
+</div>
+<div class="CenterVertical">
+
+    <h1 class="TextNameAddInfoServise">Услуги</h1>
+
+    <table class="TableBorder">
+
+      
+            <tr class="TableBorderTr">
+
+            <td >
+                <h1 class="TextTable">Название</h1>
+            </td>
+
+            <td class="TableBorderTdButten">
+                <button class="ButtonChangeServiceMini">
+                </button>
+                <button class="ButtonMinus">
+                </button>
+            </td>
+            </tr>
+
+    </table>
+
+
+    <button @onclick="ClickPlus" class="ButtonPlus">
+    </button>
+
+    <h1 class="TextNameAddInfoServise">Общая информация</h1>
+
+
+    <h1 class="TextNameMiniService">Условия</h1>
+    <input class="InputNameMiniService" />
+
+
+    <h1 class="TextNameMiniService">Срок</h1>
+
+    <input class="InputNameMiniService" />
+
+    <div class="TextContainerMenuAdmin">
+        <button  class="ButtonDesingSavePicture">Cохранить изменения</button>
+
+        <button @onclick="ClickExit" class="ButtonDesingNoSavePicture">Выход без сохранения</button>
+
+    </div>
+
+
+
+
+</div>
+
+
+
+
+
+
+@code {
+
+
+    [Parameter]
+    public int? id { get; set; }
+
+    string nameBanner = "";
+
+
+    protected override void OnInitialized()
+    {
+        Classes.Admin.Servise.ManagmentServiseClasses managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
+        nameBanner = managmentServise.GetName(Convert.ToInt32(id));
+    }
+
+
+    public void ClickPlus()
+    {
+        Navigation.NavigateTo($"/AddMiniServiceInfo/{id}");
+    }
+
+  
+
+    public void ClickExit()
+    {
+        Navigation.NavigateTo("/Servise");
+    }
+}

@@ -18,7 +18,7 @@
         @foreach (var text in services)
         {
 
-            <div class="divOneServise">
+            <div @onclick="() => ClickInfoService(text.IdService)" class="divOneServise">
                 <button @onclick="() => ClickServiceChangeOne(text.IdService)" hidden="@buttonChange" class="ButtonChangeServise">
                     <img class="ImageButtonChange" src="Image/changeIcon.png" />
                 </button>
@@ -53,8 +53,9 @@
 </div>
 
 @code {
+
     bool buttonChange = true;
-    bool buttonDelete= true;
+    bool buttonDelete = true;
 
     private string? GetImageSrc(byte[] Image)
     {
@@ -113,6 +114,15 @@
         buttonDelete = true;
         StateHasChanged();
 
+
+    }
+
+    public void ClickInfoService(int id)
+    {
+        if (buttonChange && buttonDelete)
+        {
+            Navigation.NavigateTo($"/AddInfoService/{id}");
+        }
 
     }
 }

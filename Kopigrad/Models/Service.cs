@@ -15,5 +15,5 @@ public partial class Service
 
     public byte[] Image { get; set; } = null!;
 
-    public virtual ICollection<Categoryservice> Categoryservices { get; set; } = new List<Categoryservice>();
+    public virtual ICollection<Miniservice> Miniservices { get; set; } = new List<Miniservice>();
 }

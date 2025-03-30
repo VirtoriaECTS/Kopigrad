@@ -9,9 +9,15 @@ public partial class Viewcategory
 
     public int IdCategory { get; set; }
 
-    public string NameView { get; set; } = null!;
+    public int IdView { get; set; }
+
+    public string NameStobets { get; set; } = null!;
 
     public virtual Category IdViewCategoryNavigation { get; set; } = null!;
 
-    public virtual ICollection<Priceview> Priceviews { get; set; } = new List<Priceview>();
+    public virtual Viewmaterial IdViewNavigation { get; set; } = null!;
+
+    public virtual ICollection<Price> Prices { get; set; } = new List<Price>();
+
+    public virtual ICollection<Requstсontent> Requstсontents { get; set; } = new List<Requstсontent>();
 }

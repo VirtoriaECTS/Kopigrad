@@ -481,3 +481,135 @@
     object-fit: contain;
 }
 
+.TextNameMiniService {
+    width: 100vw;
+    font-family: DaysFronts;
+    color: black;
+    font-size: 2.5vh;
+    text-align: left;
+    margin: 3vh 0vw 3vh 20vw;
+}
+
+
+.TextNameAddInfoServise {
+    width: 100vw;
+    font-family: DaysFronts;
+    color: black;
+    font-size: 2.5vh;
+    text-align: center;
+    margin: 4vh 0vw 1vh 0vw;
+}
+
+.InputNameMiniService {
+    width: 80vw;
+    height: auto;
+    min-height: 5vh;
+    background: white;
+    font-family: DaysFronts;
+    color: black;
+    font-size: 2vh;
+    border: black solid 0.2vh;
+    border-radius: 1vh;
+    margin: 0vh 0vw 3vh 0vw;
+}
+
+.TableBorder {
+    width: 80vw;
+    height: auto;
+    border: black solid 0.2vh;
+    border-radius: 1vh;
+}
+
+.TableBorderTr {
+    width: 80vw;
+    height: 5vh;
+    border: black solid 0.2vh;
+}
+
+.TableBorderTd {
+    width: auto;
+    height: auto;
+    border: black solid 0.2vh;
+    text-align: center; 
+}
+
+.TableBorderTdButten {
+    width: auto;
+    height: auto;
+    text-align: right;
+}
+
+
+.ButtonPlus {
+    margin: 1vh 1vh 1vh 1vh;
+    width: 3vh;
+    height: 3vh;
+    border-radius: 0.1vh;
+    background: #414541;
+    background-image: url('Image/plus.png');
+    background-size: cover;
+}
+
+.ButtonMinus {
+    margin: 1vh 1vh 1vh 1vh;
+    width: 3vh;
+    height: 3vh;
+    border-radius: 0.1vh;
+    background: #414541;
+    background-image: url('Image/minus.png');
+    background-size: cover;
+}
+
+.ButtonChangeServiceMini {
+    margin: 1vh 1vh 1vh 1vh;
+    width: 3vh;
+    height: 3vh;
+    border-radius: 0.1vh;
+    background: #414541;
+    background-image: url('Image/changeIcon.png');
+    background-size: cover;
+}
+
+.divButtonTr {
+    height: 5vh;
+    width: 80vw;
+    text-align: center;
+    vertical-align: central;
+}
+
+
+.TableBorderPlusMinusTr {
+    width: 80vw;
+    height: auto;
+    border-left: black solid 0.2vh;
+    border-right: black solid 0.2vh;
+    border-bottom: black solid 0.2vh;
+    border-radius: 1vh;
+}
+
+
+.DivServiceHorisontal {
+    display: flex; /* Включаем Flexbox */
+    justify-content: space-between; /* Расставляем элементы по горизонтали */
+    width: 90vw;
+    height: auto;
+}
+
+.TextTable {
+    font-family: DaysFronts;
+    color: black;
+    font-size: 2vh;
+    margin: 0.5vh 0vw 0vh 5vw;
+}
+
+.TextTableMaterial {
+    font-family: DaysFronts;
+    color: black;
+    font-size: 2vh;
+}
+
+.TextTableMaterialInput {
+    font-family: DaysFronts;
+    color: black;
+    font-size: 1.6vh;
+}

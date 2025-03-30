@@ -1,0 +1,164 @@
+﻿@page "/AddMaterial"
+@layout Layout.Menu.MenuAdmin;
+@rendermode InteractiveServer
+@using Kopigrad.Models;
+
+
+<div class="Banner">
+    <h5 class="TextBanner">Материалы</h5>
+</div>
+
+<div class="CenterVertical" >
+    <table class="TableBorder" style="margin: 5vh 0vh;">
+        <tr class="TableBorderTr">
+
+            <td class="TableBorderTd">
+
+
+                <h5 class="TextTableMaterial">Наименование</h5>
+
+            </td>
+
+
+            <td class="TableBorderTd">
+
+                <h5 class="TextTableMaterial">Количество на складе</h5>
+
+
+            </td>
+
+            <td class="TableBorderTd">
+
+                <h5 class="TextTableMaterial">Управление</h5>
+
+
+            </td>
+
+        </tr>
+
+        @foreach (var oneMaterial in viewmaterials)
+        {
+
+            <tr class="TableBorderTr">
+
+                <td class="TableBorderTd">
+
+
+                    <input class="TextTableMaterialInput" @bind="oneMaterial.NameView" />
+
+                </td>
+
+
+                <td class="TableBorderTd">
+
+
+                    <input type="number" class="TextTableMaterialInput" @bind="oneMaterial.Count" />
+
+                </td>
+
+                <td class="TableBorderTd">
+
+
+                    <button @onclick="() => ClickChange(oneMaterial.NameView, oneMaterial.Count, oneMaterial.IdView)" class="ButtonChangeServiceMini">
+                    </button>
+                    <br />
+                    <button @onclick="() => ClickDelete(oneMaterial.IdView)" class="ButtonMinus">
+                    </button>
+
+                </td>
+
+            </tr>
+
+
+        }
+
+
+        <tr class="TableBorderTr">
+
+            <td class="TableBorderTd">
+
+
+                <input class="TextTableMaterialInput" @bind="nameNew" />
+
+            </td>
+
+
+            <td class="TableBorderTd">
+
+
+                <input type="number" class="TextTableMaterialInput" @bind="countNew" />
+
+            </td>
+
+            <td class="TableBorderTd">
+
+                <br />
+                <button @onclick="ClickAdd" class="ButtonPlus">
+                </button>
+
+            </td>
+
+        </tr>
+    </table>
+
+    <h1 class="TextError">@error</h1>
+
+    <div class="TextContainerMenuAdmin">
+        <button  class="ButtonDesingSavePicture">Cохранить изменения</button>
+
+        <button  class="ButtonDesingNoSavePicture">Выход без сохранения</button>
+
+    </div>
+</div>
+
+
+
+
+@code {
+    List<Viewmaterial> viewmaterials = new List<Viewmaterial>();
+
+    string nameNew = "";
+    int countNew = 0;
+    string error = "";
+
+    Classes.Admin.Servise.ManagerMaterial manager = new Classes.Admin.Servise.ManagerMaterial();
+
+    protected override async Task OnInitializedAsync()
+    {
+        viewmaterials = manager.GetList();
+    }
+
+    public void Update()
+    {
+        viewmaterials.Clear();
+        viewmaterials = manager.GetList();
+        StateHasChanged();
+    }
+
+    public void ClickAdd()
+    {
+        error = "";
+
+        error = manager.Add(nameNew, countNew);
+        nameNew = "";
+        countNew = 0;
+
+        Update();
+    }
+
+
+    public void ClickDelete(int id)
+    {
+        manager.Delete(id);
+
+        Update();
+    }
+
+
+    public void ClickChange(string name, int count, int id)
+    {
+        manager.Change(name, count, id);
+
+        Update();
+    }
+}

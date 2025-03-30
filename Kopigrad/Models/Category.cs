@@ -7,11 +7,11 @@ public partial class Category
 {
     public int IdCategory { get; set; }
 
+    public int IdMiniService { get; set; }
+
     public string NameCategory { get; set; } = null!;
 
-    public virtual ICollection<Categoryservice> Categoryservices { get; set; } = new List<Categoryservice>();
-
-    public virtual ICollection<Image> Images { get; set; } = new List<Image>();
+    public virtual Miniservice IdMiniServiceNavigation { get; set; } = null!;
 
     public virtual Viewcategory? Viewcategory { get; set; }
 }
