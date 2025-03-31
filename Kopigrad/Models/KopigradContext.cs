@@ -16,19 +16,19 @@ public partial class KopigradContext : DbContext
     {
     }
 
-    public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<Columnname> Columnnames { get; set; }
 
     public virtual DbSet<Efmigrationshistory> Efmigrationshistories { get; set; }
 
+    public virtual DbSet<Material> Materials { get; set; }
+
     public virtual DbSet<Miniservice> Miniservices { get; set; }
 
+    public virtual DbSet<Order> Orders { get; set; }
+
+    public virtual DbSet<Orderitem> Orderitems { get; set; }
+
     public virtual DbSet<Pagepdf> Pagepdfs { get; set; }
-
-    public virtual DbSet<Price> Prices { get; set; }
-
-    public virtual DbSet<Request> Requests { get; set; }
-
-    public virtual DbSet<Requstсontent> Requstсontents { get; set; }
 
     public virtual DbSet<Service> Services { get; set; }
 
@@ -36,11 +36,9 @@ public partial class KopigradContext : DbContext
 
     public virtual DbSet<Storypdf> Storypdfs { get; set; }
 
+    public virtual DbSet<Tableminiservice> Tableminiservices { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
-
-    public virtual DbSet<Viewcategory> Viewcategories { get; set; }
-
-    public virtual DbSet<Viewmaterial> Viewmaterials { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -52,26 +50,28 @@ public partial class KopigradContext : DbContext
             .UseCollation("utf8mb4_general_ci")
             .HasCharSet("utf8mb4");
 
-        modelBuilder.Entity<Category>(entity =>
+        modelBuilder.Entity<Columnname>(entity =>
         {
-            entity.HasKey(e => e.IdCategory).HasName("PRIMARY");
+            entity.HasKey(e => e.IdColumnNames).HasName("PRIMARY");
 
-            entity.ToTable("category");
+            entity.ToTable("columnnames");
 
             entity.HasIndex(e => e.IdMiniService, "idMiniService");
 
-            entity.Property(e => e.IdCategory)
+            entity.Property(e => e.IdColumnNames)
                 .HasColumnType("int(11)")
-                .HasColumnName("idCategory");
+                .HasColumnName("idColumnNames");
             entity.Property(e => e.IdMiniService)
                 .HasColumnType("int(11)")
                 .HasColumnName("idMiniService");
-            entity.Property(e => e.NameCategory).HasColumnType("text");
+            entity.Property(e => e.NameColumn)
+                .HasColumnType("text")
+                .HasColumnName("nameColumn");
 
-            entity.HasOne(d => d.IdMiniServiceNavigation).WithMany(p => p.Categories)
+            entity.HasOne(d => d.IdMiniServiceNavigation).WithMany(p => p.Columnnames)
                 .HasForeignKey(d => d.IdMiniService)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("category_ibfk_1");
+                .HasConstraintName("columnnames_ibfk_1");
         });
 
         modelBuilder.Entity<Efmigrationshistory>(entity =>
@@ -82,6 +82,17 @@ public partial class KopigradContext : DbContext
 
             entity.Property(e => e.MigrationId).HasMaxLength(150);
             entity.Property(e => e.ProductVersion).HasMaxLength(32);
+        });
+
+        modelBuilder.Entity<Material>(entity =>
+        {
+            entity.HasKey(e => e.IdMaterial).HasName("PRIMARY");
+
+            entity.ToTable("material");
+
+            entity.Property(e => e.IdMaterial).HasColumnType("int(11)");
+            entity.Property(e => e.Count).HasColumnType("int(11)");
+            entity.Property(e => e.NameMaterial).HasColumnName("nameMaterial");
         });
 
         modelBuilder.Entity<Miniservice>(entity =>
@@ -95,15 +106,70 @@ public partial class KopigradContext : DbContext
             entity.Property(e => e.IdMiniService)
                 .HasColumnType("int(11)")
                 .HasColumnName("idMiniService");
+            entity.Property(e => e.BottomName).HasColumnType("text");
             entity.Property(e => e.IdService)
                 .HasColumnType("int(11)")
                 .HasColumnName("idService");
-            entity.Property(e => e.NameMunuSercise).HasColumnName("nameMunuSercise");
+            entity.Property(e => e.NameMiniServise).HasColumnName("nameMiniServise");
+            entity.Property(e => e.TopName).HasColumnType("text");
 
             entity.HasOne(d => d.IdServiceNavigation).WithMany(p => p.Miniservices)
                 .HasForeignKey(d => d.IdService)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("miniservice_ibfk_1");
+        });
+
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasKey(e => e.IdOrder).HasName("PRIMARY");
+
+            entity.ToTable("order");
+
+            entity.HasIndex(e => e.IdStatus, "idStatus");
+
+            entity.Property(e => e.IdOrder).HasColumnType("int(11)");
+            entity.Property(e => e.DataOrder).HasColumnType("datetime");
+            entity.Property(e => e.Email).HasColumnType("text");
+            entity.Property(e => e.IdStatus)
+                .HasColumnType("int(11)")
+                .HasColumnName("idStatus");
+            entity.Property(e => e.Name).HasColumnType("text");
+
+            entity.HasOne(d => d.IdStatusNavigation).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.IdStatus)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("order_ibfk_1");
+        });
+
+        modelBuilder.Entity<Orderitem>(entity =>
+        {
+            entity.HasKey(e => e.IdOrderItems).HasName("PRIMARY");
+
+            entity.ToTable("orderitems");
+
+            entity.HasIndex(e => e.IdOrder, "IdRequst");
+
+            entity.HasIndex(e => e.IdTableMiniService, "IdViewCategory");
+
+            entity.Property(e => e.IdOrderItems)
+                .HasColumnType("int(11)")
+                .HasColumnName("idOrderItems");
+            entity.Property(e => e.Count).HasColumnType("int(11)");
+            entity.Property(e => e.IdOrder).HasColumnType("int(11)");
+            entity.Property(e => e.IdTableMiniService)
+                .HasColumnType("int(11)")
+                .HasColumnName("idTableMiniService");
+            entity.Property(e => e.Price).HasColumnType("int(11)");
+
+            entity.HasOne(d => d.IdOrderNavigation).WithMany(p => p.Orderitems)
+                .HasForeignKey(d => d.IdOrder)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("orderitems_ibfk_1");
+
+            entity.HasOne(d => d.IdTableMiniServiceNavigation).WithMany(p => p.Orderitems)
+                .HasForeignKey(d => d.IdTableMiniService)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("orderitems_ibfk_2");
         });
 
         modelBuilder.Entity<Pagepdf>(entity =>
@@ -126,75 +192,6 @@ public partial class KopigradContext : DbContext
                 .HasForeignKey(d => d.IdStory)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("pagepdf_ibfk_1");
-        });
-
-        modelBuilder.Entity<Price>(entity =>
-        {
-            entity.HasKey(e => e.IdPrice).HasName("PRIMARY");
-
-            entity.ToTable("price");
-
-            entity.HasIndex(e => e.IdView, "IdView");
-
-            entity.Property(e => e.IdPrice).HasColumnType("int(11)");
-            entity.Property(e => e.IdView).HasColumnType("int(11)");
-            entity.Property(e => e.Price1).HasColumnName("Price");
-
-            entity.HasOne(d => d.IdViewNavigation).WithMany(p => p.Prices)
-                .HasForeignKey(d => d.IdView)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("price_ibfk_1");
-        });
-
-        modelBuilder.Entity<Request>(entity =>
-        {
-            entity.HasKey(e => e.IdRequest).HasName("PRIMARY");
-
-            entity.ToTable("request");
-
-            entity.HasIndex(e => e.IdStatus, "idStatus");
-
-            entity.Property(e => e.IdRequest).HasColumnType("int(11)");
-            entity.Property(e => e.DataRequst).HasColumnType("datetime");
-            entity.Property(e => e.Email).HasColumnType("text");
-            entity.Property(e => e.IdStatus)
-                .HasColumnType("int(11)")
-                .HasColumnName("idStatus");
-            entity.Property(e => e.Name).HasColumnType("text");
-
-            entity.HasOne(d => d.IdStatusNavigation).WithMany(p => p.Requests)
-                .HasForeignKey(d => d.IdStatus)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("request_ibfk_1");
-        });
-
-        modelBuilder.Entity<Requstсontent>(entity =>
-        {
-            entity.HasKey(e => e.IdRequstContent).HasName("PRIMARY");
-
-            entity.ToTable("requstсontent");
-
-            entity.HasIndex(e => e.IdRequst, "IdRequst");
-
-            entity.HasIndex(e => e.IdViewCategory, "IdViewCategory");
-
-            entity.Property(e => e.IdRequstContent)
-                .HasColumnType("int(11)")
-                .HasColumnName("idRequstContent");
-            entity.Property(e => e.Count).HasColumnType("int(11)");
-            entity.Property(e => e.IdRequst).HasColumnType("int(11)");
-            entity.Property(e => e.IdViewCategory).HasColumnType("int(11)");
-            entity.Property(e => e.Price).HasColumnType("int(11)");
-
-            entity.HasOne(d => d.IdRequstNavigation).WithMany(p => p.Requstсontents)
-                .HasForeignKey(d => d.IdRequst)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("requstсontent_ibfk_1");
-
-            entity.HasOne(d => d.IdViewCategoryNavigation).WithMany(p => p.Requstсontents)
-                .HasForeignKey(d => d.IdViewCategory)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("requstсontent_ibfk_2");
         });
 
         modelBuilder.Entity<Service>(entity =>
@@ -240,6 +237,48 @@ public partial class KopigradContext : DbContext
                 .HasColumnName("nameFile");
         });
 
+        modelBuilder.Entity<Tableminiservice>(entity =>
+        {
+            entity.HasKey(e => e.IdTableMiniService).HasName("PRIMARY");
+
+            entity.ToTable("tableminiservice");
+
+            entity.HasIndex(e => e.IdColumnNames, "idColumnNames");
+
+            entity.HasIndex(e => e.IdMaterial, "idMaterial");
+
+            entity.HasIndex(e => e.IdMiniService, "idMiniService");
+
+            entity.Property(e => e.IdTableMiniService)
+                .HasColumnType("int(11)")
+                .HasColumnName("idTableMiniService");
+            entity.Property(e => e.IdColumnNames)
+                .HasColumnType("int(11)")
+                .HasColumnName("idColumnNames");
+            entity.Property(e => e.IdMaterial)
+                .HasColumnType("int(100)")
+                .HasColumnName("idMaterial");
+            entity.Property(e => e.IdMiniService)
+                .HasColumnType("int(11)")
+                .HasColumnName("idMiniService");
+            entity.Property(e => e.Price).HasPrecision(10);
+
+            entity.HasOne(d => d.IdColumnNamesNavigation).WithMany(p => p.Tableminiservices)
+                .HasForeignKey(d => d.IdColumnNames)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("tableminiservice_ibfk_3");
+
+            entity.HasOne(d => d.IdMaterialNavigation).WithMany(p => p.Tableminiservices)
+                .HasForeignKey(d => d.IdMaterial)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("tableminiservice_ibfk_2");
+
+            entity.HasOne(d => d.IdMiniServiceNavigation).WithMany(p => p.Tableminiservices)
+                .HasForeignKey(d => d.IdMiniService)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("tableminiservice_ibfk_1");
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.IdUser).HasName("PRIMARY");
@@ -259,48 +298,6 @@ public partial class KopigradContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("nameUser");
             entity.Property(e => e.Salt).HasMaxLength(500);
-        });
-
-        modelBuilder.Entity<Viewcategory>(entity =>
-        {
-            entity.HasKey(e => e.IdViewCategory).HasName("PRIMARY");
-
-            entity.ToTable("viewcategory");
-
-            entity.HasIndex(e => e.IdView, "idView");
-
-            entity.Property(e => e.IdViewCategory)
-                .ValueGeneratedOnAdd()
-                .HasColumnType("int(11)")
-                .HasColumnName("idViewCategory");
-            entity.Property(e => e.IdCategory)
-                .HasColumnType("int(11)")
-                .HasColumnName("idCategory");
-            entity.Property(e => e.IdView)
-                .HasColumnType("int(100)")
-                .HasColumnName("idView");
-            entity.Property(e => e.NameStobets).HasColumnName("nameStobets");
-
-            entity.HasOne(d => d.IdViewNavigation).WithMany(p => p.Viewcategories)
-                .HasForeignKey(d => d.IdView)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("viewcategory_ibfk_2");
-
-            entity.HasOne(d => d.IdViewCategoryNavigation).WithOne(p => p.Viewcategory)
-                .HasForeignKey<Viewcategory>(d => d.IdViewCategory)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("viewcategory_ibfk_1");
-        });
-
-        modelBuilder.Entity<Viewmaterial>(entity =>
-        {
-            entity.HasKey(e => e.IdView).HasName("PRIMARY");
-
-            entity.ToTable("viewmaterial");
-
-            entity.Property(e => e.IdView).HasColumnType("int(11)");
-            entity.Property(e => e.Count).HasColumnType("int(11)");
-            entity.Property(e => e.NameView).HasColumnName("nameView");
         });
 
         OnModelCreatingPartial(modelBuilder);

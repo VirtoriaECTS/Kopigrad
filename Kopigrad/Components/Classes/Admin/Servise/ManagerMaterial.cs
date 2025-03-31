@@ -6,12 +6,12 @@ namespace Kopigrad.Components.Classes.Admin.Servise
     public class ManagerMaterial
     {
 
-        public List<Viewmaterial> GetList()
+        public List<Material> GetList()
         {
-            List < Viewmaterial> viewmaterials = new List < Viewmaterial > ();
+            List<Material> viewmaterials = new List<Material>();
             using (var context = new KopigradContext())
             {
-                viewmaterials = context.Viewmaterials.Where(x => x.Count > -1).ToList();
+                viewmaterials = context.Materials.Where(x => x.Count > -1).ToList();
 
             }
             return viewmaterials;
@@ -25,13 +25,13 @@ namespace Kopigrad.Components.Classes.Admin.Servise
 
             using (var context = new KopigradContext())
             {
-                var materialNew = new Viewmaterial
+                var materialNew = new Material
                 {
-                    NameView = nameMaterial,
+                    NameMaterial = nameMaterial,
                     Count = count
                 };
 
-                context.Viewmaterials.Add(materialNew);
+                context.Materials.Add(materialNew);
                 context.SaveChanges();
 
             }
@@ -44,7 +44,7 @@ namespace Kopigrad.Components.Classes.Admin.Servise
         {
             using (var context = new KopigradContext())
             {
-                var material = context.Viewmaterials.Where(x => x.IdView == idMateral).FirstOrDefault();
+                var material = context.Materials.Where(x => x.IdMaterial == idMateral).FirstOrDefault();
 
                 material.Count = -1;
 
@@ -62,9 +62,9 @@ namespace Kopigrad.Components.Classes.Admin.Servise
 
             using (var context = new KopigradContext())
             {
-                var materal = context.Viewmaterials.Where(x => x.IdView == id).FirstOrDefault();
+                var materal = context.Materials.Where(x => x.IdMaterial == id).FirstOrDefault();
 
-                materal.NameView = nameMaterial;
+                materal.NameMaterial = nameMaterial;
                 materal.Count = count;
 
                 context.SaveChanges();

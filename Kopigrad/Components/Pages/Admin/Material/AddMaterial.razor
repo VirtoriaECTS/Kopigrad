@@ -1,7 +1,7 @@
 ﻿@page "/AddMaterial"
 @layout Layout.Menu.MenuAdmin;
 @rendermode InteractiveServer
-@using Kopigrad.Models;
+ @using Kopigrad.Models;
 
 
 <div class="Banner">
@@ -44,7 +44,7 @@
                 <td class="TableBorderTd">
 
 
-                    <input class="TextTableMaterialInput" @bind="oneMaterial.NameView" />
+                    <input class="TextTableMaterialInput" @bind="oneMaterial.NameMaterial" />
 
                 </td>
 
@@ -59,10 +59,10 @@
                 <td class="TableBorderTd">
 
 
-                    <button @onclick="() => ClickChange(oneMaterial.NameView, oneMaterial.Count, oneMaterial.IdView)" class="ButtonChangeServiceMini">
+                    <button @onclick="() => ClickChange(oneMaterial.NameMaterial, oneMaterial.Count, oneMaterial.IdMaterial)" class="ButtonChangeServiceMini">
                     </button>
                     <br />
-                    <button @onclick="() => ClickDelete(oneMaterial.IdView)" class="ButtonMinus">
+                    <button @onclick="() => ClickDelete(oneMaterial.IdMaterial)" class="ButtonMinus">
                     </button>
 
                 </td>
@@ -115,7 +115,7 @@
 
 
 @code {
-    List<Viewmaterial> viewmaterials = new List<Viewmaterial>();
+    List<Material> viewmaterials = new List<Material>();
 
     string nameNew = "";
     int countNew = 0;

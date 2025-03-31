@@ -35,7 +35,7 @@ namespace Kopigrad.Components.Classes.Admin.Servise
         {
             Service service;
 
-            using(var context = new KopigradContext())
+            using (var context = new KopigradContext())
             {
                 service = context.Services.Where(x => x.IdService == id).FirstOrDefault();
             }

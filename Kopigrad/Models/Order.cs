@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Kopigrad.Models;
 
-public partial class Request
+public partial class Order
 {
-    public int IdRequest { get; set; }
+    public int IdOrder { get; set; }
 
     public string Name { get; set; } = null!;
 
@@ -13,9 +13,9 @@ public partial class Request
 
     public int IdStatus { get; set; }
 
-    public DateTime DataRequst { get; set; }
+    public DateTime DataOrder { get; set; }
 
     public virtual Status IdStatusNavigation { get; set; } = null!;
 
-    public virtual ICollection<Requstсontent> Requstсontents { get; set; } = new List<Requstсontent>();
+    public virtual ICollection<Orderitem> Orderitems { get; set; } = new List<Orderitem>();
 }

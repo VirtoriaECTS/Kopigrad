@@ -9,9 +9,15 @@ public partial class Miniservice
 
     public int IdService { get; set; }
 
-    public string NameMunuSercise { get; set; } = null!;
+    public string NameMiniServise { get; set; } = null!;
 
-    public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
+    public string TopName { get; set; } = null!;
+
+    public string BottomName { get; set; } = null!;
+
+    public virtual ICollection<Columnname> Columnnames { get; set; } = new List<Columnname>();
 
     public virtual Service IdServiceNavigation { get; set; } = null!;
+
+    public virtual ICollection<Tableminiservice> Tableminiservices { get; set; } = new List<Tableminiservice>();
 }

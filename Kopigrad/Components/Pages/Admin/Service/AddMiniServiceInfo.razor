@@ -26,6 +26,7 @@
 
                     if (i == 0 && j == 0)
                     {
+                        @* шапка слева с двумя данными *@
                         <td class="TableBorderTd">
                             <input @bind="topCategory" class="InputTable" />
                             <br />
@@ -34,20 +35,37 @@
                     }
                     else if (i > 0 && j > 0)
                     {
+                        @* шапка далее *@
                         <td class="TableBorderTd">
                             <input type="number" class="InputTable" />
                         </td>
                     }
+                    else if(j == 0)
+                    {
+                        @* выбор материала *@
+                        <td class="TableBorderTd">
+                            <select>
+                                @foreach (var material in viewmaterials)
+                                {
+                                    <option value="@material.IdMaterial">@material.NameMaterial</option>
+                                }
+                            </select>
+
+                        </td>
+                    }
                     else
                     {
+                        @* цены *@
                         <td class="TableBorderTd">
                             <input class="InputTable" />
                         </td>
                     }
+
                 }
 
                 @if (i == 0)
                 {
+                    @* кнопки *@
                     <td rowspan="@(trSum)" class="TableBorderTd">
 
 
@@ -120,10 +138,37 @@
     string topCategory = "";
     string bottomCategory = "";
 
+
+
+
+
+
+    private List<string> headerLeft = new();
+    private List<string> headerTop = new();
+    private List<int> materialSelection = new();
+    private List<List<decimal>> prices = new();
+
+    private List<int> selectedMaterials = new();
+    private List<List<string>> priceInputs = new();
+
+    List<Models.Material> viewmaterials = new List<Models.Material>();
+
     protected override void OnInitialized()
     {
         Classes.Admin.Servise.ManagmentServiseClasses managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
+        Classes.Admin.Servise.ManagerMaterial managerMaterial = new Classes.Admin.Servise.ManagerMaterial();
+
         nameBanner = managmentServise.GetName(Convert.ToInt32(id));
+        viewmaterials = managerMaterial.GetList();
+
+
+
+        for (int i = 0; i < trSum - 1; i++)
+        {
+            selectedMaterials.Add(viewmaterials.First().IdMaterial); // Устанавливаем начальный материал
+            priceInputs.Add(new List<string>(new string[tdSum - 1])); // Создаём список для хранения цен
+        }
+
     }
 
 
@@ -181,7 +226,40 @@
 
     private void ClickChange()
     {
+        headerLeft.Clear();
+        headerTop.Clear();
+        materialSelection.Clear();
+        prices.Clear();
 
+        // Сохранение шапки слева
+        headerLeft.Add(topCategory);
+        headerLeft.Add(bottomCategory);
+
+        // Сохранение шапки сверху
+        for (int j = 1; j < tdSum; j++)
+        {
+            headerTop.Add($"Header_{j}");
+        }
+
+        // Сохранение выбора материалов и цен
+        for (int i = 0; i < selectedMaterials.Count; i++)
+        {
+            materialSelection.Add(selectedMaterials[i]);
+
+            List<decimal> rowPrices = new();
+            for (int j = 0; j < priceInputs[i].Count; j++)
+            {
+                if (decimal.TryParse(priceInputs[i][j], out decimal price))
+                {
+                    rowPrices.Add(price);
+                }
+                else
+                {
+                    rowPrices.Add(0); // Если не смогли преобразовать в число, сохраняем 0
+                }
+            }
+            prices.Add(rowPrices);
+        }
     }
 
     public void ClickExit()
