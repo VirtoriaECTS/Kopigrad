@@ -1,13 +1,24 @@
 ﻿@page "/Pdf"
 @rendermode InteractiveServer
 
+
+
 <div class="Banner">
     <h5 class="TextBanner">PDF расчет</h5>
 </div>
 
+@for(int i = 0; i < 5; i ++){
+    <input @bind="array[i]"/>
+}
+@for (int i = 0; i < 5; i++)
+{
+    <h1>@array[i]</h1>
+}
 
 
 
-@code {
+@code{
+    int[] array = new int[9];
+
 
 }

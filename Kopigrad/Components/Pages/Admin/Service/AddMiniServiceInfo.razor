@@ -10,7 +10,7 @@
 <div class="CenterVertical">
 
     <h1 class="TextNameMiniService">Название</h1>
-    <input class="InputNameMiniService" />
+    <input @bind="nameMiniService" class="InputNameMiniService" />
 
 
     <table class="TableBorder">
@@ -26,55 +26,52 @@
 
                     if (i == 0 && j == 0)
                     {
-                        @* шапка слева с двумя данными *@
+                        @* Левая шапка с двумя данными  *@
                         <td class="TableBorderTd">
-                            <input @bind="topCategory" class="InputTable" />
+                            <input @bind="topCategory" class="InputTable"  />
                             <br />
-                            <input @bind="bottomCategory" class="InputTable" />
+                            <input @bind="bottomCategory" class="InputTable"  />
                         </td>
                     }
-                    else if (i > 0 && j > 0)
+                    else if (i == 0 && j > 0)
                     {
-                        @* шапка далее *@
+                        @* Шапка таблицы *@
                         <td class="TableBorderTd">
-                            <input type="number" class="InputTable" />
+
+                            <input value="@GetValue(j-1)" @oninput="e => UpdateValue(j-1, e.Value)"
+                                   class="InputTable" placeholder="@(j-1)" />
+
+
                         </td>
                     }
-                    else if(j == 0)
+                    else if (i > 0 && j == 0)
                     {
-                        @* выбор материала *@
+                        @* Выбор материала *@
                         <td class="TableBorderTd">
-                            <select>
+                            <select @onchange="e => GetMaterial(e, i)">
                                 @foreach (var material in viewmaterials)
                                 {
                                     <option value="@material.IdMaterial">@material.NameMaterial</option>
                                 }
+                                }
                             </select>
-
                         </td>
                     }
-                    else
+                    else if (i > 0 && j > 0)
                     {
-                        @* цены *@
+                        @*Цена*@
                         <td class="TableBorderTd">
-                            <input class="InputTable" />
+                            <input type="number" class="InputTable" placeholder="Цена" />
                         </td>
                     }
-
                 }
 
                 @if (i == 0)
                 {
-                    @* кнопки *@
                     <td rowspan="@(trSum)" class="TableBorderTd">
-
-
-                        <button @onclick="PlusTd" class="ButtonPlus">
-                        </button>
+                        <button @onclick="PlusTd" class="ButtonPlus"></button>
                         <br />
-                        <button @onclick="MinusTd" class="ButtonMinus">
-                        </button>
-
+                        <button @onclick="MinusTd" class="ButtonMinus"></button>
                     </td>
                 }
 
@@ -120,7 +117,9 @@
 
 
 
-
+<h4>@text</h4>
+<h4>  @mat</h4>
+<button @onclick="cheak">ФФФФФФФФФФФ</button>
 
 
 @code {
@@ -129,6 +128,8 @@
     public int? id { get; set; }
 
     string nameBanner = "";
+
+    string nameMiniService = "";
 
     int trSum = 3;
     int tdSum = 2;
@@ -139,17 +140,33 @@
     string bottomCategory = "";
 
 
+    string text = "";
+    string mat = "";
+
+    //Создание листов для сохранения
+
+    Dictionary<int, string> header = new Dictionary<int, string>();
+    Dictionary<int, int> valueMaterial = new Dictionary<int, int>();
+    List<List<int>> priceList = new List<List<int>>();
 
 
+    public  void cheak()
+    {
+        text = "";
+        mat = "";
+        foreach(var txt in header)
+        {
+            text += txt.Value + " ";
+        }
+
+        foreach(int m in valueMaterial.Values)
+        {
+            mat += m + " ";
+        }
 
 
-    private List<string> headerLeft = new();
-    private List<string> headerTop = new();
-    private List<int> materialSelection = new();
-    private List<List<decimal>> prices = new();
+    }
 
-    private List<int> selectedMaterials = new();
-    private List<List<string>> priceInputs = new();
 
     List<Models.Material> viewmaterials = new List<Models.Material>();
 
@@ -161,20 +178,41 @@
         nameBanner = managmentServise.GetName(Convert.ToInt32(id));
         viewmaterials = managerMaterial.GetList();
 
+        // Инициализируем header под количество колонок
+
+    }
 
 
-        for (int i = 0; i < trSum - 1; i++)
-        {
-            selectedMaterials.Add(viewmaterials.First().IdMaterial); // Устанавливаем начальный материал
-            priceInputs.Add(new List<string>(new string[tdSum - 1])); // Создаём список для хранения цен
-        }
+    public void GetMaterial(ChangeEventArgs e, int index)
+    {
+        valueMaterial[index] = Convert.ToInt32(e.Value);
 
+    }
+
+    // Получить значение из словаря
+    private string GetValue(int index)
+    {
+        return header.ContainsKey(index) ? header[index] : string.Empty;
+    }
+
+    // Обновить значение в словаре
+    private void UpdateValue(int index, object value)
+    {
+        header[index] = Convert.ToString(value);
+    }
+
+    private void ClickChange()
+    {
+
+
+        Navigation.NavigateTo($"/AddInfoService/{id}");
     }
 
 
     public void PlusTr()
     {
         trSum++;
+
         StateHasChanged();
     }
 
@@ -182,10 +220,13 @@
     {
         if (trSum - 1 > 1)
         {
+            valueMaterial.Remove(trSum);
             trSum--;
             StateHasChanged();
+
         }
     }
+
 
 
     public void PlusTd()
@@ -193,74 +234,27 @@
         if (tdSum < 9)
         {
             tdSum++;
+
             StateHasChanged();
         }
-
     }
 
     public void MinusTd()
     {
-        if (tdSum - 1 > 1)
+        if (tdSum > 2) // Минимальное количество колонок = 2
         {
+            header.Remove(tdSum);
             tdSum--;
-            StateHasChanged();
-        }
-    }
 
-    public void PlusTable()
-    {
-        countInfo++;
-        StateHasChanged();
-    }
-
-    public void MinusTable()
-    {
-        if (countInfo >= 0)
-        {
-            countInfo--;
             StateHasChanged();
         }
     }
 
 
 
-    private void ClickChange()
-    {
-        headerLeft.Clear();
-        headerTop.Clear();
-        materialSelection.Clear();
-        prices.Clear();
 
-        // Сохранение шапки слева
-        headerLeft.Add(topCategory);
-        headerLeft.Add(bottomCategory);
 
-        // Сохранение шапки сверху
-        for (int j = 1; j < tdSum; j++)
-        {
-            headerTop.Add($"Header_{j}");
-        }
 
-        // Сохранение выбора материалов и цен
-        for (int i = 0; i < selectedMaterials.Count; i++)
-        {
-            materialSelection.Add(selectedMaterials[i]);
-
-            List<decimal> rowPrices = new();
-            for (int j = 0; j < priceInputs[i].Count; j++)
-            {
-                if (decimal.TryParse(priceInputs[i][j], out decimal price))
-                {
-                    rowPrices.Add(price);
-                }
-                else
-                {
-                    rowPrices.Add(0); // Если не смогли преобразовать в число, сохраняем 0
-                }
-            }
-            prices.Add(rowPrices);
-        }
-    }
 
     public void ClickExit()
     {
