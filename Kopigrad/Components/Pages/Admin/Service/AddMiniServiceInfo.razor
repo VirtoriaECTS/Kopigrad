@@ -1,71 +1,70 @@
 ﻿@page "/AddMiniServiceInfo/{id:int}"
-
 @inject NavigationManager Navigation
-
 @rendermode InteractiveServer
 
 <div class="Banner">
     <h5 class="TextBanner">Редактирование содержания @nameBanner</h5>
 </div>
 <div class="CenterVertical">
-
     <h1 class="TextNameMiniService">Название</h1>
     <input @bind="nameMiniService" class="InputNameMiniService" />
 
-
     <table class="TableBorder">
-
         @for (int i = 0; i < trSum; i++)
         {
-
-            <tr class="TableBorderTr">
-
-
+            <tr class="TableBorderTr" @key="i">
                 @for (int j = 0; j < tdSum; j++)
                 {
-
-                    if (i == 0 && j == 0)
-                    {
-                        @* Левая шапка с двумя данными  *@
-                        <td class="TableBorderTd">
-                            <input @bind="topCategory" class="InputTable"  />
+                    <td class="TableBorderTd" @key="j">
+                        @if (i == 0 && j == 0)
+                        {
+                            <!-- Левая шапка с двумя данными -->
+                            <input @bind="topCategory" @bind:event="oninput" class="InputTable" />
                             <br />
-                            <input @bind="bottomCategory" class="InputTable"  />
-                        </td>
-                    }
-                    else if (i == 0 && j > 0)
-                    {
-                        @* Шапка таблицы *@
-                        <td class="TableBorderTd">
+                            <input @bind="bottomCategory" @bind:event="oninput" class="InputTable" />
+                        }
+                        else if (i == 0 && j > 0)
+                        {
+                            int indexHeader = (j - 1);
+                            @if (headerValues.Count <= indexHeader)
+                            {
+                                while (headerValues.Count <= indexHeader)
+                                {
+                                    headerValues.Add(string.Empty); // Добавляем недостающие значения
+                                }
+                            }
 
-                            <input value="@GetValue(j-1)" @oninput="e => UpdateValue(j-1, e.Value)"
-                                   class="InputTable" placeholder="@(j-1)" />
+                            <input @bind="headerValues[indexHeader]"
+                                   @bind:event="oninput"
+                                   class="InputTable"
+                            placeholder="Заголовок @indexHeader" />
 
 
-                        </td>
-                    }
-                    else if (i > 0 && j == 0)
-                    {
-                        @* Выбор материала *@
-                        <td class="TableBorderTd">
-                            <select @onchange="e => GetMaterial(e, i)">
+                        }
+                        else if (i > 0 && j == 0)
+                        {
+                            <!-- Выбор материала -->
+                            int indexMaterial = (i - 1);
+                            <select @bind="rowsData[indexMaterial].SelectedMaterialId" class="InputTable">
+                                <option value="0">-- Выберите материал --</option>
                                 @foreach (var material in viewmaterials)
                                 {
                                     <option value="@material.IdMaterial">@material.NameMaterial</option>
                                 }
-                                }
                             </select>
-                        </td>
-                    }
-                    else if (i > 0 && j > 0)
-                    {
-                        @*Цена*@
-                        <td class="TableBorderTd">
-                            <input type="number" class="InputTable" placeholder="Цена" />
-                        </td>
-                    }
+                        }
+                        else if (i > 0 && j > 0)
+                        {
+                            <!-- Цена -->
+                            int indexPriceI = (i - 1);
+                            int indexPriceJ = (j - 1);
+                            <input type="number"
+                                   @bind="rowsData[indexPriceI].Prices[indexPriceJ]"
+                                   @bind:event="oninput"
+                                   class="InputTable" placeholder="Цена" />
+                        }
+                    </td>
                 }
-
                 @if (i == 0)
                 {
                     <td rowspan="@(trSum)" class="TableBorderTd">
@@ -74,190 +73,272 @@
                         <button @onclick="MinusTd" class="ButtonMinus"></button>
                     </td>
                 }
-
             </tr>
-
-
         }
     </table>
+
     <table class="TableBorderPlusMinusTr">
-
         <tr>
-
             <td>
-
                 <div class="divButtonTr">
-                    <button @onclick="PlusTr" class="ButtonPlus">
-                    </button>
-
-                    <button @onclick="MinusTr" class="ButtonMinus">
-                    </button>
+                    <button @onclick="PlusTr" class="ButtonPlus"></button>
+                    <button @onclick="MinusTr" class="ButtonMinus"></button>
                 </div>
-
             </td>
-
-
         </tr>
     </table>
 
-   
-
-
     <div class="TextContainerMenuAdmin">
-        <button @onclick="ClickChange" class="ButtonDesingSavePicture">Cохранить изменения</button>
-
+        <button @onclick="SaveChanges" class="ButtonDesingSavePicture">Сохранить изменения</button>
         <button @onclick="ClickExit" class="ButtonDesingNoSavePicture">Выход без сохранения</button>
-
     </div>
 
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div style="color: red; margin-top: 10px;">
+            <strong>Ошибка:</strong> @errorMessage
+        </div>
+    }
 
-
-
+    @if (showSavedData)
+    {
+        <hr />
+        <h3>Сохранённые данные</h3>
+        <div>
+            <strong>Шапка левого столбца:</strong>
+            <div>Top: @topCategory</div>
+            <div>Bottom: @bottomCategory</div>
+        </div>
+        <div>
+            <strong>Заголовки столбцов:</strong>
+            <ul>
+                @for (int i = 0; i < headerValues.Count; i++)
+                {
+                    <li>Столбец @(i): @headerValues[i]</li>
+                }
+            </ul>
+        </div>
+        <div>
+            <strong>Материалы и цены:</strong>
+            @for (int i = 0; i < rowsData.Count; i++)
+            {
+                <div>
+                    <span>Строка @(i + 1) — Материал ID: @rowsData[i].SelectedMaterialId, Цены: </span>
+                    @for (int j = 0; j < rowsData[i].Prices.Count; j++)
+                    {
+                        <span>@rowsData[i].Prices[j]@((j < rowsData[i].Prices.Count - 1) ? ", " : "")</span>
+                    }
+                </div>
+            }
+        </div>
+    }
 </div>
 
-
-
-<h4>@text</h4>
-<h4>  @mat</h4>
-<button @onclick="cheak">ФФФФФФФФФФФ</button>
-
-
 @code {
-
     [Parameter]
     public int? id { get; set; }
 
+    // Основные переменные
     string nameBanner = "";
-
     string nameMiniService = "";
-
-    int trSum = 3;
-    int tdSum = 2;
-
-    int countInfo = 0;
-
     string topCategory = "";
     string bottomCategory = "";
+    string errorMessage = "";
 
+    // Количество строк и столбцов:
+    // Первая строка – шапка, первый столбец – выбор материала
+    int trSum = 3; // 1 строка для шапки + 2 строки для данных
+    int tdSum = 2; // 1 столбец для материала + 1 столбец для цены (минимум)
 
-    string text = "";
-    string mat = "";
+    bool showSavedData = false;
 
-    //Создание листов для сохранения
+    // Коллекция заголовков столбцов (исключая первый столбец)
+    List<string> headerValues = new List<string>();
 
-    Dictionary<int, string> header = new Dictionary<int, string>();
-    Dictionary<int, int> valueMaterial = new Dictionary<int, int>();
-    List<List<int>> priceList = new List<List<int>>();
-
-
-    public  void cheak()
-    {
-        text = "";
-        mat = "";
-        foreach(var txt in header)
-        {
-            text += txt.Value + " ";
-        }
-
-        foreach(int m in valueMaterial.Values)
-        {
-            mat += m + " ";
-        }
-
-
-    }
-
+    // Данные для строк таблицы (каждая строка соответствует материалу и набору цен)
+    List<TableRowData> rowsData = new List<TableRowData>();
 
     List<Models.Material> viewmaterials = new List<Models.Material>();
 
     protected override void OnInitialized()
     {
-        Classes.Admin.Servise.ManagmentServiseClasses managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
-        Classes.Admin.Servise.ManagerMaterial managerMaterial = new Classes.Admin.Servise.ManagerMaterial();
-
-        nameBanner = managmentServise.GetName(Convert.ToInt32(id));
-        viewmaterials = managerMaterial.GetList();
-
-        // Инициализируем header под количество колонок
-
-    }
-
-
-    public void GetMaterial(ChangeEventArgs e, int index)
-    {
-        valueMaterial[index] = Convert.ToInt32(e.Value);
-
-    }
-
-    // Получить значение из словаря
-    private string GetValue(int index)
-    {
-        return header.ContainsKey(index) ? header[index] : string.Empty;
-    }
-
-    // Обновить значение в словаре
-    private void UpdateValue(int index, object value)
-    {
-        header[index] = Convert.ToString(value);
-    }
-
-    private void ClickChange()
-    {
-
-
-        Navigation.NavigateTo($"/AddInfoService/{id}");
-    }
-
-
-    public void PlusTr()
-    {
-        trSum++;
-
-        StateHasChanged();
-    }
-
-    public void MinusTr()
-    {
-        if (trSum - 1 > 1)
+        try
         {
-            valueMaterial.Remove(trSum);
-            trSum--;
-            StateHasChanged();
+            // Получаем данные с сервера или из сервиса
+            var managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
+            var managerMaterial = new Classes.Admin.Servise.ManagerMaterial();
 
+            nameBanner = managmentServise.GetName(Convert.ToInt32(id));
+            viewmaterials = managerMaterial.GetList();
+
+            // Инициализация заголовков столбцов
+            if (headerValues == null)
+                headerValues = new List<string>();
+
+            while (headerValues.Count < tdSum - 1)
+            {
+                headerValues.Add(string.Empty);
+            }
+
+
+            // Инициализация строк данных
+            if (rowsData == null)
+                rowsData = new List<TableRowData>();
+            else
+                rowsData.Clear();
+
+            for (int i = 0; i < trSum - 1; i++)
+            {
+                var row = new TableRowData { Prices = new List<decimal?>() };
+
+                while (row.Prices.Count < tdSum - 1)
+                {
+                    row.Prices.Add(null);
+                }
+
+                rowsData.Add(row);
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Ошибка при инициализации: {ex.Message}";
         }
     }
 
 
-
-    public void PlusTd()
+    async Task SaveChanges()
     {
-        if (tdSum < 9)
+        try
         {
-            tdSum++;
-
-            StateHasChanged();
+            showSavedData = true;
+            errorMessage = "";
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Ошибка при сохранении: {ex.Message}";
         }
     }
 
-    public void MinusTd()
+    async Task ClickExit()
     {
-        if (tdSum > 2) // Минимальное количество колонок = 2
+        try
         {
-            header.Remove(tdSum);
-            tdSum--;
-
-            StateHasChanged();
+            Navigation.NavigateTo($"/AddInfoService/{id}");
+            await Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Ошибка при выходе: {ex.Message}";
         }
     }
 
-
-
-
-
-
-
-    public void ClickExit()
+    // Добавление новой строки данных
+    async Task PlusTr()
     {
-        Navigation.NavigateTo($"/AddInfoService/{id}");
+        try
+        {
+            trSum++;
+            rowsData.Add(new TableRowData
+                {
+                    Prices = Enumerable.Repeat<decimal?>(null, tdSum - 1).ToList()
+                });
+            errorMessage = "";
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Ошибка при добавлении строки: {ex.Message}";
+        }
     }
+
+    // Удаление последней строки (минимум должна оставаться хотя бы одна строка данных)
+    async Task MinusTr()
+    {
+        try
+        {
+            if (rowsData.Count > 1)
+            {
+                trSum--;
+                rowsData.RemoveAt(rowsData.Count - 1);
+                errorMessage = "";
+            }
+            else
+            {
+                errorMessage = "Нельзя удалить последнюю строку данных.";
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Ошибка при удалении строки: {ex.Message}";
+        }
+    }
+
+    // Добавление нового столбца (максимум 9)
+    async Task PlusTd()
+    {
+        try
+        {
+            if (tdSum < 9)
+            {
+                tdSum++;
+                headerValues.Add(string.Empty);
+                foreach (var row in rowsData)
+                {
+                    row.Prices.Add(null);
+                }
+                errorMessage = "";
+            }
+            else
+            {
+                errorMessage = "Достигнуто максимальное количество столбцов.";
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Ошибка при добавлении столбца: {ex.Message}";
+        }
+    }
+
+    // Удаление последнего столбца (минимум должно быть 2 столбца)
+    async Task MinusTd()
+    {
+        try
+        {
+            if (tdSum > 2)
+            {
+                tdSum--;
+                if (headerValues.Any())
+                {
+                    headerValues.RemoveAt(headerValues.Count - 1);
+                }
+                foreach (var row in rowsData)
+                {
+                    if (row.Prices.Any())
+                    {
+                        row.Prices.RemoveAt(row.Prices.Count - 1);
+                    }
+                }
+                errorMessage = "";
+            }
+            else
+            {
+                errorMessage = "Должно оставаться как минимум 2 столбца.";
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Ошибка при удалении столбца: {ex.Message}";
+        }
+    }
+
+    public class TableRowData
+    {
+        public int SelectedMaterialId { get; set; }
+        public List<decimal?> Prices { get; set; } = new List<decimal?>();
+    }
+}    }
 }
