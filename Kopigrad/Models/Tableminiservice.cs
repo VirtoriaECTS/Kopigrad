@@ -11,11 +11,11 @@ public partial class Tableminiservice
 
     public int IdMaterial { get; set; }
 
-    public int IdColumnNames { get; set; }
+    public int IdColumnName { get; set; }
 
     public decimal Price { get; set; }
 
-    public virtual Columnname IdColumnNamesNavigation { get; set; } = null!;
+    public virtual Columnname IdColumnNameNavigation { get; set; } = null!;
 
     public virtual Material IdMaterialNavigation { get; set; } = null!;
 

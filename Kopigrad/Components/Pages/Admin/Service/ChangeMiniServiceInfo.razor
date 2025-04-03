@@ -1,4 +1,5 @@
-﻿@page "/AddMiniServiceInfo/{id:int}"
+﻿
+@page "/ChangeMiniServiceInfo/{id:int}"
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
@@ -37,7 +38,7 @@
                             <input @bind="headerValues[indexHeader]"
                                    @bind:event="oninput"
                                    class="InputTable"
-                            placeholder="Заголовок @indexHeader" />
+                                   placeholder="Заголовок @indexHeader" />
 
 
                         }
@@ -93,7 +94,7 @@
         <button @onclick="ClickExit" class="ButtonDesingNoSavePicture">Выход без сохранения</button>
     </div>
 
-  
+
 </div>
 
 
@@ -109,8 +110,8 @@
     string bottomCategory = "";
     string errorMessage = "";
 
-    int trSum = 3;
-    int tdSum = 2;
+    int trSum = 4; //строки
+    int tdSum = 3; //столбцы
     bool showSavedData = false;
 
     List<string> headerValues = new List<string>();
@@ -124,46 +125,25 @@
 
     protected override void OnInitialized()
     {
-        var managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
-        var managerMaterial = new Classes.Admin.Servise.ManagerMaterial();
+        Classes.Admin.Servise.ManagmentServiseClasses managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
+        Classes.Admin.Servise.ManagerMaterial managerMaterial = new Classes.Admin.Servise.ManagerMaterial();
+        Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
 
-        nameBanner = managmentServise.GetName(Convert.ToInt32(id));
+        int idMiniService = Convert.ToInt32(id);
+
+        var miniService = managmentMiniService.GetMiniService(idMiniService);
+        nameBanner = miniService.NameMiniServise;
+        topCategory = miniService.TopName;
+        bottomCategory = miniService.BottomName;
+
         viewmaterials = managerMaterial.GetList();
 
-        if (headerValues == null)
-            headerValues = new List<string>();
+        headerValues = managmentMiniService.GetNameColums(idMiniService);
+        materialIds = managmentMiniService.GetMaterial(idMiniService).Select(x => x.IdMaterial).ToList();
+        priceList = managmentMiniService.GetPrice(idMiniService, headerValues.Count);
 
-        while (headerValues.Count < tdSum - 1)
-        {
-            headerValues.Add(string.Empty);
-        }
-
-
-        if (materialIds == null)
-            materialIds = new List<int>();
-
-        while (materialIds.Count < trSum - 1)
-        {
-            materialIds.Add(0);
-        }
-
-
-        if(priceList.Count < trSum - 1)
-        {
-            priceList = new List<List<decimal>>();
-        }
-
-        while (priceList.Count < trSum - 1)
-        {
-            List<decimal> list = new List<decimal>();
-            for(int i = 0; i < tdSum -1; i++)
-            {
-                list.Add(0);
-            }
-
-            priceList.Add(list);
-        }
-
+        // trSum = viewmaterials.Count + 1;
+        // tdSum = headerValues.Count + 1;
 
 
     }
@@ -176,7 +156,7 @@
 
         Navigation.NavigateTo($"/AddInfoService/{id}");
         await Task.CompletedTask;
-        
+
     }
 
     async Task ClickExit()
@@ -224,7 +204,7 @@
     {
         if (tdSum < 9)
         {
-            foreach(List<decimal> list in priceList)
+            foreach (List<decimal> list in priceList)
             {
                 list.Add(0);
             }
@@ -247,7 +227,7 @@
 
             foreach (List<decimal> list in priceList)
             {
-                list.RemoveAt(list.Count -1);
+                list.RemoveAt(list.Count - 1);
             }
 
 
@@ -257,7 +237,7 @@
             {
                 headerValues.RemoveAt(headerValues.Count - 1);
             }
-            
+
             errorMessage = "";
             await InvokeAsync(StateHasChanged);
         }

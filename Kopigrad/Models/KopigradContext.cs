@@ -56,7 +56,7 @@ public partial class KopigradContext : DbContext
 
             entity.ToTable("columnnames");
 
-            entity.HasIndex(e => e.IdMiniService, "idMiniService");
+            entity.HasIndex(e => e.IdMiniService, "columnnames_ibfk_1");
 
             entity.Property(e => e.IdColumnNames)
                 .HasColumnType("int(11)")
@@ -243,7 +243,7 @@ public partial class KopigradContext : DbContext
 
             entity.ToTable("tableminiservice");
 
-            entity.HasIndex(e => e.IdColumnNames, "idColumnNames");
+            entity.HasIndex(e => e.IdColumnName, "idColumnName");
 
             entity.HasIndex(e => e.IdMaterial, "idMaterial");
 
@@ -252,9 +252,9 @@ public partial class KopigradContext : DbContext
             entity.Property(e => e.IdTableMiniService)
                 .HasColumnType("int(11)")
                 .HasColumnName("idTableMiniService");
-            entity.Property(e => e.IdColumnNames)
+            entity.Property(e => e.IdColumnName)
                 .HasColumnType("int(11)")
-                .HasColumnName("idColumnNames");
+                .HasColumnName("idColumnName");
             entity.Property(e => e.IdMaterial)
                 .HasColumnType("int(100)")
                 .HasColumnName("idMaterial");
@@ -263,8 +263,8 @@ public partial class KopigradContext : DbContext
                 .HasColumnName("idMiniService");
             entity.Property(e => e.Price).HasPrecision(10);
 
-            entity.HasOne(d => d.IdColumnNamesNavigation).WithMany(p => p.Tableminiservices)
-                .HasForeignKey(d => d.IdColumnNames)
+            entity.HasOne(d => d.IdColumnNameNavigation).WithMany(p => p.Tableminiservices)
+                .HasForeignKey(d => d.IdColumnName)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("tableminiservice_ibfk_3");
 

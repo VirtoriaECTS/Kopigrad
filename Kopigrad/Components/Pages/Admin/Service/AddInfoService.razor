@@ -12,20 +12,24 @@
 
     <table class="TableBorder">
 
-      
+        @foreach(var miniservice in miniservices)
+        {
             <tr class="TableBorderTr">
 
-            <td >
-                <h1 class="TextTable">Название</h1>
-            </td>
+                <td>
 
-            <td class="TableBorderTdButten">
-                <button class="ButtonChangeServiceMini">
-                </button>
-                <button class="ButtonMinus">
-                </button>
-            </td>
+                    <h1 class="TextTable">@miniservice.NameMiniServise</h1>
+                </td>
+
+                <td class="TableBorderTdButten">
+                    <button @onclick="() => ClickChange(miniservice.IdMiniService)" class="ButtonChangeServiceMini">
+                    </button>
+                    <button class="ButtonMinus">
+                    </button>
+                </td>
             </tr>
+        }
+
 
     </table>
 
@@ -68,18 +72,26 @@
     public int? id { get; set; }
 
     string nameBanner = "";
-
+    List<Models.Miniservice> miniservices = new List<Models.Miniservice>(); 
 
     protected override void OnInitialized()
     {
         Classes.Admin.Servise.ManagmentServiseClasses managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
+        Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
         nameBanner = managmentServise.GetName(Convert.ToInt32(id));
+        miniservices = managmentMiniService.GetMiniServices();
+
     }
 
 
     public void ClickPlus()
     {
         Navigation.NavigateTo($"/AddMiniServiceInfo/{id}");
+    }
+
+    public void ClickChange(int idMiniServie)
+    {
+        Navigation.NavigateTo($"/ChangeMiniServiceInfo/{idMiniServie}");
     }
 
   

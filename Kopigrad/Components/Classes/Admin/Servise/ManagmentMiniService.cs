@@ -3,17 +3,19 @@ using Kopigrad.Models;
 
 namespace Kopigrad.Components.Classes.Admin.Servise
 {
-    public class MiniService
+    public class ManagmentMiniService
 
     {
+
+
 
         public void Add(int idService, string nameMiniService, string TopName, string BottomName, List<string> NameColumns, List<int> Material, List<List<decimal>> Prices)
         {
 
-            int idMiniService = AddMiniService(idService, nameMiniService, TopName, BottomName); 
+            int idMiniService = AddMiniService(idService, nameMiniService, TopName, BottomName);
 
 
-            for(int column = 0; column < NameColumns.Count; column ++) 
+            for (int column = 0; column < NameColumns.Count; column++)
             {
                 int idColums = AddColumnNames(idMiniService, NameColumns[column]);
 
@@ -48,7 +50,7 @@ namespace Kopigrad.Components.Classes.Admin.Servise
                 context.Miniservices.Add(miniServicelNew);
                 context.SaveChanges();
 
-                id = context.Miniservices.Select(x => x.IdMiniService).LastOrDefault();
+                id = context.Miniservices.OrderBy(x => x.IdMiniService).Select(x => x.IdMiniService).LastOrDefault();
             }
             return id;
         }
@@ -69,7 +71,7 @@ namespace Kopigrad.Components.Classes.Admin.Servise
                 context.Columnnames.Add(columnlNew);
                 context.SaveChanges();
 
-                id = context.Columnnames.Select(x => x.IdColumnNames).LastOrDefault();
+                id = context.Columnnames.OrderBy(x => x.IdColumnNames).Select(x => x.IdColumnNames).LastOrDefault();
             }
             return id;
         }
@@ -83,7 +85,7 @@ namespace Kopigrad.Components.Classes.Admin.Servise
                 {
                     IdMiniService = idMiniService,
                     IdMaterial = idMaterial,
-                    IdColumnNames = idColumnNames,
+                    IdColumnName = idColumnNames,
                     Price = price
 
                 };
@@ -93,5 +95,95 @@ namespace Kopigrad.Components.Classes.Admin.Servise
 
             }
         }
+
+        public List<Miniservice> GetMiniServices()
+        {
+            List<Miniservice> miniServices = new List<Miniservice>();
+            using (var context = new KopigradContext())
+            {
+                miniServices = context.Miniservices.ToList();
+
+            }
+            return miniServices;
+
+        }
+
+
+        public Miniservice GetMiniService(int idMiniService)
+        {
+
+            Miniservice miniService = new Miniservice();
+            using (var context = new KopigradContext())
+            {
+                miniService = context.Miniservices.Where(x => x.IdMiniService == idMiniService).FirstOrDefault();
+
+            }
+            return miniService;
+        }
+
+
+        public List<string> GetNameColums(int inMiniService)
+        {
+            List<string> headers = new List<string>();
+
+            using (var context = new KopigradContext())
+            {
+                headers = context.Columnnames.Where(x => x.IdMiniService == inMiniService).Select(x => x.NameColumn).ToList();
+            }
+
+            return headers;
+        }
+
+
+        public List<Material> GetMaterial(int idMiniService)
+        {
+            List<Material> materials = new List<Material>();
+
+            using (var context = new KopigradContext())
+            {
+                List<Tableminiservice> tableMiniService = context.Tableminiservices.Where(x => x.IdMiniService == idMiniService).ToList();
+
+                foreach (var table in tableMiniService)
+                {
+                    Material material = context.Materials.Where(x => x.IdMaterial == table.IdMaterial).FirstOrDefault();
+
+                    materials.Add(material);
+                }
+            }
+
+            return materials;
+        }
+
+        public List<List<decimal>> GetPrice(int idMiniService, int countColumn)
+        {
+            List<List<decimal>> priceAll = new List<List<decimal>>();
+
+            using (var context = new KopigradContext())
+            {
+                List<Tableminiservice> tableMiniService = context.Tableminiservices.Where(x => x.IdMiniService == idMiniService).ToList();
+
+                int countTr = tableMiniService.Count / countColumn; 
+
+                int index = 0;
+
+                for(int i = 0; i < countTr; i++)
+                {
+                    List<decimal> price = new List<decimal>();
+                    for(int j = 0; j < countColumn; j++)
+                    {
+                        price.Add(tableMiniService[index].Price);
+                        index++;
+                    }
+                    priceAll.Add(price);
+                }
+            }
+
+            return priceAll;
+        }
+
+
+        
+
+
     }
 }
