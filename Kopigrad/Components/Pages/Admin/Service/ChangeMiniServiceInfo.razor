@@ -63,7 +63,8 @@
                                    @bind="priceList[indexPriceI][indexPriceJ]"
                                    @bind:event="oninput"
                                    class="InputTable" placeholder="Цена" />
-                        }
+
+                }
                     </td>
                 }
                 @if (i == 0)
@@ -98,6 +99,17 @@
 </div>
 
 
+@foreach(List<decimal> ints in priceList)
+{
+    <h5>Строка новая</h5>
+
+    @foreach(decimal k in ints)
+    {
+        <h4>@k </h4>
+    }
+}
+
+
 
 
 @code {
@@ -110,8 +122,8 @@
     string bottomCategory = "";
     string errorMessage = "";
 
-    int trSum = 4; //строки
-    int tdSum = 3; //столбцы
+    int trSum; //строки
+    int tdSum; //столбцы
     bool showSavedData = false;
 
     List<string> headerValues = new List<string>();
@@ -142,8 +154,8 @@
         materialIds = managmentMiniService.GetMaterial(idMiniService).Select(x => x.IdMaterial).ToList();
         priceList = managmentMiniService.GetPrice(idMiniService, headerValues.Count);
 
-        // trSum = viewmaterials.Count + 1;
-        // tdSum = headerValues.Count + 1;
+        trSum = priceList.Count + 1;
+        tdSum = headerValues.Count + 1;
 
 
     }

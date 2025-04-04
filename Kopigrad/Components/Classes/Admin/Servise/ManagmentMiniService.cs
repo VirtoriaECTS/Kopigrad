@@ -1,5 +1,6 @@
 ﻿using Kopigrad.Components.Pages.Admin.Material;
 using Kopigrad.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Kopigrad.Components.Classes.Admin.Servise
 {
@@ -15,17 +16,27 @@ namespace Kopigrad.Components.Classes.Admin.Servise
             int idMiniService = AddMiniService(idService, nameMiniService, TopName, BottomName);
 
 
-            for (int column = 0; column < NameColumns.Count; column++)
+
+            List<int> idColumsId = new List<int>();
+
+
+
+            foreach(string namecolumn in NameColumns)
             {
-                int idColums = AddColumnNames(idMiniService, NameColumns[column]);
-
-
-                for (int row = 0; row < Material.Count; row++)
+                int id = AddColumnNames(idMiniService, namecolumn);
+                idColumsId.Add(id);
+            }
+            int i = 0;
+            int j = 0;
+            foreach (int material in Material)
+            {
+               foreach(int idColums in idColumsId)
                 {
-                    AddTableMiniServie(idMiniService, Material[row], idColums, Prices[row][column]);
+                    AddTableMiniServie(idMiniService, material, idColums, Prices[i][j]);
+                    j++;
                 }
-
-
+                i++;
+                j = 0;
             }
 
 

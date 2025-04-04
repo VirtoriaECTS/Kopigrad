@@ -97,7 +97,15 @@
 </div>
 
 
+@foreach(List<decimal> ints in priceList)
+{
+    <h5>Строка новая</h5>
 
+    @foreach(decimal k in ints)
+    {
+        <h4>@k </h4>
+    }
+}
 
 @code {
     [Parameter]
