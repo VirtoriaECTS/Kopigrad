@@ -1,5 +1,6 @@
 ﻿using Kopigrad.Components.Pages.Admin.Material;
 using Kopigrad.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Kopigrad.Components.Classes.Admin.Servise
@@ -107,12 +108,25 @@ namespace Kopigrad.Components.Classes.Admin.Servise
             }
         }
 
-        public List<Miniservice> GetMiniServices()
+        public List<Miniservice> GetMiniServices(int idService)
         {
             List<Miniservice> miniServices = new List<Miniservice>();
             using (var context = new KopigradContext())
             {
-                miniServices = context.Miniservices.ToList();
+                List<int> mini = context.Miniservices
+                    .Include(x => x.Tableminiservices).Where(x => x.IdService == idService)
+                    .Where(x => x.Tableminiservices.Any(t => t.Price > 0))
+                    .Select(x => x.IdMiniService)
+                    .Distinct()
+                    .ToList();
+
+                var service = context.Miniservices.ToList();
+
+                foreach(int id in mini)
+                {
+                    miniServices.Add(service.Where(x => x.IdMiniService == id).FirstOrDefault());
+                }
+                
 
             }
             return miniServices;
@@ -193,8 +207,94 @@ namespace Kopigrad.Components.Classes.Admin.Servise
         }
 
 
-        
+        public void DeleteMiniService(int idMiniService)
+        {
+            using (var context = new KopigradContext())
+            {
+                var tableMiniSevice = context.Tableminiservices.Where(x => x.IdMiniService==idMiniService).ToList();
 
+                foreach(var item in tableMiniSevice)
+                {
+                    item.Price = -1;
+                    
+                }
+                context.SaveChanges();
+            }
+        }
+
+
+        public void Change(int idMiniService, string nameMiniService, string TopName, string BottomName, List<string> NameColumns, List<int> Material, List<List<decimal>> Prices)
+        {
+
+            ChangeMiniService(idMiniService, nameMiniService, TopName, BottomName);
+
+            RealyDelete(idMiniService);
+
+            List<int> idColumsId = new List<int>();
+
+
+
+            foreach (string namecolumn in NameColumns)
+            {
+                int id = AddColumnNames(idMiniService, namecolumn);
+                idColumsId.Add(id);
+            }
+            int i = 0;
+            int j = 0;
+            foreach (int material in Material)
+            {
+                foreach (int idColums in idColumsId)
+                {
+                    AddTableMiniServie(idMiniService, material, idColums, Prices[i][j]);
+                    j++;
+                }
+                i++;
+                j = 0;
+            }
+
+
+
+        }
+        public void ChangeMiniService(int idMiniService, string nameMiniService, string TopName, string BottomName) 
+        {
+            using (var context = new KopigradContext())
+            {
+                var miniService = context.Miniservices.Where(x => x.IdMiniService == idMiniService).FirstOrDefault();
+
+                miniService.NameMiniServise = nameMiniService;
+                miniService.TopName = TopName;
+                miniService.BottomName = BottomName;
+
+                context.SaveChanges();
+            }
+        }
+
+        public void RealyDelete(int idMiniService)
+        {
+            using (var context = new KopigradContext())
+            {
+
+
+
+                var tableMiniService = context.Tableminiservices.Where(x => x.IdMiniService == idMiniService).ToList();
+
+                foreach(var row in tableMiniService)
+                {
+                    context.Tableminiservices.Remove(row);
+                }
+
+                var colums = context.Columnnames.Where(x => x.IdMiniService == idMiniService).ToList();
+
+                foreach (var colum in colums)
+                {
+                    context.Columnnames.Remove(colum);
+                }
+
+                context.SaveChanges();
+
+                context.SaveChanges();
+            }
+        }
 
     }
 }

@@ -99,23 +99,13 @@
 </div>
 
 
-@foreach(List<decimal> ints in priceList)
-{
-    <h5>Строка новая</h5>
-
-    @foreach(decimal k in ints)
-    {
-        <h4>@k </h4>
-    }
-}
-
 
 
 
 @code {
     [Parameter]
     public int? id { get; set; }
-
+    public int idService = 0;
     string nameBanner = "";
     string nameMiniService = "";
     string topCategory = "";
@@ -147,6 +137,7 @@
         nameBanner = miniService.NameMiniServise;
         topCategory = miniService.TopName;
         bottomCategory = miniService.BottomName;
+        nameMiniService = miniService.NameMiniServise;
 
         viewmaterials = managerMaterial.GetList();
 
@@ -157,23 +148,24 @@
         trSum = priceList.Count + 1;
         tdSum = headerValues.Count + 1;
 
+        idService = miniService.IdService;
 
     }
 
     async Task SaveChanges()
     {
         Classes.Admin.Servise.ManagmentMiniService managment = new Classes.Admin.Servise.ManagmentMiniService();
-        managment.Add(Convert.ToInt32(id), nameMiniService, topCategory, bottomCategory, headerValues, materialIds, priceList);
+        managment.Change(Convert.ToInt32(id), nameMiniService, topCategory, bottomCategory, headerValues, materialIds, priceList);
 
 
-        Navigation.NavigateTo($"/AddInfoService/{id}");
+        Navigation.NavigateTo($"/AddInfoService/{idService}");
         await Task.CompletedTask;
 
     }
 
     async Task ClickExit()
     {
-        Navigation.NavigateTo($"/AddInfoService/{id}");
+        Navigation.NavigateTo($"/AddInfoService/{idService}");
         await Task.CompletedTask;
     }
 

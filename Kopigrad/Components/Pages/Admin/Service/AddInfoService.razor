@@ -24,7 +24,7 @@
                 <td class="TableBorderTdButten">
                     <button @onclick="() => ClickChange(miniservice.IdMiniService)" class="ButtonChangeServiceMini">
                     </button>
-                    <button class="ButtonMinus">
+                    <button @onclick="() => ClickDelete(miniservice.IdMiniService)" class="ButtonMinus">
                     </button>
                 </td>
             </tr>
@@ -41,12 +41,12 @@
 
 
     <h1 class="TextNameMiniService">Условия</h1>
-    <input class="InputNameMiniService" />
+    <input @bind="condition" class="InputNameMiniService" />
 
 
     <h1 class="TextNameMiniService">Срок</h1>
 
-    <input class="InputNameMiniService" />
+    <input @bind="time" class="InputNameMiniService" />
 
     <div class="TextContainerMenuAdmin">
         <button  class="ButtonDesingSavePicture">Cохранить изменения</button>
@@ -72,6 +72,8 @@
     public int? id { get; set; }
 
     string nameBanner = "";
+    string condition = "";
+    string time = "";
     List<Models.Miniservice> miniservices = new List<Models.Miniservice>(); 
 
     protected override void OnInitialized()
@@ -79,7 +81,7 @@
         Classes.Admin.Servise.ManagmentServiseClasses managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
         Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
         nameBanner = managmentServise.GetName(Convert.ToInt32(id));
-        miniservices = managmentMiniService.GetMiniServices();
+        miniservices = managmentMiniService.GetMiniServices(Convert.ToInt32(id));
 
     }
 
@@ -94,7 +96,16 @@
         Navigation.NavigateTo($"/ChangeMiniServiceInfo/{idMiniServie}");
     }
 
-  
+    public void ClickDelete(int idMiniServie)
+    {
+        Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
+        managmentMiniService.DeleteMiniService(idMiniServie);
+
+        miniservices.Clear();
+        miniservices = managmentMiniService.GetMiniServices(Convert.ToInt32(id));
+        StateHasChanged();
+    }
+
 
     public void ClickExit()
     {

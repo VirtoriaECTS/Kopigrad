@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 
 namespace Kopigrad.Components.Classes.Admin.Servise
@@ -83,6 +84,17 @@ namespace Kopigrad.Components.Classes.Admin.Servise
 
             }
             return name;
+        }
+
+        public void ChangeConditionAndTime(int idService, string condition, string time)
+        {
+            using (var context = new KopigradContext())
+            {
+                var service = context.Services.Where(x => x.IdService == idService).FirstOrDefault();
+                service.ConditionText = condition;
+                service.Time = time;
+                context.SaveChanges();
+            }
         }
     }
 }
