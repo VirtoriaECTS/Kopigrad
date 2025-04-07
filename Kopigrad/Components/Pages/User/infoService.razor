@@ -1,0 +1,220 @@
+﻿@page "/infoService/{id:int}"
+
+<div class="Banner">
+    <h5 class="TextBanner">Редактирование содержания @nameBanner</h5>
+</div>
+
+<div class="CenterVertical">
+    <h1 class="TextNameMiniService">Название</h1>
+    <input @bind="nameMiniService" class="InputNameMiniService" />
+
+    <table class="TableBorder">
+        @for (int i = 0; i < trSum; i++)
+        {
+            <tr class="TableBorderTr" @key="i">
+                @for (int j = 0; j < tdSum; j++)
+                {
+                    <td class="TableBorderTd" @key="j">
+                        @if (i == 0 && j == 0)
+                        {
+                            <!-- Левая шапка с двумя данными -->
+                            <input @bind="topCategory" @bind:event="oninput" class="InputTable" />
+                            <br />
+                            <input @bind="bottomCategory" @bind:event="oninput" class="InputTable" />
+                        }
+                        else if (i == 0 && j > 0)
+                        {
+                            int indexHeader = (j - 1);
+
+                            <input @bind="headerValues[indexHeader]"
+                                   @bind:event="oninput"
+                                   class="InputTable"
+                                   placeholder="Заголовок @indexHeader" />
+
+
+                        }
+                        else if (i > 0 && j == 0)
+                        {
+                            <!-- Выбор материала -->
+                            int indexMaterial = (i - 1);
+                            <select @bind="materialIds[indexMaterial]" class="InputTable">
+                                <option value="0">-- Выберите материал --</option>
+                                @foreach (var material in viewmaterials)
+                                {
+                                    <option value="@material.IdMaterial">@material.NameMaterial</option>
+                                }
+                            </select>
+                        }
+                        else if (i > 0 && j > 0)
+                        {
+                            <!-- Цена -->
+                            int indexPriceI = (i - 1);
+                            int indexPriceJ = (j - 1);
+                            <input type="number"
+                                   @bind="priceList[indexPriceI][indexPriceJ]"
+                                   @bind:event="oninput"
+                                   class="InputTable" placeholder="Цена" />
+
+                        }
+                    </td>
+                }
+                
+            </tr>
+        }
+    </table>
+
+
+
+</div>
+
+
+
+
+
+@code {
+    [Parameter]
+    public int? id { get; set; }
+    public int idService = 0;
+    string nameBanner = "";
+    string nameMiniService = "";
+    string topCategory = "";
+    string bottomCategory = "";
+    string errorMessage = "";
+
+    int trSum; //строки
+    int tdSum; //столбцы
+    bool showSavedData = false;
+
+    List<string> headerValues = new List<string>();
+    List<int> materialIds = new List<int>();
+    List<List<decimal>> priceList = new List<List<decimal>>();
+
+
+
+
+    List<Models.Material> viewmaterials = new List<Models.Material>();
+
+    protected override void OnInitialized()
+    {
+        Classes.Admin.Servise.ManagmentServiseClasses managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
+        Classes.Admin.Servise.ManagerMaterial managerMaterial = new Classes.Admin.Servise.ManagerMaterial();
+        Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
+
+        int idMiniService = Convert.ToInt32(id);
+
+        var miniService = managmentMiniService.GetMiniService(idMiniService);
+        nameBanner = miniService.NameMiniServise;
+        topCategory = miniService.TopName;
+        bottomCategory = miniService.BottomName;
+        nameMiniService = miniService.NameMiniServise;
+
+        viewmaterials = managerMaterial.GetList();
+
+        headerValues = managmentMiniService.GetNameColums(idMiniService);
+        materialIds = managmentMiniService.GetMaterial(idMiniService).Select(x => x.IdMaterial).ToList();
+        priceList = managmentMiniService.GetPrice(idMiniService, headerValues.Count);
+
+        trSum = priceList.Count + 1;
+        tdSum = headerValues.Count + 1;
+
+        idService = miniService.IdService;
+
+    }
+
+    async Task SaveChanges()
+    {
+        Classes.Admin.Servise.ManagmentMiniService managment = new Classes.Admin.Servise.ManagmentMiniService();
+        managment.Change(Convert.ToInt32(id), nameMiniService, topCategory, bottomCategory, headerValues, materialIds, priceList);
+
+
+        Navigation.NavigateTo($"/AddInfoService/{idService}");
+        await Task.CompletedTask;
+
+    }
+
+    async Task ClickExit()
+    {
+        Navigation.NavigateTo($"/AddInfoService/{idService}");
+        await Task.CompletedTask;
+    }
+
+    async Task PlusTr()
+    {
+        List<decimal> list = new List<decimal>();
+        for (int i = 0; i < tdSum - 1; i++)
+        {
+            list.Add(0);
+        }
+        priceList.Add(list); // Добавляем в список строк
+
+        trSum++;
+
+        materialIds.Add(0);
+        errorMessage = "";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task MinusTr()
+    {
+        if (trSum > 2)
+        {
+            materialIds.RemoveAt(materialIds.Count - 1);
+            priceList.RemoveAt(priceList.Count - 1);
+
+
+
+            trSum--;
+            errorMessage = "";
+        }
+        else
+        {
+            errorMessage = "Минимальное число строк";
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task PlusTd()
+    {
+        if (tdSum < 9)
+        {
+            foreach (List<decimal> list in priceList)
+            {
+                list.Add(0);
+            }
+
+            tdSum++;
+            headerValues.Add(string.Empty);
+
+        }
+        else
+        {
+            errorMessage = "Достигнуто максимальное количество столбцов.";
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task MinusTd()
+    {
+        if (tdSum > 2)
+        {
+
+            foreach (List<decimal> list in priceList)
+            {
+                list.RemoveAt(list.Count - 1);
+            }
+
+
+
+            tdSum--;
+            if (headerValues.Any())
+            {
+                headerValues.RemoveAt(headerValues.Count - 1);
+            }
+
+            errorMessage = "";
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+
+}

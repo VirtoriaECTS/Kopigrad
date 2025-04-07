@@ -1,0 +1,65 @@
+﻿
+@inject NavigationManager Navigation
+
+
+<div class="Vertical">
+    <div class="TextContainerMenuAdmin">
+        @for (int i = 0; i < services.Count / 2; i++)
+        {
+
+
+            <h5 class="TextMenuUser">@services[i].NameService</h5>
+
+        }
+    </div>
+
+    <div class="TextContainerMenuAdmin">
+        @for (int i = (services.Count / 2); i < services.Count; i++)
+        {
+
+            <h5 class="TextMenuUser">@services[i].NameService</h5>
+
+        }
+    </div>
+
+</div>
+
+
+
+@code {
+    List<Models.Service> services = new List<Models.Service>();
+    int seredina = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var context = new Models.KopigradContext())
+        {
+
+            services = context.Services.ToList();
+            seredina = services.Count / 2;
+        }
+
+    }
+
+
+    public void Servise()
+    {
+        Navigation.NavigateTo("/Servise");
+    }
+
+    public void Requst()
+    {
+        Navigation.NavigateTo("/Requst");
+    }
+
+    public void Pdf()
+    {
+        Navigation.NavigateTo("/Pdf");
+    }
+
+
+    public void Material()
+    {
+        Navigation.NavigateTo("/AddMaterial");
+    }
+}

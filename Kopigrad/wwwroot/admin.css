@@ -613,3 +613,22 @@
     color: black;
     font-size: 1.6vh;
 }
+
+
+.Vertical {
+    display: flex;
+    flex-direction: column; /* Элементы внутри будут располагаться по вертикали */
+    justify-content: center; /* Центрирует элементы по вертикали */
+    align-items: center; /* Центрирует элементы по горизонтали (по необходимости) */
+}
+
+.TextMenuUser {
+    width: auto; /* Ширина будет автоматически подстраиваться под содержимое */
+    text-align: center;
+    cursor: default;
+    font-family: DaysFronts;
+    font-size: 1.3vw;
+    margin: 0.3vw 3vw 0.3vw 3vw;
+    white-space: nowrap; /* Не переносить текст на новую строку */
+    display: inline-block; /* Элемент будет занимать только ту ширину, которую ему необходимо */
+}

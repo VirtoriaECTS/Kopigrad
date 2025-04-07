@@ -1,0 +1,42 @@
+﻿body {
+
+
+}
+
+@font-face {
+    font-family: 'DaysFronts';
+    src: url('/Fronts/DAYS.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+.UsersBaner {
+    height: auto;
+    width: 100vw;
+
+}
+
+.Vertical {
+    display: flex;
+    flex-direction: column; /* Элементы внутри будут располагаться по вертикали */
+    justify-content: center; /* Центрирует элементы по вертикали */
+    align-items: center; /* Центрирует элементы по горизонтали (по необходимости) */
+}
+
+.TextCenter{
+    margin: 2vw 0vw;
+    font-size: 2vw;
+    font-family: DaysFronts;
+    text-align: center;
+}
+
+
+
+.DivSenter {
+    width: 100vw;
+    margin: 3vw 0;
+    text-align: center;
+    display: flex; /* Для использования flexbox */
+    justify-content: center; /* Центрирование по горизонтали */
+    align-items: center; /* Центрирование по вертикали */
+    height: 100vh; /* Устанавливаем высоту контейнера на весь экран */
+}

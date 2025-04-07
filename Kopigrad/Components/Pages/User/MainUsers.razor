@@ -1,0 +1,73 @@
+﻿@page "/"
+@layout Layout.Menu.MenuUser;
+
+
+<div class="Vertical">
+    <head>
+        <link rel="stylesheet" href="users.css">
+        <link rel="stylesheet" href="admin.css">
+    </head>
+
+    <img class="UsersBaner" src="Image\Baners\banerOne.png">
+
+    <h5 class="TextCenter">Наши услуги</h5>
+</div>
+
+<div class="CenterDiv">
+    <div class="DivService">
+        @foreach (var text in services)
+        {
+
+            <div @onclick="() => ClickService(text.IdService)" class="divOneServise">
+
+
+
+                <img class="ImageStyleServiseAll" src="@GetImageSrc(text.Image)" alt="Изображение" />
+
+                <h1 class="TextServise">
+                    @text.NameService
+                </h1>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="DivSenter">
+    <div style="width:560px;height:800px;overflow:hidden;position:relative; text-align: center;">
+        <iframe style="width:100%;height:100%;border:1px solid #e6e6e6;border-radius:8px;box-sizing:border-box"
+                src="https://yandex.ru/maps-reviews-widget/191955890671?comments"></iframe>
+        <a href="https://yandex.ru/maps/org/kopigrad/191955890671/" target="_blank"
+           style="box-sizing:border-box;text-decoration:none;
+color:#b3b3b3;font-size:10px;font-family:YS Text,sans-serif;padding:0 20px;position:absolute;bottom:8px;width:100%;text-align:center;left:0;
+overflow:hidden;text-overflow:ellipsis;display:block;max-height:14px;white-space:nowrap;padding:0 16px;box-sizing:border-box">
+            КопиГрад на карте Екатеринбурга — Яндекс Карты
+        </a>
+    </div>
+</div>
+
+
+
+
+@code {
+    private List<Kopigrad.Models.Service> services = new List<Kopigrad.Models.Service>();
+
+    private string? GetImageSrc(byte[] Image)
+    {
+
+        return Classes.All.ConvertImage.GetImageSrc(Image);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        using (var context = new Models.KopigradContext())
+        {
+
+            services = context.Services.ToList();
+        }
+
+    }
+
+    public void ClickService(int idService)
+    {
+        
+    }
+}
