@@ -96,5 +96,7 @@ namespace Kopigrad.Components.Classes.Admin.Servise
                 context.SaveChanges();
             }
         }
+
+
     }
 }

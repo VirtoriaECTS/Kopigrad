@@ -1,6 +1,7 @@
 ﻿@page "/"
 @layout Layout.Menu.MenuUser;
-
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
 
 <div class="Vertical">
     <head>
@@ -68,6 +69,6 @@ overflow:hidden;text-overflow:ellipsis;display:block;max-height:14px;white-space
 
     public void ClickService(int idService)
     {
-        
+        Navigation.NavigateTo($"/InfoService/{idService}");
     }
 }

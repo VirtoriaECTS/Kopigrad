@@ -269,6 +269,17 @@ namespace Kopigrad.Components.Classes.Admin.Servise
             }
         }
 
+        public List<Models.Columnname> GetColums(int idMiniService)
+        {
+            List<Models.Columnname> colums = new List<Columnname>();
+            using (var context = new KopigradContext())
+            {
+                colums = context.Columnnames.Where(x => x.IdMiniServiceNavigation.IdMiniService == idMiniService).ToList();
+            }
+
+            return colums;
+        }
+
         public void RealyDelete(int idMiniService)
         {
             using (var context = new KopigradContext())

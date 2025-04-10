@@ -1,98 +1,224 @@
-﻿@page "/infoService/{id:int}"
+﻿@page "/InfoService/{id:int}"
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+@layout Layout.Menu.MenuUser;
 
-<div class="Banner">
-    <h5 class="TextBanner">Редактирование содержания @nameBanner</h5>
-</div>
+
 
 <div class="CenterVertical">
-    <h1 class="TextNameMiniService">Название</h1>
-    <input @bind="nameMiniService" class="InputNameMiniService" />
+    <head>
+        <link rel="stylesheet" href="users.css">
+        <link rel="stylesheet" href="admin.css">
+    </head>
 
-    <table class="TableBorder">
-        @for (int i = 0; i < trSum; i++)
-        {
-            <tr class="TableBorderTr" @key="i">
-                @for (int j = 0; j < tdSum; j++)
-                {
-                    <td class="TableBorderTd" @key="j">
-                        @if (i == 0 && j == 0)
-                        {
-                            <!-- Левая шапка с двумя данными -->
-                            <input @bind="topCategory" @bind:event="oninput" class="InputTable" />
-                            <br />
-                            <input @bind="bottomCategory" @bind:event="oninput" class="InputTable" />
-                        }
-                        else if (i == 0 && j > 0)
-                        {
-                            int indexHeader = (j - 1);
+    <div class="Banner">
 
-                            <input @bind="headerValues[indexHeader]"
-                                   @bind:event="oninput"
-                                   class="InputTable"
-                                   placeholder="Заголовок @indexHeader" />
+        <h5 class="TextBanner">@nameBanner</h5>
+    </div>
 
 
-                        }
-                        else if (i > 0 && j == 0)
-                        {
-                            <!-- Выбор материала -->
-                            int indexMaterial = (i - 1);
-                            <select @bind="materialIds[indexMaterial]" class="InputTable">
-                                <option value="0">-- Выберите материал --</option>
-                                @foreach (var material in viewmaterials)
-                                {
-                                    <option value="@material.IdMaterial">@material.NameMaterial</option>
-                                }
-                            </select>
-                        }
-                        else if (i > 0 && j > 0)
-                        {
-                            <!-- Цена -->
-                            int indexPriceI = (i - 1);
-                            int indexPriceJ = (j - 1);
-                            <input type="number"
-                                   @bind="priceList[indexPriceI][indexPriceJ]"
-                                   @bind:event="oninput"
-                                   class="InputTable" placeholder="Цена" />
 
-                        }
-                    </td>
-                }
-                
-            </tr>
-        }
-    </table>
+    @foreach(var info in infoMinis)
+    {
+        <h5 style="font-weight: bold;" class="NameMiniService">@info.nameMiniService</h5>
 
 
+        <table class="TableBorder">
+
+
+            @for (int i = 0; i < info.trSum; i++)
+            {
+                <tr class="TableBorderTr" @key="i">
+                    @for (int j = 0; j < info.tdSum; j++)
+                    {
+                        <td class="TableBorderTd" @key="j">
+                             @if (i == 0 && j == 0)
+                            {
+                                <!-- Левая шапка с двумя данными -->
+                                <h5 class="TextTableUser" style="font-weight: bold;">@info.bottomCategory / @info.topCategory</h5>
+                            }
+                            else if (i == 0 && j > 0)
+                            {
+                                int indexHeader = (j - 1);
+                                <h5 style="font-weight: bold;" class="TextTableUser">@info.headerValues[indexHeader]</h5>
+
+                            }
+                            else if (i > 0 && j == 0)
+                            {
+                                <!-- Выбор материала -->
+                                int indexMaterial = (i - 1);
+
+
+                                <h5 class="TextTableUser">@viewmaterials.Where(x => x.IdMaterial == info.materialIds[indexMaterial]).Select(x => x.NameMaterial).First().</h5>
+                            }
+                            else if (i > 0 && j > 0)
+                            {
+                                <!-- Цена -->
+                                int indexPriceI = (i - 1);
+                                int indexPriceJ = (j - 1);
+
+                                <h5 class="TextTableUser">@info.priceList[indexPriceI][indexPriceJ]</h5>
+
+                            }
+                        </td>
+                        
+                    }
+
+                </tr>
+            }
+        </table>
+
+
+
+    }
+
+    <br />
+    <h5 class="TextTableCondition">@((MarkupString)FormattedCondition)</h5>
+
+
+    <br />
+    <h5 class="TextTableCondition">@time</h5>
+    <br />
 
 </div>
 
 
+<div class="divUsersColumn">
+    <div  class="ColumnUserCalculatorAmdButton">
+        <h5 class="NameMiniService">Рассчитать стоимость</h5>
 
+        <div class="DivCalculator">
+
+            <h5 class="TextCalculator">Наименование</h5>
+
+            <select class="SelectedUser" @onchange="OnMiniServiceChanged">
+                <option disabled selected>Выберите услугу</option>
+                @foreach (var name in infoMinis)
+                {
+                    <option value="@name.idMiniService">@name.nameMiniService</option>
+                }
+            </select>
+
+
+
+            <h5 class="TextCalculator">@bottomCategory</h5>
+
+            <select class="SelectedUser" @onchange="OnMaterialChanged">
+                @foreach (var material in selectedMaterials)
+                {
+                    <option value="@material.IdMaterial">@material.NameMaterial</option> <!-- или другое поле -->
+                }
+            </select>
+
+
+
+            @if(topCategory != "Тираж")
+            { 
+                <h5 class="TextCalculator">@topCategory</h5>
+
+                <select class="SelectedUser">
+                    @foreach (var header in selectedHeader)
+                    {
+                        <option>@header.NameColumn</option> <!-- или другое поле -->
+                    }
+                </select>
+
+            }
+
+
+            <h5 class="TextCalculator">Количество</h5>
+            <input type="number" @bind="count" class="inputUser" />
+
+            <button @onclick="ClickFindAllPrice" class="ButtonUsers">Узнать стоимость</button>
+            <h5 class="TextCalculator">@price</h5>
+
+
+
+        </div>
+    </div>
+
+
+    <div class="ColumnUserCalculatorAmdButton">
+        <h5 class="NameMiniService">Оформить заявку</h5>
+
+        <button class="ButtonUsers">Написать на whatsapp</button>
+        <button class="ButtonUsers">Отправить заявку на почту</button>
+    </div>
+</div>
 
 
 @code {
     [Parameter]
     public int? id { get; set; }
-    public int idService = 0;
+
     string nameBanner = "";
-    string nameMiniService = "";
-    string topCategory = "";
+
+
+    //калькулятор
     string bottomCategory = "";
-    string errorMessage = "";
-
-    int trSum; //строки
-    int tdSum; //столбцы
-    bool showSavedData = false;
-
-    List<string> headerValues = new List<string>();
-    List<int> materialIds = new List<int>();
-    List<List<decimal>> priceList = new List<List<decimal>>();
+    string topCategory = "";
+    string selectedMiniServiceName = "";
+    List<Models.Material> selectedMaterials = new();
+    List<Models.Columnname> selectedHeader = new();
 
 
+    int idMiniService = -1;
+    int idMaterial = -1;
+    int idHeader = -1;
+    int count = 0;
 
+
+    string condition = "";
+    string time = "";
+    public MarkupString FormattedCondition => 
+       (MarkupString)(condition?.Replace("\n", "<br>") ?? "");
+
+    List<Classes.Data.InfoMiniServiceData> infoMinis = new List<Classes.Data.InfoMiniServiceData>();
+
+    Models.Service service = new Models.Service();
 
     List<Models.Material> viewmaterials = new List<Models.Material>();
+
+    decimal price = 0;
+
+    List<decimal> priceList = new List<decimal>();
+
+    void OnMiniServiceChanged(ChangeEventArgs e)
+    {
+        selectedMaterials.Clear();
+        int id = Convert.ToInt32(e.Value.ToString());
+        idMiniService = id;
+
+        var info = infoMinis.Where(x => x.idMiniService == id).First();
+        List<int> materials = info.materialIds;
+
+        foreach(int material in materials)
+        {
+            selectedMaterials.Add(viewmaterials.Where(x => x.IdMaterial == material).First());
+
+        }
+        selectedMaterials.Distinct();
+        Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
+
+        selectedHeader = managmentMiniService.GetColums(id);
+    }
+
+    void OnMaterialChanged(ChangeEventArgs e)
+    {
+
+
+        idMaterial = Convert.ToInt32(e.Value.ToString());
+    }
+
+    public void ClickFindAllPrice()
+    {
+        Classes.All.SearchPrice searchPrice = new Classes.All.SearchPrice();
+
+
+           price = searchPrice.priceNotHeader(idMiniService, idMaterial, selectedHeader, count);
+
+
+    }
 
     protected override void OnInitialized()
     {
@@ -100,121 +226,60 @@
         Classes.Admin.Servise.ManagerMaterial managerMaterial = new Classes.Admin.Servise.ManagerMaterial();
         Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
 
-        int idMiniService = Convert.ToInt32(id);
-
-        var miniService = managmentMiniService.GetMiniService(idMiniService);
-        nameBanner = miniService.NameMiniServise;
-        topCategory = miniService.TopName;
-        bottomCategory = miniService.BottomName;
-        nameMiniService = miniService.NameMiniServise;
-
         viewmaterials = managerMaterial.GetList();
 
-        headerValues = managmentMiniService.GetNameColums(idMiniService);
-        materialIds = managmentMiniService.GetMaterial(idMiniService).Select(x => x.IdMaterial).ToList();
-        priceList = managmentMiniService.GetPrice(idMiniService, headerValues.Count);
 
-        trSum = priceList.Count + 1;
-        tdSum = headerValues.Count + 1;
+        service = managmentServise.Find(Convert.ToInt32(id));
+        int idService = service.IdService;
+        string nameBanner = service.NameService;
+        condition = service.ConditionText;
+        time = service.Time;
 
-        idService = miniService.IdService;
+
+        var miniServices = managmentMiniService.GetMiniServices(idService);
+        nameBanner = managmentServise.GetName(idService);
+        bottomCategory = miniServices.Select(x => x.BottomName).First();
+        topCategory = miniServices.Select(x => x.TopName).First();
+
+        foreach(var oneService in miniServices)
+        {
+            Classes.Data.InfoMiniServiceData infoMiniServiceData = new Classes.Data.InfoMiniServiceData(
+                oneService.IdMiniService,
+                oneService.NameMiniServise,
+                oneService.TopName,
+                oneService.BottomName,
+                managmentMiniService.GetNameColums(oneService.IdMiniService),
+                managmentMiniService.GetMaterial(oneService.IdMiniService).Select(x => x.IdMaterial).Distinct().ToList()
+                
+            );
+
+            int headerCount = infoMiniServiceData.headerValues.Count;
+
+
+            infoMiniServiceData.priceList = managmentMiniService.GetPrice(oneService.IdMiniService, headerCount);
+            int priceListCount = infoMiniServiceData.priceList.Count;
+            infoMiniServiceData.trSum = priceListCount + 1;
+            infoMiniServiceData.tdSum = headerCount + 1;
+
+            infoMinis.Add(infoMiniServiceData);
+
+
+            
+        }
+
+
 
     }
 
-    async Task SaveChanges()
-    {
-        Classes.Admin.Servise.ManagmentMiniService managment = new Classes.Admin.Servise.ManagmentMiniService();
-        managment.Change(Convert.ToInt32(id), nameMiniService, topCategory, bottomCategory, headerValues, materialIds, priceList);
 
-
-        Navigation.NavigateTo($"/AddInfoService/{idService}");
-        await Task.CompletedTask;
-
-    }
 
     async Task ClickExit()
     {
-        Navigation.NavigateTo($"/AddInfoService/{idService}");
+        Navigation.NavigateTo($"/AddInfoService/{Convert.ToInt32(id)}");
         await Task.CompletedTask;
     }
 
-    async Task PlusTr()
-    {
-        List<decimal> list = new List<decimal>();
-        for (int i = 0; i < tdSum - 1; i++)
-        {
-            list.Add(0);
-        }
-        priceList.Add(list); // Добавляем в список строк
-
-        trSum++;
-
-        materialIds.Add(0);
-        errorMessage = "";
-        await InvokeAsync(StateHasChanged);
-    }
-
-    async Task MinusTr()
-    {
-        if (trSum > 2)
-        {
-            materialIds.RemoveAt(materialIds.Count - 1);
-            priceList.RemoveAt(priceList.Count - 1);
-
-
-
-            trSum--;
-            errorMessage = "";
-        }
-        else
-        {
-            errorMessage = "Минимальное число строк";
-        }
-        await InvokeAsync(StateHasChanged);
-    }
-
-    async Task PlusTd()
-    {
-        if (tdSum < 9)
-        {
-            foreach (List<decimal> list in priceList)
-            {
-                list.Add(0);
-            }
-
-            tdSum++;
-            headerValues.Add(string.Empty);
-
-        }
-        else
-        {
-            errorMessage = "Достигнуто максимальное количество столбцов.";
-        }
-        await InvokeAsync(StateHasChanged);
-    }
-
-    async Task MinusTd()
-    {
-        if (tdSum > 2)
-        {
-
-            foreach (List<decimal> list in priceList)
-            {
-                list.RemoveAt(list.Count - 1);
-            }
-
-
-
-            tdSum--;
-            if (headerValues.Any())
-            {
-                headerValues.RemoveAt(headerValues.Count - 1);
-            }
-
-            errorMessage = "";
-            await InvokeAsync(StateHasChanged);
-        }
-    }
+  
 
 
 }

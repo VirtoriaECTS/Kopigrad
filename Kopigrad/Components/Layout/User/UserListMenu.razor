@@ -1,14 +1,14 @@
 ﻿
 @inject NavigationManager Navigation
 
-
+@rendermode InteractiveServer
 <div class="Vertical">
     <div class="TextContainerMenuAdmin">
         @for (int i = 0; i < services.Count / 2; i++)
         {
 
 
-            <h5 class="TextMenuUser">@services[i].NameService</h5>
+            <h5 @onclick="() => ClickService(services[i].IdService)" class="TextMenuUser">@services[i].NameService</h5>
 
         }
     </div>
@@ -17,7 +17,7 @@
         @for (int i = (services.Count / 2); i < services.Count; i++)
         {
 
-            <h5 class="TextMenuUser">@services[i].NameService</h5>
+            <h5 @onclick="() => ClickService(services[i].IdService)" class="TextMenuUser">@services[i].NameService</h5>
 
         }
     </div>
@@ -42,24 +42,9 @@
     }
 
 
-    public void Servise()
+    public void ClickService(int idService)
     {
-        Navigation.NavigateTo("/Servise");
+        Navigation.NavigateTo($"/InfoService/{idService}");
     }
 
-    public void Requst()
-    {
-        Navigation.NavigateTo("/Requst");
-    }
-
-    public void Pdf()
-    {
-        Navigation.NavigateTo("/Pdf");
-    }
-
-
-    public void Material()
-    {
-        Navigation.NavigateTo("/AddMaterial");
-    }
 }

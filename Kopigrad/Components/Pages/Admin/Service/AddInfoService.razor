@@ -41,15 +41,15 @@
 
 
     <h1 class="TextNameMiniService">Условия</h1>
-    <input @bind="condition" class="InputNameMiniService" />
+    <textarea @bind="condition" class="InputNameMiniService" name="Text1" cols="40" rows="5"></textarea>
 
 
     <h1 class="TextNameMiniService">Срок</h1>
 
-    <input @bind="time" class="InputNameMiniService" />
+    <textarea @bind="time" class="InputNameMiniService" name="Text1" cols="40" rows="5"></textarea>
 
     <div class="TextContainerMenuAdmin">
-        <button  class="ButtonDesingSavePicture">Cохранить изменения</button>
+        <button @onclick="ClickSave" class="ButtonDesingSavePicture">Cохранить изменения</button>
 
         <button @onclick="ClickExit" class="ButtonDesingNoSavePicture">Выход без сохранения</button>
 
@@ -80,8 +80,15 @@
     {
         Classes.Admin.Servise.ManagmentServiseClasses managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
         Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
-        nameBanner = managmentServise.GetName(Convert.ToInt32(id));
+
+        var service = managmentServise.Find(Convert.ToInt32(id));
+        nameBanner = service.NameService;
+        condition = service.ConditionText;
+        time = service.Time;
+
         miniservices = managmentMiniService.GetMiniServices(Convert.ToInt32(id));
+
+
 
     }
 
@@ -109,6 +116,13 @@
 
     public void ClickExit()
     {
+        Navigation.NavigateTo("/Servise");
+    }
+
+    public void ClickSave()
+    {
+        Classes.Admin.Servise.ManagmentServiseClasses managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
+        managmentServise.ChangeConditionAndTime(Convert.ToInt32(id), condition, time);
         Navigation.NavigateTo("/Servise");
     }
 }

@@ -632,3 +632,15 @@
     white-space: nowrap; /* Не переносить текст на новую строку */
     display: inline-block; /* Элемент будет занимать только ту ширину, которую ему необходимо */
 }
+
+
+.TextTable {
+    width: auto; /* Ширина будет автоматически подстраиваться под содержимое */
+    text-align: center;
+    cursor: default;
+    font-family: DaysFronts;
+    font-size: 1.3vw;
+    margin: 0.3vw 3vw 0.3vw 3vw;
+    white-space: nowrap; /* Не переносить текст на новую строку */
+    display: inline-block; /* Элемент будет занимать только ту ширину, которую ему необходимо */
+}

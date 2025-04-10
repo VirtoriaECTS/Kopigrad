@@ -40,3 +40,85 @@
     align-items: center; /* Центрирование по вертикали */
     height: 100vh; /* Устанавливаем высоту контейнера на весь экран */
 }
+
+.NameMiniService {
+    height: auto;
+    font-family: DaysFronts;
+    font-size: 2vh;
+    margin: 5vh 0vw 2.5vh 0vw;
+    text-align: center;
+}
+
+
+.TextTableCondition {
+    width: 80vw;
+    text-align: left;
+    font-family: DaysFronts;
+    font-size: 1.3vh;
+    font-style: revert;
+}
+
+
+.TextTableUser {
+    font-family: DaysFronts;
+    font-size: 1.5vh;
+}
+
+
+.divUsersColumn {
+    
+    display: flex; /* Располагает дочерние элементы в строку */
+}
+
+
+.ColumnUserCalculatorAmdButton{
+    width: 50vw;
+    height: 50vw;
+    text-align: center;
+}
+
+
+.ButtonUsers {
+    margin: 2.5vh 0vw 0vh 0vw;
+    border-radius: 2vw;
+    background: #000000;
+    width: 25vw;
+    height: 4vw;
+    font-family: DaysFronts;
+    font-size: 1.5vh;
+    color: white;
+    text-align: center;
+}
+
+
+.DivCalculator {
+    text-align: center;
+    margin: 2.5vh 0vw 0vh 10vw;
+    width: 30vw;
+    height: 40vw;
+    border: 0.2vw solid #000000;
+    border-radius: 0.5vw;
+}
+
+.TextCalculator {
+    margin: 3vh 0vw 1vh 0vw;
+    font-family: DaysFronts;
+    font-size: 2vh;
+    text-align: center;
+}
+
+.inputUser {
+    font-family: DaysFronts;
+    font-size: 2vh;
+    border-radius: 0.5vw;
+    width: 20vw;
+}
+
+
+.SelectedUser {
+    font-family: DaysFronts;
+    font-size: 1.8vh;
+    border-radius: 0.5vw;
+    width: 20vw;
+    height: 2vw;
+}
