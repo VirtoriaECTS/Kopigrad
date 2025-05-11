@@ -122,3 +122,12 @@
     width: 20vw;
     height: 2vw;
 }
+
+
+.backRequst {
+    width: 100vw;
+    height: 150vh;
+    background-image: url("/Image/Baners/backgroundRequst.png");
+    background-size: cover; /* Чтобы картинка масштабировалась под блок */
+    background-position: center; /* Чтобы она была по центру */
+}

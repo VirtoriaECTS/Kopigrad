@@ -1,0 +1,124 @@
+﻿@page "/businesscard"
+
+@rendermode InteractiveServer
+
+@using System.Net.Http.Json
+@inject HttpClient Http
+
+<h3>Генератор визиток</h3>
+
+<div class="form-group">
+    <label>Имя:</label>
+    <input class="form-control" @bind="Name" />
+</div>
+
+<div class="form-group">
+    <label>Должность:</label>
+    <input class="form-control" @bind="JobTitle" />
+</div>
+
+<div class="form-group">
+    <label>Компания:</label>
+    <input class="form-control" @bind="Company" />
+</div>
+
+<div class="form-group">
+    <label>Контакт:</label>
+    <input class="form-control" @bind="Contact" />
+</div>
+
+<div class="form-group">
+    <label>Стиль визитки:</label>
+    <select class="form-control" @bind="SelectedStyle">
+        @foreach (var style in Styles)
+        {
+            <option value="@style">@style</option>
+        }
+    </select>
+</div>
+
+<button class="btn btn-primary mt-2" @onclick="GenerateImageAsync" disabled="@IsLoading">
+    @(IsLoading ? "Генерация..." : "Сгенерировать визитку")
+</button>
+
+@if (!string.IsNullOrEmpty(ImageUrl))
+{
+    <div class="mt-3">
+        <img src="@ImageUrl" alt="Business Card" style="max-width:100%; border: 1px solid #ccc;" />
+
+        <div class="mt-2">
+            <a class="btn btn-success" href="@ImageUrl" download="@($"{Name}_card.png")" target="_blank">
+                Скачать визитку
+            </a>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger mt-2">@ErrorMessage</div>
+}
+
+@code {
+    private string Name;
+    private string JobTitle;
+    private string Company;
+    private string Contact;
+    private string ImageUrl;
+    private string ErrorMessage;
+    private string SelectedStyle = "Минимализм";
+    private bool IsLoading;
+
+    private readonly string[] Styles = new[]
+    {
+        "Минимализм", "Современный", "Технологичный", "Ретро", "Классический", "Черно-белый", "Цветной"
+    };
+
+    private const string ApiKey = "1b64c4d6-9e17-403d-aee0-0b1a3766ba69";
+
+    private async Task GenerateImageAsync()
+    {
+        ErrorMessage = string.Empty;
+        ImageUrl = string.Empty;
+        IsLoading = true;
+
+        var prompt = $"визитка в стиле {SelectedStyle.ToLower()}, с именем {Name}, должностью {JobTitle}, компанией {Company}, и контактами {Contact}";
+
+        var payload = new
+        {
+            token = ApiKey,
+            prompt = prompt,
+            width = 1024,
+            height = 512,
+            response_type = "url",
+            stream = false
+        };
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://neuroimg.art/api/v1/free-generate", payload);
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse>();
+
+            if (result?.status == "SUCCESS" && !string.IsNullOrEmpty(result.image_url))
+            {
+                ImageUrl = result.image_url;
+            }
+            else
+            {
+                ErrorMessage = "Ошибка генерации изображения.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Ошибка: " + ex.Message;
+        }
+
+        IsLoading = false;
+    }
+
+    private class ApiResponse
+    {
+        public string status { get; set; }
+        public string image_url { get; set; }
+    }
+}

@@ -2,6 +2,7 @@ using Kopigrad.Components;
 using Kopigrad.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.Features;
+using Kopigrad.Components.Classes.Admin.Servise;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,10 @@ builder.Services.Configure<FormOptions>(options =>
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 builder.Logging.AddConsole();
 
+
+
+
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -22,6 +27,9 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContext<KopigradContext>(options =>
     options.UseMySql("server=localhost;database=kopigrad;user=viktoria;password=17092002Ol!",
     new MySqlServerVersion(new Version(8, 0, 30))));
+
+builder.Services.AddHttpClient();
+
 
 var app = builder.Build();
 

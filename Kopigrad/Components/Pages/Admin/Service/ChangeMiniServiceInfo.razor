@@ -142,7 +142,7 @@
         viewmaterials = managerMaterial.GetList();
 
         headerValues = managmentMiniService.GetNameColums(idMiniService);
-        materialIds = managmentMiniService.GetMaterial(idMiniService).Select(x => x.IdMaterial).ToList();
+        materialIds = managmentMiniService.GetMaterial(idMiniService).Select(x => x.IdMaterial).Distinct().ToList();
         priceList = managmentMiniService.GetPrice(idMiniService, headerValues.Count);
 
         trSum = priceList.Count + 1;
@@ -155,7 +155,7 @@
     async Task SaveChanges()
     {
         Classes.Admin.Servise.ManagmentMiniService managment = new Classes.Admin.Servise.ManagmentMiniService();
-        managment.Change(Convert.ToInt32(id), nameMiniService, topCategory, bottomCategory, headerValues, materialIds, priceList);
+        managment.Change(Convert.ToInt32(id), nameMiniService, topCategory, bottomCategory, headerValues, materialIds.Distinct().ToList(), priceList);
 
 
         Navigation.NavigateTo($"/AddInfoService/{idService}");

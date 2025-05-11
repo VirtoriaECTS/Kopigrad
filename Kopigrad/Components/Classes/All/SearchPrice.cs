@@ -21,6 +21,22 @@ namespace Kopigrad.Components.Classes.All
             return result;
         }
 
+        public decimal priceHeader(int idMiniService, int idMaterial, int idColumn, int count)
+        {
+            decimal result = 0;
+
+            using (var context = new KopigradContext())
+            {
+                decimal price = context.Tableminiservices.Where(x => x.IdMiniService == idMiniService).Where(X => X.IdMaterial == idMaterial).Where(x => x.IdColumnName == idColumn).Select(x => x.Price).FirstOrDefault();
+
+                
+                result = price * count;
+            }
+
+
+            return result;
+        }
+
 
         private List<decimal> GetPriceList(int idMiniService, int idMaterial)
         {

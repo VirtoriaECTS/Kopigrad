@@ -116,10 +116,10 @@
             { 
                 <h5 class="TextCalculator">@topCategory</h5>
 
-                <select class="SelectedUser">
+                <select class="SelectedUser" @onchange="OnHeaderChanged">
                     @foreach (var header in selectedHeader)
                     {
-                        <option>@header.NameColumn</option> <!-- или другое поле -->
+                        <option value="@header.IdColumnNames">@header.NameColumn</option> <!-- или другое поле -->
                     }
                 </select>
 
@@ -142,7 +142,7 @@
         <h5 class="NameMiniService">Оформить заявку</h5>
 
         <button class="ButtonUsers">Написать на whatsapp</button>
-        <button class="ButtonUsers">Отправить заявку на почту</button>
+        <button class="ButtonUsers" @onclick="ClickRequst">Отправить заявку</button>
     </div>
 </div>
 
@@ -198,6 +198,8 @@
 
         }
         selectedMaterials.Distinct();
+
+
         Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
 
         selectedHeader = managmentMiniService.GetColums(id);
@@ -210,12 +212,26 @@
         idMaterial = Convert.ToInt32(e.Value.ToString());
     }
 
+    void OnHeaderChanged(ChangeEventArgs e)
+    {
+
+
+        idHeader = Convert.ToInt32(e.Value.ToString());
+    }
+
     public void ClickFindAllPrice()
     {
         Classes.All.SearchPrice searchPrice = new Classes.All.SearchPrice();
 
+        @if (topCategory == "Тираж")
+        {
+            price = searchPrice.priceNotHeader(idMiniService, idMaterial, selectedHeader, count);
 
-           price = searchPrice.priceNotHeader(idMiniService, idMaterial, selectedHeader, count);
+        }
+        else
+        {
+            price = searchPrice.priceHeader(idMiniService, idMaterial, idHeader, count);
+        }
 
 
     }
@@ -272,6 +288,11 @@
     }
 
 
+    async Task ClickRequst()
+    {
+        Navigation.NavigateTo($"/CreateRequest");
+        await Task.CompletedTask;
+    }
 
     async Task ClickExit()
     {

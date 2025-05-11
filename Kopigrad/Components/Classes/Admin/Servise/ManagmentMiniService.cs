@@ -11,7 +11,7 @@ namespace Kopigrad.Components.Classes.Admin.Servise
 
 
 
-        public void Add(int idService, string nameMiniService, string TopName, string BottomName, List<string> NameColumns, List<int> Material, List<List<decimal>> Prices)
+        public void Add(int idService, string nameMiniService, string TopName, string BottomName, List<string> NameColumns, List<int> Materials, List<List<decimal>> Prices)
         {
 
             int idMiniService = AddMiniService(idService, nameMiniService, TopName, BottomName);
@@ -29,7 +29,7 @@ namespace Kopigrad.Components.Classes.Admin.Servise
             }
             int i = 0;
             int j = 0;
-            foreach (int material in Material)
+            foreach (int material in Materials)
             {
                foreach(int idColums in idColumsId)
                 {
