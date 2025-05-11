@@ -131,3 +131,31 @@
     background-size: cover; /* Чтобы картинка масштабировалась под блок */
     background-position: center; /* Чтобы она была по центру */
 }
+
+
+
+.DivCards{
+    width: 100vw;
+    margin: 3vw 0;
+    text-align: center;
+    display: flex; /* Для использования flexbox */
+    justify-content: center; /* Центрирование по горизонтали */
+    height: 100vh; /* Устанавливаем высоту контейнера на весь экран */
+}
+
+.ButtonUsersDombload {
+    margin: 2.5vh 0vw 0vh 0vw;
+    border-radius: 2vw;
+    background: #006227;
+    width: 25vw;
+    height: 4vw;
+    font-family: DaysFronts;
+    font-size: 1.5vh;
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
+}
