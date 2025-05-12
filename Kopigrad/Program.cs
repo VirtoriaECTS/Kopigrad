@@ -9,9 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Увеличиваем лимит для файлов (например, до 100 MB)
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 100 * 1024 * 1024;  // 100 MB
+    options.MultipartBodyLengthLimit = long.MaxValue; // максимальный размер тела запроса
 });
-
 // Включаем подробные ошибки
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 builder.Logging.AddConsole();

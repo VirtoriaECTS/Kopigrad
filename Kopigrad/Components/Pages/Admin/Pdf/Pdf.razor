@@ -1,24 +1,318 @@
 ﻿@page "/Pdf"
+@using PdfSharpCore.Pdf.IO
 @rendermode InteractiveServer
 
+@inject IWebHostEnvironment env
+
+
+
+<head>
+    <link rel="stylesheet" href="users.css">
+</head>
 
 
 <div class="Banner">
     <h5 class="TextBanner">PDF расчет</h5>
 </div>
 
-@for(int i = 0; i < 5; i ++){
-    <input @bind="array[i]"/>
-}
-@for (int i = 0; i < 5; i++)
+<div class="divUsersColumn">
+
+
+    <table style="width: 45vw; margin: 5vw 5vw 5vw 5vw;">
+        <tr>
+            <td>
+                <InputFile  OnChange="HandleFileSelected" accept=".pdf" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @if (!string.IsNullOrEmpty(pdfFilePath))
+                {
+                    <h4 class="TextCalculator">Просмотр PDF:</h4>
+                    <object data="@pdfFilePath" type="application/pdf" width="100%" height="600px">
+                        <p>
+                            Ваш браузер не поддерживает PDF.
+                            <a href="@pdfFilePath">Скачать PDF</a>.
+                        </p>
+                    </object>
+                }
+            </td>
+        </tr>
+    </table>
+
+    @if (!string.IsNullOrEmpty(pdfFilePath))
+    {
+        <table class="custom-table" style="width: 45vw; margin: 5vw;">
+            <tr>
+                <td><h3 class="TextCalculator">Номер страницы</h3></td>
+                <td><h3 class="TextCalculator">Размер</h3></td>
+                <td><h3 class="TextCalculator">Выбор услуги</h3></td>
+                <td><h3 class="TextCalculator">Выбор колонки</h3></td>
+                <td><h3 class="TextCalculator">Выбор материала</h3></td>
+                <td><h3 class="TextCalculator">Цена</h3></td>
+            </tr>
+
+            @for (int i = 0; i < pageFormats.Count; i++)
+            {
+                var currentIndex = i;
+                <tr>
+                    <td><h3 class="TextTableUser">@(i + 1)</h3></td>
+                    <td><h3 class="TextTableUser">@pageFormats[i]</h3></td>
+
+                    <td>
+                        <select class="SelectedPdf" @onchange="@(e => OnMiniServiceChanged(e, currentIndex))">
+                            <option disabled selected>Выберите</option>
+                            @foreach (var serviceMini in miniservices)
+                            {
+                                <option value="@serviceMini.IdMiniService">@serviceMini.NameMiniServise</option>
+                            }
+                        </select>
+                    </td>
+
+                    <td>
+                        <select @onchange="@(e => OnColumsChanged(e, currentIndex))">
+                            <option disabled selected>Выберите</option>
+                            @foreach (var colums in colums.Where(x => x.IdMiniService == idMiniServices[currentIndex]))
+                            {
+                                <option value="@colums.IdColumnNames">@colums.NameColumn</option>
+                            }
+                        </select>
+                    </td>
+
+                    <td>
+                        <select @onchange="@(e => OnMaterialChanged(e, currentIndex))">
+                            <option disabled selected>Выберите</option>
+                            @foreach (var material in materials.Where(m => m.Tableminiservices.Any(t => t.IdMiniService == idMiniServices[currentIndex])))
+                            {
+                                <option value="@material.IdMaterial">@material.NameMaterial</option>
+                            }
+                        </select>
+                    </td>
+
+                    <td><h5 class="TextTableUser">@Prices[currentIndex]</h5></td>
+                </tr>
+            }
+
+            @if (Prices != null)
+            {
+                <h5 class="TextCalculator">Итого: @Prices.Sum()</h5>
+            }
+        </table>
+    }
+
+   
+
+
+
+
+
+</div>
+
+<style>
+    .custom-table, .custom-table th, .custom-table td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+        .custom-table td, .custom-table th {
+            padding: 10px;
+            text-align: center;
+        }
+
+    .custom-table {
+        width: 100%;
+    }
+
+        .custom-table h3, .custom-table h5 {
+            margin: 0;
+        }
+
+        .custom-table select {
+            width: 100%;
+        }
+</style>
+
+
+
+
+@code {
+
+    private string? pdfFilePath;
+
+
+    public List<string> pageFormats = new List<string>();
+
+    public List<Classes.Data.DataSize> dataSizes = new List<Classes.Data.DataSize>();
+
+
+    //отследить id
+    int[] idMiniServices;
+    int[] idColums;
+    int[] idMaterial;
+    decimal[] Prices;
+
+    //для combobox
+    List<Models.Miniservice> miniservices = new List<Models.Miniservice>();
+    List<Models.Material> materials = new List<Models.Material>();
+    List<Models.Columnname> colums = new List<Models.Columnname>();
+
+
+
+    Dictionary<string, decimal> formatPricesNonColors = new Dictionary<string, decimal>
 {
-    <h1>@array[i]</h1>
-}
+    { "A4", 5.00m },
+    { "A3", 7.50m },
+    { "A2", 5.00m },
+    { "A1", 7.50m },
+    { "A0", 5.00m },
+    { "Неизвестный формат", 0.00m }
+
+};
+
+
+    Dictionary<string, decimal> formatPricesColors = new Dictionary<string, decimal>
+{
+    { "A4", 5.00m },
+    { "A3", 7.50m },
+    { "A2", 5.00m },
+    { "A1", 7.50m },
+    { "A0", 5.00m },
+    { "Неизвестный формат", 0.00m }
+};
+
+
+    protected override void OnInitialized()
+    {
+        Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
+        miniservices = managmentMiniService.getMiniServiceToPdf();
+
+        colums = managmentMiniService.getAllColums();
+        materials = managmentMiniService.getAllMaterial();
 
 
 
-@code{
-    int[] array = new int[9];
+    }
 
+    Classes.Admin.Servise.ConvertPdfonPrice convertFormat = new Classes.Admin.Servise.ConvertPdfonPrice();
+
+
+    void OnMiniServiceChanged(ChangeEventArgs e, int index)
+    {
+        Classes.Admin.Servise.ManagmentMiniService managment = new Classes.Admin.Servise.ManagmentMiniService();
+
+        if (int.TryParse(e.Value?.ToString(), out int selectedId))
+        {
+            idMiniServices[index] = selectedId;
+
+            if (idMaterial[index] != 0)
+            {
+                getPrice(index);
+            }
+
+        }
+    }
+
+    void OnColumsChanged(ChangeEventArgs e, int index)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int selectedId))
+        {
+            idColums[index] = selectedId;
+        }
+    }
+
+    void OnMaterialChanged(ChangeEventArgs e, int index)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int selectedId))
+        {
+            idMaterial[index] = selectedId;
+        }
+
+        if(idColums[index] != 0)
+        {
+            getPrice(index);
+        }
+
+    }
+
+
+    public void getPrice(int index)
+    {
+        Classes.Admin.Servise.ConvertPdfonPrice convert = new Classes.Admin.Servise.ConvertPdfonPrice();
+        double wight = dataSizes[index].weight;
+        double height = dataSizes[index].heuiht;
+        Prices[index] = convert.getPriceNormal(idMiniServices[index], idColums[index], idMaterial[index], pageFormats[index], wight, height);
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        var uploadsPath = Path.Combine(env.WebRootPath, "uploads");
+        Directory.CreateDirectory(uploadsPath);
+
+        var fileName = Path.GetFileName(file.Name);
+        var fullPath = Path.Combine(uploadsPath, fileName);
+
+        // Записываем файл на сервер
+        using (var fs = new FileStream(fullPath, FileMode.Create))
+        {
+            await file.OpenReadStream(long.MaxValue).CopyToAsync(fs);
+        }
+
+
+        pdfFilePath = $"uploads/{fileName}";
+
+
+        // Немного ждём, чтобы файл стал доступен
+        await Task.Delay(500); // 500 миллисекунд
+
+        bool cheak = true;
+
+        while (cheak)
+        {
+            try
+            {
+                // Открываем PDF-документ
+                using (var document = PdfReader.Open(fullPath, PdfDocumentOpenMode.ReadOnly))
+                {
+                    int i = 1;
+                    foreach (var page in document.Pages)
+                    {
+                        // Получаем размер страницы
+                        var width = page.Width;
+                        var height = page.Height;
+
+
+
+                        // Определяем формат и добавляем его
+                        var format = convertFormat.GetPaperFormat(width, height);
+                        pageFormats.Add($"{format}");
+                        Classes.Data.DataSize item = new Classes.Data.DataSize(width, height);
+                        dataSizes.Add(item);
+                        i++;
+                    }
+                }
+
+
+
+                cheak = false;
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Ошибка при открытии файла: {ex.Message}");
+            }
+        }
+
+        int count = pageFormats.Count();
+
+        idMiniServices = new int[count];
+        idColums = new int[count];
+        idMaterial = new int[count];
+        Prices = new decimal[count];
+
+
+    }
+
+  
 
 }

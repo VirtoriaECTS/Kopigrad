@@ -159,3 +159,41 @@
     text-align: center;
     text-decoration: none;
 }
+
+.custom-upload {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #28a745;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+    .custom-upload:hover {
+        background-color: #218838;
+    }
+
+.input-hidden {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+}
+
+
+.SelectedPdf {
+
+    border-radius: 0.5vw;
+    font-family: DaysFronts;
+    font-size: 1.3vh;
+    font-style: revert;
+}

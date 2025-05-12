@@ -307,5 +307,41 @@ namespace Kopigrad.Components.Classes.Admin.Servise
             }
         }
 
+
+        public List<Miniservice> getMiniServiceToPdf()
+        {
+            using(var context = new KopigradContext())
+            {
+                List<Miniservice> one = GetMiniServices(1);
+                List<Miniservice> two = GetMiniServices(4);
+                List<Miniservice> result = one.Concat(two).ToList();
+                return result;
+            }
+        }
+
+
+        public List<Material> getAllMaterial()
+        {
+            using (var context = new KopigradContext())
+            {
+                return context.Materials
+                    .Include(m => m.Tableminiservices)
+                    .ToList();
+            }
+        }
+
+
+        public List<Models.Columnname> getAllColums()
+        {
+            using (var context = new KopigradContext())
+            {
+                return context.Columnnames.ToList();
+            }
+        }
+
+
+
+
+
     }
 }
