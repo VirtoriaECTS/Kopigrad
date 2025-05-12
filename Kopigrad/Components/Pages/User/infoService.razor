@@ -18,7 +18,7 @@
 
 
 
-    @foreach(var info in infoMinis)
+    @foreach (var info in infoMinis)
     {
         <h5 style="font-weight: bold;" class="NameMiniService">@info.nameMiniService</h5>
 
@@ -32,7 +32,7 @@
                     @for (int j = 0; j < info.tdSum; j++)
                     {
                         <td class="TableBorderTd" @key="j">
-                             @if (i == 0 && j == 0)
+                            @if (i == 0 && j == 0)
                             {
                                 <!-- Левая шапка с двумя данными -->
                                 <h5 class="TextTableUser" style="font-weight: bold;">@info.bottomCategory / @info.topCategory</h5>
@@ -61,7 +61,7 @@
 
                             }
                         </td>
-                        
+
                     }
 
                 </tr>
@@ -84,7 +84,7 @@
 
 
 <div class="divUsersColumn">
-    <div  class="ColumnUserCalculatorAmdButton">
+    <div class="ColumnUserCalculatorAmdButton">
         <h5 class="NameMiniService">Рассчитать стоимость</h5>
 
         <div class="DivCalculator">
@@ -112,8 +112,8 @@
 
 
 
-            @if(topCategory != "Тираж")
-            { 
+            @if (topCategory != "Тираж")
+            {
                 <h5 class="TextCalculator">@topCategory</h5>
 
                 <select class="SelectedUser" @onchange="OnHeaderChanged">
@@ -170,7 +170,7 @@
 
     string condition = "";
     string time = "";
-    public MarkupString FormattedCondition => 
+    public MarkupString FormattedCondition =>
        (MarkupString)(condition?.Replace("\n", "<br>") ?? "");
 
     List<Classes.Data.InfoMiniServiceData> infoMinis = new List<Classes.Data.InfoMiniServiceData>();
@@ -192,7 +192,7 @@
         var info = infoMinis.Where(x => x.idMiniService == id).First();
         List<int> materials = info.materialIds;
 
-        foreach(int material in materials)
+        foreach (int material in materials)
         {
             selectedMaterials.Add(viewmaterials.Where(x => x.IdMaterial == material).First());
 
@@ -257,7 +257,7 @@
         bottomCategory = miniServices.Select(x => x.BottomName).First();
         topCategory = miniServices.Select(x => x.TopName).First();
 
-        foreach(var oneService in miniServices)
+        foreach (var oneService in miniServices)
         {
             Classes.Data.InfoMiniServiceData infoMiniServiceData = new Classes.Data.InfoMiniServiceData(
                 oneService.IdMiniService,
@@ -266,7 +266,7 @@
                 oneService.BottomName,
                 managmentMiniService.GetNameColums(oneService.IdMiniService),
                 managmentMiniService.GetMaterial(oneService.IdMiniService).Select(x => x.IdMaterial).Distinct().ToList()
-                
+
             );
 
             int headerCount = infoMiniServiceData.headerValues.Count;
@@ -280,7 +280,7 @@
             infoMinis.Add(infoMiniServiceData);
 
 
-            
+
         }
 
 
@@ -300,7 +300,7 @@
         await Task.CompletedTask;
     }
 
-  
+
 
 
 }
