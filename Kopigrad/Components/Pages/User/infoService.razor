@@ -4,13 +4,11 @@
 @layout Layout.Menu.MenuUser;
 
 
-
 <div class="CenterVertical">
     <head>
-        <link rel="stylesheet" href="users.css">
-        <link rel="stylesheet" href="admin.css">
+        <link rel="stylesheet" href="/users.css">
+        <link rel="stylesheet" href="/admin.css">
     </head>
-
     <div class="Banner">
 
         <h5 class="TextBanner">@nameBanner</h5>
@@ -84,6 +82,8 @@
 
 
 <div class="divUsersColumn">
+
+  
     <div class="ColumnUserCalculatorAmdButton">
         <h5 class="NameMiniService">Рассчитать стоимость</h5>
 
@@ -139,15 +139,20 @@
 
 
     <div class="ColumnUserCalculatorAmdButton">
-        <h5 class="NameMiniService">Оформить заявку</h5>
+    @*     <h5 class="NameMiniService">Оформить заявку</h5> *@
 
-        <button class="ButtonUsers">Написать на whatsapp</button>
-        <button class="ButtonUsers" @onclick="ClickRequst">Отправить заявку</button>
+@*         <button class="ButtonUsers">Написать на whatsapp</button>
+        <button class="ButtonUsers" @onclick="ClickRequst">Отправить заявку</button> *@
+        @if(id == 6)
+        {
+            <button class="ButtonUsers" @onclick="ClickRequst">Конструтор визиток</button>
+        }
     </div>
 </div>
 
 
 @code {
+
     [Parameter]
     public int? id { get; set; }
 
@@ -291,6 +296,12 @@
     async Task ClickRequst()
     {
         Navigation.NavigateTo($"/CreateRequest");
+        await Task.CompletedTask;
+    }
+
+    async Task ClickGenerate()
+    {
+        Navigation.NavigateTo($"//businesscard");
         await Task.CompletedTask;
     }
 

@@ -42,7 +42,8 @@ public partial class KopigradContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
-        => optionsBuilder.UseMySql("server=127.0.0.1;database=kopigrad;user=viktoria;password=17092002Ol!", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.4.32-mariadb"));
+        => optionsBuilder.UseMySql("server=62.76.233.55;port=3306;database=kopigrad;user=blazoruser;password=newpassword123;", ServerVersion.Parse("10.4.32-mariadb"));
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

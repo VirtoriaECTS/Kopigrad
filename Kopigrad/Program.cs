@@ -3,6 +3,7 @@ using Kopigrad.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.Features;
 using Kopigrad.Components.Classes.Admin.Servise;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,22 +16,28 @@ builder.Services.Configure<FormOptions>(options =>
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 builder.Logging.AddConsole();
 
-
-
-
-
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddDbContext<KopigradContext>(options =>
-    options.UseMySql("server=localhost;database=kopigrad;user=viktoria;password=17092002Ol!",
-    new MySqlServerVersion(new Version(8, 0, 30))));
+{
+    options.UseMySql(
+        "server=62.76.233.55;port=3306;database=kopigrad;user=blazoruser;password=newpassword123;",
+        new MySqlServerVersion(new Version(10, 4, 32)), // Убедитесь, что версия правильно указана
+        mysqlOptions => mysqlOptions.EnableRetryOnFailure()  // Включаем повторные попытки подключения
+    );
+});
+
+
 
 builder.Services.AddHttpClient();
 
 
 var app = builder.Build();
+
+// Настроим приложение на прослушивание на всех интерфейсах на порту 5000
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
