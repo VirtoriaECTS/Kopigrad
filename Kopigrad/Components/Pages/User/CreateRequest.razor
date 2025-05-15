@@ -29,12 +29,12 @@
             <label>Как с вами связаться</label>
             <select @bind="idContact">
                 <option value="0" disabled>Выберите способ связи</option>
-                <option value="1">В Telegram</option>
-                <option value="2">По почте</option>
+                <option value="2">В Telegram</option>
+                <option value="3">По почте</option>
             </select>
 
 
-            @if (idContact == 1)
+            @if (idContact == 2)
             {
                 // Если выбран Telegram, показываем либо инфу, либо виджет авторизации
                 if (!string.IsNullOrEmpty(telegramId))
@@ -62,7 +62,7 @@
                     </script>
                 }
             }
-            else if (idContact == 2)
+            else if (idContact == 3)
             {
                 <p>Вы выбрали связаться по почте. Здесь можно добавить форму для ввода почты.</p>
             }
@@ -130,8 +130,6 @@
                 </select>
             }
 
-            <label>Опишите что вам требуется</label>
-            <input type="text" />
 
             <label>Прикрепить файлы</label>
             <InputFile OnChange="HandleFileSelected" multiple />
@@ -357,7 +355,7 @@
                 var fullPath = Path.Combine(uploadsPath, uniqueFileName);
 
                 await using var fs = new FileStream(fullPath, FileMode.Create);
-                await file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024).CopyToAsync(fs);
+                await file.OpenReadStream(long.MaxValue).CopyToAsync(fs);
 
                 filePaths.Add($"/userfiles/{uniqueFileName}");
             }
@@ -369,9 +367,9 @@
 
         Classes.User.CreateRequstcsManager createRequstcsManager = new Classes.User.CreateRequstcsManager();
         int idTable = createRequstcsManager.FirstIdTableMiniService(idServiceMini, idMaterial, idColumn);
-        if(idContact == 1)
+        if(idContact == 2)
         {
-            createRequstcsManager.CreateOrder(name, 1, "@Molotov", idTable, filePaths, price, count);
+            createRequstcsManager.CreateOrder(name, 2, "@Molotov", idTable, filePaths, price, count);
         }
 
 

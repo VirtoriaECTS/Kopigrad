@@ -153,14 +153,21 @@ public partial class KopigradContext : DbContext
 
             entity.HasIndex(e => e.IdStatus, "idStatus");
 
+            entity.HasIndex(e => e.IdTableMiniService, "idx_idTableMiniService");
+
             entity.Property(e => e.IdOrder).HasColumnType("int(11)");
             entity.Property(e => e.Contact).HasMaxLength(255);
             entity.Property(e => e.ContactTypeId).HasColumnType("int(11)");
+            entity.Property(e => e.Count).HasColumnType("int(11)");
             entity.Property(e => e.DataOrder).HasColumnType("datetime");
             entity.Property(e => e.IdStatus)
                 .HasColumnType("int(11)")
                 .HasColumnName("idStatus");
+            entity.Property(e => e.IdTableMiniService)
+                .HasColumnType("int(11)")
+                .HasColumnName("idTableMiniService");
             entity.Property(e => e.NameUser).HasColumnType("text");
+            entity.Property(e => e.Price).HasPrecision(10, 2);
 
             entity.HasOne(d => d.ContactType).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.ContactTypeId)
@@ -171,6 +178,11 @@ public partial class KopigradContext : DbContext
                 .HasForeignKey(d => d.IdStatus)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("order_ibfk_1");
+
+            entity.HasOne(d => d.IdTableMiniServiceNavigation).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.IdTableMiniService)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_order_tableminiservice");
         });
 
         modelBuilder.Entity<Orderitem>(entity =>
@@ -181,28 +193,14 @@ public partial class KopigradContext : DbContext
 
             entity.HasIndex(e => e.IdOrder, "IdRequst");
 
-            entity.HasIndex(e => e.IdTableMiniService, "IdViewCategory");
-
             entity.Property(e => e.IdOrderItems)
                 .HasColumnType("int(11)")
                 .HasColumnName("idOrderItems");
-            entity.Property(e => e.Count).HasColumnType("int(11)");
-            entity.Property(e => e.FilePath).HasMaxLength(255);
             entity.Property(e => e.IdOrder).HasColumnType("int(11)");
-            entity.Property(e => e.IdTableMiniService)
-                .HasColumnType("int(11)")
-                .HasColumnName("idTableMiniService");
-            entity.Property(e => e.Price).HasPrecision(10, 2);
 
             entity.HasOne(d => d.IdOrderNavigation).WithMany(p => p.Orderitems)
                 .HasForeignKey(d => d.IdOrder)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("orderitems_ibfk_1");
-
-            entity.HasOne(d => d.IdTableMiniServiceNavigation).WithMany(p => p.Orderitems)
-                .HasForeignKey(d => d.IdTableMiniService)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("orderitems_ibfk_2");
+                .HasConstraintName("fk_orderitems_order");
         });
 
         modelBuilder.Entity<Pagepdf>(entity =>

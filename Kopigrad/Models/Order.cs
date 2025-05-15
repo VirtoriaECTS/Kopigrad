@@ -17,9 +17,17 @@ public partial class Order
 
     public int ContactTypeId { get; set; }
 
+    public int IdTableMiniService { get; set; }
+
+    public int Count { get; set; }
+
+    public decimal Price { get; set; }
+
     public virtual ContactType ContactType { get; set; } = null!;
 
     public virtual Status IdStatusNavigation { get; set; } = null!;
+
+    public virtual Tableminiservice IdTableMiniServiceNavigation { get; set; } = null!;
 
     public virtual ICollection<Orderitem> Orderitems { get; set; } = new List<Orderitem>();
 }

@@ -1,0 +1,122 @@
+﻿
+@font-face {
+    font-family: 'DaysFronts';
+    src: url('/Fronts/DAYS.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.page-container {
+    padding: 1rem;
+    font-family: 'DaysFronts', sans-serif;
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.control {
+    padding: 0.5rem 1rem;
+    border: 2px solid black;
+    border-radius: 10px;
+    background: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+    .search-box input {
+        border: none;
+        outline: none;
+        font-weight: bold;
+    }
+
+/* Order summary */
+.order-card {
+    border: 1px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.order-summary {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 1rem;
+    align-items: center;
+    cursor: pointer;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.expand-icon {
+    font-size: 1.2rem;
+}
+
+/* Details layout */
+.order-details {
+    border-top: 1px solid #aaa;
+    padding: 1rem;
+}
+
+.details-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+}
+
+    .details-row > div > div {
+        margin-bottom: 0.5rem;
+    }
+
+.change-status-btn {
+    margin-top: 1rem;
+    padding: 0.4rem 1rem;
+    border-radius: 10px;
+    border: 2px solid black;
+    background: white;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .details-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .details-row {
+        grid-template-columns: 1fr;
+    }
+
+    .order-summary {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+}
+

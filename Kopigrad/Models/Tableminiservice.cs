@@ -21,5 +21,5 @@ public partial class Tableminiservice
 
     public virtual Miniservice IdMiniServiceNavigation { get; set; } = null!;
 
-    public virtual ICollection<Orderitem> Orderitems { get; set; } = new List<Orderitem>();
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

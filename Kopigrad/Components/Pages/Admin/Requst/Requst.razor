@@ -1,30 +1,165 @@
 ﻿@page "/Requst"
-@using System.Net.Http.Json
+@rendermode InteractiveServer
 
 
-@foreach(var item in orders)
-{
-    <h5>
-        @item.NameUser
-    </h5>
+<head>
+    <link rel="stylesheet" href="/users.css">
+    <link rel="stylesheet" href="/admin.css">
+    <link rel="stylesheet" href="/orders.css">
+</head>
 
-    <h5>
-        @item.Contact
-    </h5>
+<div class="Banner">
+    <h5 class="TextBanner">Заказы</h5>
+</div>
+    <div class="page-container">
 
-    <h5>
-        @item.DataOrder
-    </h5>
+        <!-- Панель управления -->
+        <div class="toolbar">
+            <div class="control search-box">
+                <input type="text" placeholder="Поиск" />
+                <span class="icon">🔍</span>
+            </div>
+            <select class="control">
+                <option>Фильтрация</option>
+                <option>По дате</option>
+                <option>По имени</option>
+            </select>
+            <select class="control">
+                <option>Сортировка</option>
+                <option>По возрастанию</option>
+                <option>По убыванию</option>
+            </select>
+        </div>
 
 
-    
-}
+    @for(int i = 0; i < orders.Count; i ++)
+    {
+        var index = i;
 
-@code{
+        <div class="order-card" style="margin: 2vh">
+            <div class="order-summary" @onclick="() => ToggleDetails(index)">
+                <span><strong>@orders[index].NameUser</strong></span>
+                <span><strong>@contactTypes.Where(x => x.ContactTypeId == orders[index].ContactTypeId).Select(x => x.ContactTypeName).First():</strong> @orders[index].Contact</span>
+                <span><strong>@orders[index].DataOrder</strong></span>
+                @{
+                    var status = statuses.FirstOrDefault(s => s.IdStatus == orders[index].IdStatus);
+                }
+                <span class="status">
+                    <span class="dot" style="display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:6px; background-color:@GetStatusColor(Convert.ToString(status?.IdStatus))"></span>
+                    @status?.NameStatus
+                </span>
+
+                <span class="expand-icon">@(!isExpanded[index] ? "⬇" : "⬆")</span>
+            </div>
+
+            @if (isExpanded[index])
+            {
+               
+                <div class="order-details">
+                    <div class="details-row">
+                        <div class="col-1">
+                            <div style="white-space: nowrap;">
+                                @dataOrdersItems[index].nameService
+                            </div>
+                            <div style="white-space: nowrap;">
+                                @dataOrdersItems[index].miniService
+                            </div>
+                            <div style="white-space: nowrap;">
+                                @dataOrdersItems[index].nameColumn
+                            </div>
+                            <div style="white-space: nowrap;">
+                                @dataOrdersItems[index].nameMaterial
+                            </div>
+
+                        </div>
+                        <div class="col-2">
+                            
+                            @dataOrdersItems[index].dataList.Count();
+@*                             @foreach (var item in @dataOrdersItems[index].dataList)
+                            {
+                                <div style="white-space: nowrap;">
+                                    @item
+                                </div>
+                            } *@
+                        </div>
+                        <div class="col-3">
+                            @foreach (var item in @dataOrdersItems[index].dataList)
+                            {
+                                <div><a href="#">просмотр</a></div>
+                            }
+                        </div>
+                        <div class="col-4">
+                            <div><strong>Стоимость:</strong> 500 рублей</div>
+                            <div><a href="#">Связаться с клиентом</a></div>
+                            <select class="change-status-btn" @onchange="e => ChangeStatus(index, int.Parse(e.Value.ToString()))">
+                                <option disabled>Изменить статус</option>
+                                @foreach (var init in statuses)
+                                {
+                                    <option value="@init.IdStatus">@init.NameStatus</option>
+                                }
+
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+
+</div>
+
+
+   
+
+
+@code {
+    List<bool> isExpanded = new List<bool>();
+    List<Models.Status> statuses = new List<Models.Status>();
     List<Models.Order> orders = new List<Models.Order>();
+    List<Models.ContactType> contactTypes = new List<Models.ContactType>();
+    List<Classes.Data.DataOrdersClass> dataOrdersItems = new List<Classes.Data.DataOrdersClass>();
 
-    protected override void OnInitialized(){
+
+    protected override void OnInitialized()
+    {
         Classes.Admin.Servise.Order.OrderManager orderManager = new Classes.Admin.Servise.Order.OrderManager();
-        orders = orderManager.getOrder();
+        statuses = orderManager.getStatus();
+        orders = orderManager.GetOrders();
+
+        contactTypes = orderManager.GetStatusType();
+
+
+        dataOrdersItems = orderManager.getOrderItems();
+
+        foreach(var item in orders)
+        {
+            isExpanded.Add(false);
+        }
+    }
+
+    private void ToggleDetails(int index)
+    {
+        isExpanded[index] = !isExpanded[index];
+        StateHasChanged();
+    }
+
+    private void ChangeStatus(int index, int newStatus)
+    {
+        statuses[index].IdStatus = newStatus;
+
+    }
+
+    private string GetStatusColor(string status)
+    {
+        return status switch
+        {
+            "1" => "green",
+            "2" => "#E8C200",  // вот тут заменил на нужный желтый
+            "3" => "red",
+            "4" => "gray",
+            _ => "transparent"
+        };
     }
 }
+
