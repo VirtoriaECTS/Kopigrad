@@ -2,6 +2,9 @@
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 @layout Layout.Menu.MenuUser;
+@inject IHttpContextAccessor HttpContextAccessor
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <div>
     <head>
@@ -17,10 +20,363 @@
 </div>
 
 
-<div class="backRequst">
+<div class="order-form-container">
+    <form class="order-form">
+        <div class="form-section dark">
+            <label>Имя</label>
+            <input @bind="name" type="text" />
 
+            <label>Как с вами связаться</label>
+            <select @bind="idContact">
+                <option value="0" disabled>Выберите способ связи</option>
+                <option value="1">В Telegram</option>
+                <option value="2">По почте</option>
+            </select>
+
+
+            @if (idContact == 1)
+            {
+                // Если выбран Telegram, показываем либо инфу, либо виджет авторизации
+                if (!string.IsNullOrEmpty(telegramId))
+                {
+
+                    <div style="display: flex; align-items: center; gap: 8px;">
+
+                        @if (!string.IsNullOrEmpty(telegramPhoto))
+                        {
+                            <img src="@telegramPhoto" alt="Аватарка Telegram" style="width: 50px; height: 50px; border-radius: 50%;" />
+                        }
+                        <p style="margin: 0;">
+                            <label>Ваш ID: <strong>@telegramId</strong></label>
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <div id="telegram-login-container"></div>
+                    <script async src="https://telegram.org/js/telegram-widget.js?15"
+                            data-telegram-login="DiplomKopigradBot"
+                            data-size="large"
+                            data-userpic="false"
+                            data-auth-url="/auth/telegram">
+                    </script>
+                }
+            }
+            else if (idContact == 2)
+            {
+                <p>Вы выбрали связаться по почте. Здесь можно добавить форму для ввода почты.</p>
+            }
+
+
+            <label>Выберите услугу</label>
+            <select @onchange="OnIdServiceChanged">
+                <option disabled selected>Выберите</option>
+                @foreach (var item in services)
+                {
+                    <option value ="@item.IdService">@item.NameService</option>
+                }
+            </select>
+
+
+
+
+
+        </div>
+
+        <div class="form-section light">
+            <label>Количество</label>
+            <div class="quantity-control">
+                <input type="number" value="@count" @oninput="OnCountChanged" min="1" />
+
+
+
+            </div>
+            @{
+                var selectService = idService;
+            }
+
+            @if (selectService != 0)
+            {
+                <label>Выбор мини услуги</label>
+                <select @bind="idServiceMini">
+                    @foreach (var item in miniservices.Where(x => x.IdService == selectService))
+                    {
+                        <option value="@item.IdMiniService">@item.NameMiniServise</option>
+                    }
+                </select>
+
+            }
+
+            @if(idServiceMini != 0)
+            {
+                <label>@miniservices.Where(x => x.IdMiniService == idServiceMini).Select(x => x.TopName).FirstOrDefault()</label>
+                <select @onchange="OnIdColumnChanged">
+                    @foreach (var item in colums.Where(x => x.IdMiniService == idServiceMini))
+                    {
+                        <option value="@item.IdColumnNames">@item.NameColumn</option>
+                    }
+                </select>
+            }
+
+
+            @if (idServiceMini != 0)
+            {
+                <label>@miniservices.Where(x => x.IdMiniService == idServiceMini).Select(x => x.BottomName).FirstOrDefault()</label>
+                <select @onchange="OnIdMaterialChanged">
+                    @foreach (var item in materials.Where(m => m.Tableminiservices.Any(t => t.IdMiniService == idServiceMini)))
+                    {
+                        <option value="@item.IdMaterial">@item.NameMaterial</option>
+                    }
+                </select>
+            }
+
+            <label>Опишите что вам требуется</label>
+            <input type="text" />
+
+            <label>Прикрепить файлы</label>
+            <InputFile OnChange="HandleFileSelected" multiple />
+
+            @if (selectedFiles?.Count > 0)
+            {
+                <ul>
+                    @foreach (var file in selectedFiles.Select((f, i) => new { File = f, Index = i }))
+                    {
+                        <li>
+                            @file.File.Name
+                            <button type="button" @onclick="() => RemoveFile(file.Index)" class="remove-button">❌</button>
+
+
+                        </li>
+                    }
+                </ul>
+            }
+
+
+
+
+
+            @if(price != 0)
+            {
+                <div class="price">Стоимость: @price рублей</div>
+            }
+
+
+            <button @onclick="SubmitAsync" class="submit-button">Отправить</button>
+
+        </div>
+    </form>
 </div>
 
+<style>
+    .remove-button {
+        background: #FFFFFF;
+        border: none;
+        cursor: pointer;
+        color: #ff4d4d; /* Красный крестик */
+        font-size: 1.2rem;
+        margin-left: 8px;
+    }
+
+        .remove-button:hover {
+            color: darkred;
+            transform: scale(1.1);
+        }
+
+</style>
 @code {
+    Classes.Admin.Servise.Price managerPrice = new Classes.Admin.Servise.Price();
+    //выбор услуги
+    List<Models.Service> services = new List<Models.Service>();
+    List<Models.Miniservice> miniservices = new List<Models.Miniservice>();
+    List<Models.Miniservice> tableMiniService = new List<Models.Miniservice>();
+
+    List<Models.Material> materials = new List<Models.Material>();
+    List<Models.Columnname> colums = new List<Models.Columnname>();
+
+    int idService = 0;
+    int idServiceMini = 0;
+    int count = 1;
+    int idColumn = 0;
+    int idMaterial = 0;
+    decimal price = 0;
+
+
+    string name = "";
+
+    public void onclick()
+    {
+        price = managerPrice.getPrice(idService, idColumn, idMaterial, count);
+    }
+
+    protected override void OnInitialized()
+    {
+        Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
+        Classes.Admin.Servise.ManagmentServiseClasses managerService = new Classes.Admin.Servise.ManagmentServiseClasses();
+        services = managerService.GetService();
+
+        miniservices = managmentMiniService.getMiniService();
+
+        colums = managmentMiniService.getAllColums();
+        materials = managmentMiniService.getAllMaterial();
+    }
+
+    private void OnIdServiceChanged(ChangeEventArgs e)
+    {
+        idService = int.Parse(e.Value.ToString());
+        idServiceMini = miniservices.Where(x => x.IdService == idService).Select(x => x.IdMiniService).FirstOrDefault();
+
+        idMaterial = materials.Where(m => m.Tableminiservices.Any(t => t.IdMiniService == idServiceMini)).Select(x => x.IdMaterial).FirstOrDefault();
+        idColumn = colums.Where(x => x.IdMiniService == idServiceMini).Select(x => x.IdColumnNames).FirstOrDefault();
+        ChangeCount(); // пересчет
+    }
+
+    private void OnIdColumnChanged(ChangeEventArgs e)
+    {
+        idColumn = int.Parse(e.Value.ToString());
+        ChangeCount(); // пересчет
+
+    }
+
+    private void OnIdMaterialChanged(ChangeEventArgs e)
+    {
+        idMaterial = int.Parse(e.Value.ToString());
+        ChangeCount(); // пересчет
+
+    }
+
+
+
+    public void ChangeCount()
+    {
+        if (idServiceMini != 0 && idColumn != 0 && idMaterial != 0 && count > 0)
+        {
+            price = managerPrice.getPrice(idServiceMini, idColumn, idMaterial, count);
+        }
+        else
+        {
+            price = 0; // Если что-то не выбрано — цена сбрасывается
+        }
+    }
+
+    private void OnCountChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int newCount))
+        {
+            count = newCount;
+            ChangeCount();
+        }
+    }
+
+    //Авторизация
+    private int _idContact = 0;
+    int idContact
+    {
+        get => _idContact;
+        set
+        {
+            if (_idContact != value)
+            {
+                _idContact = value;
+                SaveIdContactAsync(value);
+            }
+        }
+    }
+
+    string? telegramId;
+    string? telegramPhoto;
+
+    private async Task SaveIdContactAsync(int value)
+    {
+        //Авторизация
+        await JS.InvokeVoidAsync("saveState", "idContact", value.ToString());
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        //Авторизация
+        if (firstRender)
+        {
+            telegramId = await JS.InvokeAsync<string>("getCookie", "TelegramId");
+            telegramPhoto = await JS.InvokeAsync<string>("getCookie", "TelegramPhoto");
+
+            var savedIdContact = await JS.InvokeAsync<string>("loadState", "idContact");
+            if (int.TryParse(savedIdContact, out var savedValue))
+            {
+                _idContact = savedValue;
+                StateHasChanged();
+            }
+        }
+
+
+
+
+    }
+
+    //Загрузка файлов
+    private List<IBrowserFile> selectedFiles = new();
+
+    // Пути к сохранённым файлам (после загрузки)
+    private List<string> filePaths = new();
+
+    // Обработка выбора файлов
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            selectedFiles.Add(file);
+        }
+    }
+
+    // Удаление выбранного файла до загрузки
+    private void RemoveFile(int index)
+    {
+        if (index >= 0 && index < selectedFiles.Count)
+        {
+            selectedFiles.RemoveAt(index);
+        }
+    }
+
+    // Загрузка файлов на сервер
+    private async Task SubmitAsync()
+    {
+        filePaths.Clear();
+
+        if (selectedFiles.Count > 0)
+        {
+            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "userfiles");
+
+            if (!Directory.Exists(uploadsPath))
+            {
+                Directory.CreateDirectory(uploadsPath);
+            }
+
+            foreach (var file in selectedFiles)
+            {
+                var uniqueFileName = $"{Guid.NewGuid()}_{file.Name}";
+                var fullPath = Path.Combine(uploadsPath, uniqueFileName);
+
+                await using var fs = new FileStream(fullPath, FileMode.Create);
+                await file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024).CopyToAsync(fs);
+
+                filePaths.Add($"/userfiles/{uniqueFileName}");
+            }
+
+            // Очистка списка прикреплённых файлов после загрузки
+            selectedFiles.Clear();
+        }
+
+
+        Classes.User.CreateRequstcsManager createRequstcsManager = new Classes.User.CreateRequstcsManager();
+        int idTable = createRequstcsManager.FirstIdTableMiniService(idServiceMini, idMaterial, idColumn);
+        if(idContact == 1)
+        {
+            createRequstcsManager.CreateOrder(name, 1, "@Molotov", idTable, filePaths, price, count);
+        }
+
+
+        Navigation.NavigateTo($"/");
+        // Здесь можно добавить сохранение заявки в БД и т.д.
+    }
 
 }

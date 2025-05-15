@@ -18,7 +18,11 @@ public partial class KopigradContext : DbContext
 
     public virtual DbSet<Columnname> Columnnames { get; set; }
 
-    public virtual DbSet<Efmigrationshistory> Efmigrationshistories { get; set; }
+    public virtual DbSet<ContactType> ContactTypes { get; set; }
+
+    public virtual DbSet<EfmigrationsHistory> EfmigrationsHistories { get; set; }
+
+    public virtual DbSet<Efmigrationshistory1> Efmigrationshistories1 { get; set; }
 
     public virtual DbSet<Material> Materials { get; set; }
 
@@ -41,9 +45,8 @@ public partial class KopigradContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-
-        => optionsBuilder.UseMySql("server=62.76.233.55;port=3306;database=kopigrad;user=blazoruser;password=newpassword123;", ServerVersion.Parse("10.4.32-mariadb"));
-
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseMySql("server=62.76.233.55;port=3306;user=blazoruser;password=newpassword123;database=kopigrad", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.11.11-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -75,7 +78,27 @@ public partial class KopigradContext : DbContext
                 .HasConstraintName("columnnames_ibfk_1");
         });
 
-        modelBuilder.Entity<Efmigrationshistory>(entity =>
+        modelBuilder.Entity<ContactType>(entity =>
+        {
+            entity.HasKey(e => e.ContactTypeId).HasName("PRIMARY");
+
+            entity.ToTable("ContactType");
+
+            entity.Property(e => e.ContactTypeId).HasColumnType("int(11)");
+            entity.Property(e => e.ContactTypeName).HasMaxLength(255);
+        });
+
+        modelBuilder.Entity<EfmigrationsHistory>(entity =>
+        {
+            entity.HasKey(e => e.MigrationId).HasName("PRIMARY");
+
+            entity.ToTable("__EFMigrationsHistory");
+
+            entity.Property(e => e.MigrationId).HasMaxLength(150);
+            entity.Property(e => e.ProductVersion).HasMaxLength(32);
+        });
+
+        modelBuilder.Entity<Efmigrationshistory1>(entity =>
         {
             entity.HasKey(e => e.MigrationId).HasName("PRIMARY");
 
@@ -126,15 +149,23 @@ public partial class KopigradContext : DbContext
 
             entity.ToTable("order");
 
+            entity.HasIndex(e => e.ContactTypeId, "fk_contacttype");
+
             entity.HasIndex(e => e.IdStatus, "idStatus");
 
             entity.Property(e => e.IdOrder).HasColumnType("int(11)");
+            entity.Property(e => e.Contact).HasMaxLength(255);
+            entity.Property(e => e.ContactTypeId).HasColumnType("int(11)");
             entity.Property(e => e.DataOrder).HasColumnType("datetime");
-            entity.Property(e => e.Email).HasColumnType("text");
             entity.Property(e => e.IdStatus)
                 .HasColumnType("int(11)")
                 .HasColumnName("idStatus");
-            entity.Property(e => e.Name).HasColumnType("text");
+            entity.Property(e => e.NameUser).HasColumnType("text");
+
+            entity.HasOne(d => d.ContactType).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.ContactTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_contacttype");
 
             entity.HasOne(d => d.IdStatusNavigation).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.IdStatus)
@@ -156,11 +187,12 @@ public partial class KopigradContext : DbContext
                 .HasColumnType("int(11)")
                 .HasColumnName("idOrderItems");
             entity.Property(e => e.Count).HasColumnType("int(11)");
+            entity.Property(e => e.FilePath).HasMaxLength(255);
             entity.Property(e => e.IdOrder).HasColumnType("int(11)");
             entity.Property(e => e.IdTableMiniService)
                 .HasColumnType("int(11)")
                 .HasColumnName("idTableMiniService");
-            entity.Property(e => e.Price).HasColumnType("int(11)");
+            entity.Property(e => e.Price).HasPrecision(10, 2);
 
             entity.HasOne(d => d.IdOrderNavigation).WithMany(p => p.Orderitems)
                 .HasForeignKey(d => d.IdOrder)

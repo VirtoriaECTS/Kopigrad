@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Kopigrad.Models;
 
-public partial class EfmigrationsHistory
+public partial class Efmigrationshistory
 {
     public string MigrationId { get; set; } = null!;
 

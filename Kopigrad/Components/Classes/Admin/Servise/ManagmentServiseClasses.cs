@@ -97,6 +97,13 @@ namespace Kopigrad.Components.Classes.Admin.Servise
             }
         }
 
+        public List<Models.Service> GetService()
+        {
+            using (var context = new KopigradContext())
+            {
+                return context.Services.ToList();
+            }
+        }
 
     }
 }

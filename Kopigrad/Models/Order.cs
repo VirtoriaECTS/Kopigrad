@@ -7,13 +7,17 @@ public partial class Order
 {
     public int IdOrder { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string Contact { get; set; } = null!;
 
-    public string Email { get; set; } = null!;
+    public string NameUser { get; set; } = null!;
 
     public int IdStatus { get; set; }
 
     public DateTime DataOrder { get; set; }
+
+    public int ContactTypeId { get; set; }
+
+    public virtual ContactType ContactType { get; set; } = null!;
 
     public virtual Status IdStatusNavigation { get; set; } = null!;
 

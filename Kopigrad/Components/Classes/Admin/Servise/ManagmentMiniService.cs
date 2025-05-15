@@ -340,6 +340,16 @@ namespace Kopigrad.Components.Classes.Admin.Servise
         }
 
 
+        public List<Models.Miniservice> getMiniService()
+        {
+            using (var context = new KopigradContext())
+            {
+                return context.Miniservices.Include(x => x.Tableminiservices)
+                    .Where(x => x.Tableminiservices.Any(t => t.Price > 0))
+                    .Distinct()
+                    .ToList();
+            }
+        }
 
 
 

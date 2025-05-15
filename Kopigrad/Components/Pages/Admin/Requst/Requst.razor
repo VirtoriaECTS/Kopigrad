@@ -1,3 +1,30 @@
 ﻿@page "/Requst"
 @using System.Net.Http.Json
 
+
+@foreach(var item in orders)
+{
+    <h5>
+        @item.NameUser
+    </h5>
+
+    <h5>
+        @item.Contact
+    </h5>
+
+    <h5>
+        @item.DataOrder
+    </h5>
+
+
+    
+}
+
+@code{
+    List<Models.Order> orders = new List<Models.Order>();
+
+    protected override void OnInitialized(){
+        Classes.Admin.Servise.Order.OrderManager orderManager = new Classes.Admin.Servise.Order.OrderManager();
+        orders = orderManager.getOrder();
+    }
+}

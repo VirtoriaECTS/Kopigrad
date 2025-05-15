@@ -161,6 +161,7 @@
 }
 
 .custom-upload {
+    font-family: DaysFronts;
     display: inline-block;
     padding: 12px 24px;
     background-color: #28a745;
@@ -176,10 +177,12 @@
 }
 
     .custom-upload:hover {
+        font-family: DaysFronts;
         background-color: #218838;
     }
 
 .input-hidden {
+    font-family: DaysFronts;
     position: absolute;
     left: 0;
     top: 0;
@@ -191,9 +194,116 @@
 
 
 .SelectedPdf {
-
+    font-family: DaysFronts;
     border-radius: 0.5vw;
     font-family: DaysFronts;
     font-size: 1.3vh;
     font-style: revert;
 }
+
+.order-form-container {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+    font-family: DaysFronts;
+    min-height: 100vh;
+}
+
+.order-form {
+    display: flex;
+    flex-direction: row;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+    max-width: 900px;
+    width: 100%;
+    flex-wrap: wrap;
+    font-family: DaysFronts;
+}
+
+.form-section {
+    padding: 1.5rem;
+    flex: 1 1 300px;
+    box-sizing: border-box;
+    font-family: DaysFronts;
+}
+
+    .form-section.dark {
+        background-color: #1f1f1f;
+        color: white;
+    }
+
+    .form-section.light {
+        background-color: white;
+        color: black;
+    }
+
+    .form-section label {
+        display: block;
+        margin-top: 1rem;
+        font-weight: bold;
+    }
+
+    .form-section input[type="text"],
+    .form-section input[type="number"],
+    .form-section input[type="file"],
+    .form-section select {
+        width: 100%;
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+    }
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: DaysFronts;
+}
+
+    .quantity-control button {
+        background: #ccc;
+        border: none;
+        border-radius: 6px;
+        padding: 0.5rem;
+        cursor: pointer;
+    }
+
+.price {
+    font-family: DaysFronts;
+    margin-top: 1.5rem;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.submit-button {
+    font-family: DaysFronts;
+    margin-top: 1rem;
+    background-color: #1f1f1f;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .order-form {
+        flex-direction: column;
+    }
+
+    .form-section {
+        padding: 1rem;
+    }
+
+    .submit-button {
+        font-size: 1.2rem;
+    }
+}
+
+
