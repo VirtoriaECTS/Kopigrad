@@ -338,43 +338,61 @@
     // Загрузка файлов на сервер
     private async Task SubmitAsync()
     {
-        filePaths.Clear();
-
-        if (selectedFiles.Count > 0)
+        try
         {
-            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "userfiles");
+            filePaths.Clear();
 
-            if (!Directory.Exists(uploadsPath))
+            if (selectedFiles.Count > 0)
             {
-                Directory.CreateDirectory(uploadsPath);
+                var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "userfiles");
+
+                if (!Directory.Exists(uploadsPath))
+                {
+                    Directory.CreateDirectory(uploadsPath);
+                    Console.WriteLine($"Создан каталог: {uploadsPath}");
+                }
+
+                foreach (var file in selectedFiles)
+                {
+                    try
+                    {
+                        var uniqueFileName = $"{Guid.NewGuid()}_{file.Name}";
+                        var fullPath = Path.Combine(uploadsPath, uniqueFileName);
+
+                        await using var fs = new FileStream(fullPath, FileMode.Create);
+                        await file.OpenReadStream(long.MaxValue).CopyToAsync(fs);
+
+                        var relativePath = $"/userfiles/{uniqueFileName}";
+                        filePaths.Add(relativePath);
+
+                        Console.WriteLine($"Файл сохранён: {relativePath}");
+                    }
+                    catch (Exception exFile)
+                    {
+                        Console.WriteLine($"Ошибка при сохранении файла {file.Name}: {exFile.Message}");
+                    }
+                }
+
+                selectedFiles.Clear();
             }
 
-            foreach (var file in selectedFiles)
+            var createRequstcsManager = new Classes.User.CreateRequstcsManager();
+            int idTable = createRequstcsManager.FirstIdTableMiniService(idServiceMini, idMaterial, idColumn);
+            Console.WriteLine($"Получен IdTableMiniService: {idTable}");
+
+            if (idContact == 2)
             {
-                var uniqueFileName = $"{Guid.NewGuid()}_{file.Name}";
-                var fullPath = Path.Combine(uploadsPath, uniqueFileName);
-
-                await using var fs = new FileStream(fullPath, FileMode.Create);
-                await file.OpenReadStream(long.MaxValue).CopyToAsync(fs);
-
-                filePaths.Add($"/userfiles/{uniqueFileName}");
+                createRequstcsManager.CreateOrder(name, 2, "@vmolotov", idTable, filePaths, price, count);
+                Console.WriteLine("Заявка успешно создана.");
             }
 
-            // Очистка списка прикреплённых файлов после загрузки
-            selectedFiles.Clear();
+            Navigation.NavigateTo("/");
         }
-
-
-        Classes.User.CreateRequstcsManager createRequstcsManager = new Classes.User.CreateRequstcsManager();
-        int idTable = createRequstcsManager.FirstIdTableMiniService(idServiceMini, idMaterial, idColumn);
-        if(idContact == 2)
+        catch (Exception ex)
         {
-            createRequstcsManager.CreateOrder(name, 2, "@Molotov", idTable, filePaths, price, count);
+            Console.WriteLine($"Общая ошибка при отправке заявки: {ex.Message}");
         }
-
-
-        Navigation.NavigateTo($"/");
-        // Здесь можно добавить сохранение заявки в БД и т.д.
     }
+
 
 }

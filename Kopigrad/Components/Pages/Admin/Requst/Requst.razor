@@ -73,24 +73,38 @@
 
                         </div>
                         <div class="col-2">
-                            
-                            @dataOrdersItems[index].dataList.Count();
-@*                             @foreach (var item in @dataOrdersItems[index].dataList)
+                            @foreach (var item in dataOrdersItems[index].dataList)
                             {
                                 <div style="white-space: nowrap;">
                                     @item
                                 </div>
-                            } *@
-                        </div>
-                        <div class="col-3">
-                            @foreach (var item in @dataOrdersItems[index].dataList)
-                            {
-                                <div><a href="#">просмотр</a></div>
                             }
                         </div>
+
+                        <div class="col-3">
+                            @foreach (var item in dataOrdersItems[index].dataList)
+                            {
+                                <div>
+                                    <a href="@item" target="_blank" rel="noopener noreferrer">просмотр</a>
+                                    <a href="@item" download>скачать</a>
+                                </div>
+                            }
+                        </div>
+
+
                         <div class="col-4">
-                            <div><strong>Стоимость:</strong> 500 рублей</div>
-                            <div><a href="#">Связаться с клиентом</a></div>
+                            <div><strong>Стоимость:</strong> @orders[index].Price рублей</div>
+                            <div>
+                                @if (orders[index].ContactTypeId == 2)
+                                {
+
+                                    <a href="https://t.me/@(@orders[index].Contact.TrimStart('@'))" target="_blank" rel="noopener noreferrer">
+                                        Связаться с клиентом
+                                    </a>
+                                }
+
+
+                            </div>
                             <select class="change-status-btn" @onchange="e => ChangeStatus(index, int.Parse(e.Value.ToString()))">
                                 <option disabled>Изменить статус</option>
                                 @foreach (var init in statuses)
@@ -114,6 +128,10 @@
 
 
 @code {
+
+
+
+
     List<bool> isExpanded = new List<bool>();
     List<Models.Status> statuses = new List<Models.Status>();
     List<Models.Order> orders = new List<Models.Order>();
