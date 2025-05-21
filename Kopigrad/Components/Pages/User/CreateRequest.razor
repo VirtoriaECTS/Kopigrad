@@ -1,10 +1,12 @@
-﻿@page "/CreateRequest"
+﻿Вы сказали:
+@page "/CreateRequest"
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 @layout Layout.Menu.MenuUser;
 @inject IHttpContextAccessor HttpContextAccessor
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject Classes.Admin.Servise.MailSender EmailService
 
 <div>
     <head>
@@ -21,7 +23,8 @@
 
 
 <div class="order-form-container">
-    <form class="order-form">
+    <form class="order-form" @onsubmit="OnFormSubmit">
+
         <div class="form-section dark">
             <label>Имя</label>
             <input @bind="name" type="text" />
@@ -64,7 +67,31 @@
             }
             else if (idContact == 3)
             {
-                <p>Вы выбрали связаться по почте. Здесь можно добавить форму для ввода почты.</p>
+                @if (!isConfirmed)
+                {
+                    <div>
+                        <input @bind="email" placeholder="Введите Email" />
+                        <button type="button" @onclick="SendCode">Отправить код</button>
+
+
+                    </div>
+
+                    @if (codeSent)
+                    {
+                        <div style="margin-top: 10px;">
+                            <input @bind="enteredCode" placeholder="Введите код" />
+                            <button type="button" @onclick="CheckCode">Подтвердить</button>
+
+                        </div>
+                    }
+
+                    <p>@status</p>
+                }
+                else
+                {
+                    <p style="color:green;">✅ @email подтверждён! </p>
+                }
+
             }
 
 
@@ -73,7 +100,7 @@
                 <option disabled selected>Выберите</option>
                 @foreach (var item in services)
                 {
-                    <option value ="@item.IdService">@item.NameService</option>
+                    <option value="@item.IdService">@item.NameService</option>
                 }
             </select>
 
@@ -107,7 +134,7 @@
 
             }
 
-            @if(idServiceMini != 0)
+            @if (idServiceMini != 0)
             {
                 <label>@miniservices.Where(x => x.IdMiniService == idServiceMini).Select(x => x.TopName).FirstOrDefault()</label>
                 <select @onchange="OnIdColumnChanged">
@@ -153,19 +180,27 @@
 
 
 
-            @if(price != 0)
+            @if (price != 0)
             {
                 <div class="price">Стоимость: @price рублей</div>
             }
 
 
-            <button @onclick="SubmitAsync" class="submit-button">Отправить</button>
+            <button @onclick="SubmitAsync" disabled="@disableButton" class="submit-button">Отправить</button>
 
         </div>
     </form>
 </div>
 
 <style>
+    .submit-button:disabled {
+        background-color: #ccc; /* Серый фон */
+        color: #666; /* Тусклый текст */
+        cursor: not-allowed;
+        border: 1px solid #999;
+        opacity: 0.7;
+    }
+
     .remove-button {
         background: #FFFFFF;
         border: none;
@@ -182,6 +217,67 @@
 
 </style>
 @code {
+    private void OnFormSubmit()
+    {
+        // Ничего не делаем, просто предотвращаем стандартную отправку формы
+    }
+
+    //email
+    private string email;
+    private string status;
+    private string sentCode;
+    private string enteredCode;
+    private bool codeSent = false;
+    private bool isConfirmed = false;
+
+    private async Task SendCode(MouseEventArgs e)
+    {
+
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            status = "Введите email.";
+            return;
+        }
+
+        // Генерируем код и сохраняем
+        var rnd = new Random();
+        sentCode = rnd.Next(100000, 999999).ToString();
+
+        try
+        {
+            await EmailService.SendEmailAsync(email, "Код подтверждения", $"Ваш код: {sentCode}");
+            status = "Код отправлен!";
+            codeSent = true;
+
+            // Сохраняем в localStorage
+            await JS.InvokeVoidAsync("saveState", "email", email);
+            await JS.InvokeVoidAsync("saveState", "sentCode", sentCode);
+            await JS.InvokeVoidAsync("saveState", "codeSent", "true");
+        }
+        catch (Exception ex)
+        {
+            status = $"Ошибка отправки письма: {ex.Message}";
+        }
+    }
+
+
+    private void CheckCode()
+    {
+        if (enteredCode == sentCode)
+        {
+            isConfirmed = true;
+            status = "Email успешно подтверждён!";
+            disableButton = false;
+        }
+        else
+        {
+            status = "Неверный код.";
+        }
+    }
+
+    bool disableButton = true;
+
     Classes.Admin.Servise.Price managerPrice = new Classes.Admin.Servise.Price();
     //выбор услуги
     List<Models.Service> services = new List<Models.Service>();
@@ -302,8 +398,26 @@
             if (int.TryParse(savedIdContact, out var savedValue))
             {
                 _idContact = savedValue;
-                StateHasChanged();
+
+                // Если выбрано Telegram и id найден, активировать кнопку
+                if (_idContact == 2 && !string.IsNullOrEmpty(telegramId))
+                {
+                    disableButton = false;
+                }
+
+
             }
+
+            // восстанавливаем email-авторизацию
+            email = await JS.InvokeAsync<string>("loadState", "email");
+            sentCode = await JS.InvokeAsync<string>("loadState", "sentCode");
+            var codeSentStr = await JS.InvokeAsync<string>("loadState", "codeSent");
+            if (codeSentStr == "true")
+            {
+                codeSent = true;
+            }
+            StateHasChanged();
+
         }
 
 
@@ -382,7 +496,12 @@
 
             if (idContact == 2)
             {
-                createRequstcsManager.CreateOrder(name, 2, "@vmolotov", idTable, filePaths, price, count);
+                createRequstcsManager.CreateOrder(name, 2, telegramId, idTable, filePaths, price, count);
+                Console.WriteLine("Заявка успешно создана.");
+            }
+            if (idContact == 3)
+            {
+                createRequstcsManager.CreateOrder(name, 3, email, idTable, filePaths, price, count);
                 Console.WriteLine("Заявка успешно создана.");
             }
 
