@@ -37,6 +37,16 @@ builder.Services.AddDbContext<KopigradContext>(options =>
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultChallengeScheme = "Google";
+})
+.AddCookie("Cookies");
+
+
+
+builder.Services.AddAuthorization();
+
 
 
 var app = builder.Build();
