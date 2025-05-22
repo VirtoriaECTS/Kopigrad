@@ -223,6 +223,7 @@
     }
 
     //email
+    private string emailCopygrad = "vikmolotova@gmail.com";
     private string email;
     private string status;
     private string sentCode;
@@ -489,7 +490,7 @@
 
                 selectedFiles.Clear();
             }
-
+            DateTime currentDate = DateTime.Now;
             var createRequstcsManager = new Classes.User.CreateRequstcsManager();
             int idTable = createRequstcsManager.FirstIdTableMiniService(idServiceMini, idMaterial, idColumn);
             Console.WriteLine($"Получен IdTableMiniService: {idTable}");
@@ -497,11 +498,19 @@
             if (idContact == 2)
             {
                 createRequstcsManager.CreateOrder(name, 2, telegramId, idTable, filePaths, price, count);
+                string textRequst = $"Телеграмм: {telegramId}\nУслуга: {miniservices.Where(x => x.IdMiniService == idServiceMini).Select(x => x.NameMiniServise).First()}\nКоличество: {count}\nЦена: {price}\nДата: {currentDate}";
+                await EmailService.SendEmailAsyncRequst(emailCopygrad, $"{name}", textRequst);
+
                 Console.WriteLine("Заявка успешно создана.");
             }
             if (idContact == 3)
             {
                 createRequstcsManager.CreateOrder(name, 3, email, idTable, filePaths, price, count);
+
+
+                string textRequst = $"Почта: {email}\nУслуга: {miniservices.Where(x => x.IdMiniService == idServiceMini).Select(x => x.NameMiniServise).First()}\nКоличество: {count}\nЦена: {price}\nДата: {currentDate}";
+                await EmailService.SendEmailAsyncRequst(emailCopygrad, $"{name}", textRequst);
+
                 Console.WriteLine("Заявка успешно создана.");
             }
 

@@ -1,0 +1,41 @@
+﻿@page "/modaltest"
+@rendermode InteractiveServer
+<h3>Пример модального окна</h3>
+
+<!-- Кнопка для открытия модального окна -->
+<button class="btn btn-primary" @onclick="ShowModal">Открыть диалог</button>
+
+<!-- Модальное окно -->
+@if (isModalVisible)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Диалог</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Это содержимое модального окна.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool isModalVisible = false;
+
+    private void ShowModal()
+    {
+        isModalVisible = true;
+    }
+
+    private void CloseModal()
+    {
+        isModalVisible = false;
+    }
+}

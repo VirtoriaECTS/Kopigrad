@@ -4,8 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.Features;
 using Kopigrad.Components.Classes.Admin.Servise;
 using Microsoft.Extensions.Options;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddMudServices();
 
 // Увеличиваем лимит для файлов (например, до 100 MB)
 builder.Services.Configure<FormOptions>(options =>
@@ -39,10 +41,12 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddAuthentication(options =>
 {
+    options.DefaultScheme = "Cookies";
     options.DefaultChallengeScheme = "Google";
 })
 .AddCookie("Cookies");
 
+builder.Services.AddSingleton<MailSender>();
 
 
 builder.Services.AddAuthorization();

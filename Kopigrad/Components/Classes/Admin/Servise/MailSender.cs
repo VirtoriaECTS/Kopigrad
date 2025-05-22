@@ -39,5 +39,34 @@ namespace Kopigrad.Components.Classes.Admin.Servise
 
             await client.SendMailAsync(message);
         }
+
+
+        public async Task SendEmailAsyncRequst(string toEmail, string subject, string body)
+        {
+            var smtpHost = _config["Smtp:Host"];
+            var smtpPort = int.Parse(_config["Smtp:Port"]);
+            var smtpUser = _config["Smtp:Username"];
+            var smtpPass = _config["Smtp:Password"];
+            var fromEmail = _config["Smtp:From"];
+            var enableSsl = bool.Parse(_config["Smtp:EnableSsl"] ?? "true");
+
+            using var client = new SmtpClient(smtpHost, smtpPort)
+            {
+                EnableSsl = enableSsl,
+                Credentials = new NetworkCredential(smtpUser, smtpPass),
+                DeliveryMethod = SmtpDeliveryMethod.Network
+            };
+
+            var message = new MailMessage
+            {
+                From = new MailAddress(fromEmail, "Оформлен новый заказ"),
+                Subject = subject,
+                Body = body
+            };
+
+            message.To.Add(toEmail);
+
+            await client.SendMailAsync(message);
+        }
     }
 }

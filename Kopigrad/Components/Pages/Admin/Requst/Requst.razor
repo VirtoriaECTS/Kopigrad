@@ -15,20 +15,22 @@
 
         <!-- Панель управления -->
         <div class="toolbar">
-            <div class="control search-box">
-                <input type="text" placeholder="Поиск" />
-                <span class="icon">🔍</span>
-            </div>
-            <select class="control">
-                <option>Фильтрация</option>
-                <option>По дате</option>
-                <option>По имени</option>
+
+        <select class="control" @onchange="HandleFiltrChange">
+            <option value="0">Без фильтрации</option>
+            <option value="1">Указан телеграмм</option>
+            <option value="2">Указанна почта</option>
             </select>
-            <select class="control">
-                <option>Сортировка</option>
-                <option>По возрастанию</option>
-                <option>По убыванию</option>
-            </select>
+        <select class="control" @onchange="HandleSortChange">
+            <option value="0">Без сортировки</option>
+            <option value="1">Сначала новые заказы</option>
+            <option value="2">Сначала старые заказы</option>
+            <option value="3">Сначала выполненные заказы</option>
+            <option value="4">Сначала невыполненые заказы</option>
+            <option value="5">Сначала дорогие заказы</option>
+            <option value="6">Сначала недорогие заказы</option>
+        </select>
+
         </div>
 
 
@@ -112,13 +114,16 @@
 
                             </div>
                             <select class="change-status-btn" @onchange="e => ChangeStatus(index, int.Parse(e.Value.ToString()))">
-                                <option disabled>Изменить статус</option>
+                                <option disabled value="">Изменить статус</option>
                                 @foreach (var init in statuses)
                                 {
-                                    <option value="@init.IdStatus">@init.NameStatus</option>
+                                    <option value="@init.IdStatus" selected="@(init.IdStatus == orders[index].IdStatus)">
+                                        @init.NameStatus
+                                    </option>
                                 }
-
                             </select>
+
+
                         </div>
                     </div>
                 </div>
@@ -130,12 +135,114 @@
 </div>
 
 
-   
+@if (isModalVisible)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ошибка</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@error</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 
 
 @code {
 
+    private int currentSortOption = 0;
+    private int currentFilterOption = 0;
+    List<Models.Order> allOrders = new List<Models.Order>();
+    private void ApplyFilterAndSort()
+    {
+        IEnumerable<Models.Order> filtered = allOrders;
 
+        // Применяем фильтрацию
+        if (currentFilterOption != 0)
+        {
+            switch (currentFilterOption)
+            {
+                case 1: // Только Telegram
+                    filtered = filtered.Where(x => x.ContactTypeId == 2);
+                    break;
+                case 2: // Только Email
+                    filtered = filtered.Where(x => x.ContactTypeId == 3);
+                    break;
+            }
+        }
+
+        // Применяем сортировку
+        if (currentSortOption != 0)
+        {
+            switch (currentSortOption)
+            {
+                case 1: // Новые
+                    filtered = filtered.OrderByDescending(o => o.DataOrder);
+                    break;
+                case 2: // Старые
+                    filtered = filtered.OrderBy(o => o.DataOrder);
+                    break;
+                case 3: // Выполненные
+                    filtered = filtered.OrderByDescending(o => o.IdStatus == 1);
+                    break;
+                case 4: // Невыполненные
+                    filtered = filtered.OrderByDescending(o => o.IdStatus == 3);
+                    break;
+                case 5: // Дорогие
+                    filtered = filtered.OrderByDescending(o => o.Price);
+                    break;
+                case 6: // Недорогие
+                    filtered = filtered.OrderBy(o => o.Price);
+                    break;
+            }
+        }
+
+        orders = filtered.ToList();
+        isExpanded = new List<bool>(new bool[orders.Count]);
+    }
+
+
+
+    private void HandleSortChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int value))
+        {
+            currentSortOption = value;
+            ApplyFilterAndSort();
+        }
+    }
+
+
+
+    private void HandleFiltrChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int value))
+        {
+            currentFilterOption = value;
+            ApplyFilterAndSort();
+        }
+    }
+
+    private void CloseModal()
+    {
+        isModalVisible = false;
+        error = ""; // можно очистить текст ошибки
+    }
+
+
+    bool isModalVisible = false;
+
+
+    Classes.Admin.Servise.ManagerOrders managerOrders = new Classes.Admin.Servise.ManagerOrders();
 
 
     List<bool> isExpanded = new List<bool>();
@@ -143,14 +250,15 @@
     List<Models.Order> orders = new List<Models.Order>();
     List<Models.ContactType> contactTypes = new List<Models.ContactType>();
     List<Classes.Data.DataOrdersClass> dataOrdersItems = new List<Classes.Data.DataOrdersClass>();
+    string error = "";
 
 
     protected override void OnInitialized()
     {
         Classes.Admin.Servise.Order.OrderManager orderManager = new Classes.Admin.Servise.Order.OrderManager();
         statuses = orderManager.getStatus();
-        orders = orderManager.GetOrders();
-
+        allOrders = orderManager.GetOrders(); // ← сохраняем полный список
+        orders = allOrders.ToList();          // ← отображаем копию
         contactTypes = orderManager.GetStatusType();
 
 
@@ -170,9 +278,24 @@
 
     private void ChangeStatus(int index, int newStatus)
     {
-        statuses[index].IdStatus = newStatus;
+        // Обновляем статус в базе
+        int idOrder = orders[index].IdOrder;
+        error = managerOrders.ChangeStatusOrder(idOrder, newStatus);
 
+        if(error == "")
+        {
+            // Меняем статус в заказе
+            orders[index].IdStatus = newStatus;
+        
+        }
+        else
+        {
+            isModalVisible = true; // Показываем модальное окно
+        }
+
+        StateHasChanged(); // Обновляем UI
     }
+
 
     private string GetStatusColor(string status)
     {

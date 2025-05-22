@@ -1,0 +1,49 @@
+﻿@page "/Register"
+@layout Layout.Menu.MenuAdminVhod;
+@using Kopigrad.Components.Layout
+@inject Models.KopigradContext DbContext
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+<PageTitle>Admin</PageTitle>
+<head>
+    <link rel="stylesheet" href="/users.css">
+    <link rel="stylesheet" href="/admin.css">
+</head>
+
+<div class="Banner">
+    <h5 class="TextBanner">Панель админа</h5>
+</div>
+
+<div class="VhodAdmin">
+    <h5 class="TextVhodAdmin">Email:</h5>
+    <input type="email" class="InputAdmin" />
+    <h5 class="TextVhodAdmin">Пароль:</h5>
+    <input type="password" class="InputAdmin" />
+@*     <div>
+        <h5 class="TextVhodAdmin">Код регистрации:</h5>
+        <input  />
+        <button type="button" >Отправить код</button>
+    </div>
+
+    @if (codeSent)
+    {
+        <div style="margin-top: 10px;">
+            <h5 class="TextVhodAdmin">Введите код, который пришел на почту copygrad96@mail.ru</h5>
+            <input  />
+            <button type="button" >Подтвердить</button>
+
+        </div>
+    } *@
+    <button @onclick="onClickVhod" class="BittonAdminVhod">Зарегистироваться</button>
+    <a href="/Admin" class="TextFindPassword">Назад</a>
+</div>
+
+@code {
+    private string code = "a9Lx3Tq7Vm";
+    private bool codeSent = true;
+
+    public void onClickVhod()
+    {
+        Navigation.NavigateTo("/Servise");
+    }
+}
