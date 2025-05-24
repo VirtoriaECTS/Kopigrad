@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Components\Classes\Новая папка1\**" />
+    <Compile Remove="Components\Classes\Новая папка\**" />
+    <Content Remove="Components\Classes\Новая папка1\**" />
+    <Content Remove="Components\Classes\Новая папка\**" />
+    <EmbeddedResource Remove="Components\Classes\Новая папка1\**" />
+    <EmbeddedResource Remove="Components\Classes\Новая папка\**" />
+    <None Remove="Components\Classes\Новая папка1\**" />
+    <None Remove="Components\Classes\Новая папка\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\Image\Baners\backgroundRequst.png" />
   </ItemGroup>
 
@@ -28,6 +39,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\userfiles\" />
+    <Folder Include="wwwroot\visit\" />
   </ItemGroup>
 
 </Project>

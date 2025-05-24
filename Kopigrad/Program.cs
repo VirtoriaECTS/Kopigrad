@@ -39,6 +39,8 @@ builder.Services.AddDbContext<KopigradContext>(options =>
 
 builder.Services.AddHttpClient();
 
+
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = "Cookies";

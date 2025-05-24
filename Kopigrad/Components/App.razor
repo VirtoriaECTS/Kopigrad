@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="~/users.css?v=1.0.1" />
     <link rel="stylesheet" href="~/orders.css?v=1.0.1" />
 
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Open+Sans&family=Lato&family=Montserrat&display=swap"
+          rel="stylesheet" />
+
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 
@@ -22,6 +26,32 @@
 
 <body>
     <Routes />
+
+    <!-- 1) Подключаем html2canvas (без integrity, чтобы не было блокировок) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Ставим белый фон вместо прозрачного -->
+    <script>
+        window.downloadVisitCard = async (selector, filename) => {
+            const el = document.querySelector(selector);
+            if (!el) {
+                console.error("Element not found:", selector);
+                return;
+            }
+            // здесь фон будет белым
+            const canvas = await html2canvas(el, { backgroundColor: '#ffffff' });
+            const dataUrl = canvas.toDataURL("image/png");
+            const a = document.createElement("a");
+            a.href = dataUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+    </script>
+
+
+
     <script src="_framework/blazor.web.js"></script>
 
 
