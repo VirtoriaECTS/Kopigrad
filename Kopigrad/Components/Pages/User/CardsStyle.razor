@@ -1,0 +1,47 @@
+﻿
+@page "/CardsStyle"
+@rendermode InteractiveServer
+@layout Layout.Menu.MenuUser;
+@inject NavigationManager Nav
+
+
+
+
+<head>
+    <link rel="stylesheet" href="/users.css">
+    <link rel="stylesheet" href="/admin.css">
+    <link rel="stylesheet" href="/cardsvisit.css">
+</head>
+<div class="Banner">
+
+    <h5 class="TextBanner">Конструктор визиток</h5>
+
+
+</div>
+
+
+
+<select class="form-control" @onchange="HandleChange" style="width:80vw; margin: 3vw;">
+    <option value="1">Создать визитку</option>
+    <option value="2">Использовать шаблон</option>
+</select>
+
+
+ВЫБОР
+@code {
+    private void HandleChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int value))
+        {
+            if(value == 1)
+            {
+                Nav.NavigateTo("/businesscard");
+            }
+            else
+            {
+                Nav.NavigateTo("/BisnesShablon");
+            }
+        }
+    }
+
+}

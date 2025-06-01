@@ -1,0 +1,573 @@
+﻿
+@page "/BisnesShablon"
+@layout Layout.Menu.MenuUser;
+@rendermode InteractiveServer
+
+@inject NavigationManager Nav
+
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+
+<head>
+    <link rel="stylesheet" href="/users.css">
+    <link rel="stylesheet" href="/admin.css">
+    <link rel="stylesheet" href="/cardsvisit.css">
+</head>
+<div class="Banner">
+
+    <h5 class="TextBanner">Конструктор визиток</h5>
+
+
+</div>
+
+
+
+<select class="form-control" @onchange="HandleChange" style="width:80vw; margin: 3vw;">
+    <option value="0" disabled>Выберите режим</option>
+    <option value="2">Использовать шаблон</option>
+    <option value="1">Создать визитку</option>
+</select>
+
+<div class="row">
+    <!-- Левое меню: выбор шаблона + динамические поля -->
+    <div class="col-12 col-md-4 mb-4">
+        <h5>Выберите шаблон:</h5>
+        <div class="d-flex flex-wrap">
+            @foreach (var tmpl in AllTemplates)
+            {
+                <div class="m-1">
+                    <img src="@tmpl.BackgroundImageUrl"
+                         class="img-thumbnail @(tmpl == SelectedTemplate ? "border-success border-2" : "")"
+                         style="width:100px; height: auto; cursor:pointer;"
+                         @onclick="@(() => SelectTemplate(tmpl))" />
+                </div>
+            }
+        </div>
+
+        @if (SelectedTemplate != null)
+        {
+            <hr />
+            <h5 class="mt-3">Заполните данные:</h5>
+
+            @* Для каждого текстового слота создаём поле ввода *@
+            @foreach (var slot in SelectedTemplate.Slots)
+            {
+                <div class="form-group mb-2">
+                    <label>@slot.Label</label>
+                    <input class="form-control"
+                           @bind="SlotValues[slot.Key]"
+                           placeholder="@slot.Label" />
+                </div>
+            }
+
+            <button class="btn btn-success mt-3" @onclick="SaveAsPng">Сохранить как PNG</button>
+        }
+    </div>
+
+    <!-- Правое поле: само превью (динамически рисуем блоки в нужных позициях) -->
+    <div class="col-12 col-md-8 mb-4">
+        @if (SelectedTemplate != null)
+        {
+            <div class="preview-wrapper mx-auto">
+                @* 
+                    «card-preview» – это контейнер, который мы будем рендерить в PNG.
+                    В него кладётся фоновая картинка и динамические слоты с текстом.
+                *@
+                <div id="card-preview" class="card-preview position-relative">
+                    @* Устанавливаем фон: *@
+                    <div class="w-100 h-100"
+                         style="
+                            background-image: url('@SelectedTemplate.BackgroundImageUrl');
+                            background-size: cover;
+                            background-position: center;
+                            width: 100%;
+                            height: 0;
+                            padding-top: @AspectRatioPadding%;
+                            position: relative;
+                         ">
+                        @* 
+                            padding-top: 56.25% соответствует соотношению 16:9 (9/16 ≈ 0.5625 → 56.25%). 
+                            Но мы дальше пересчитаем этот кусок, чтобы каждый шаблон масштабировался под свой ratio. 
+                        *@
+
+                        @* Для каждого слота создаём блок <div> с абсолютно заданными координатами *@
+                        @foreach (var slot in SelectedTemplate.Slots)
+                        {
+                            @* Текущее значение текста: если нет – пустая строка *@
+                            var textValue = SlotValues.ContainsKey(slot.Key) ? SlotValues[slot.Key] : "";
+                            <div class="text-slot"
+                                 style="
+                                    position: absolute;
+                                    left: @($"{slot.XPercent}%");
+                                    top: @($"{slot.YPercent}%");
+                                    transform: translate(-50%, -50%); /* чтобы центрировать текст по указанной точке */
+                                    font-size: @($"{slot.FontSizePx}px");
+                                    color: @slot.Color;
+                                    text-align: @slot.TextAlign;
+                                    @slot.AdditionalCss
+                                 ">
+                                @textValue
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@* 
+    Ниже — CSS, который описывает стили превью (card-preview) и адаптивность.
+    Если у вас есть глобальный файл site.css, можно скопировать эти стили туда.
+*@
+<style>
+    /* 
+        Обёртка .card-preview-wrapper сделана для того, чтобы при необходимости ограничить максимальную ширину. 
+        Можно убирать или менять под себя.
+    */
+    .card-preview-wrapper {
+        max-width: 100%;
+    }
+
+    /* 
+        Блок с превью: 
+        - background-image: выбранный шаблон
+        - aspect-ratio: 16/9 (можно подогнать под ваши картинки)
+        - position: relative, чтобы вкладывать в него абсолютно позиционированный текст
+        - background-size: cover, background-position: center
+    */
+    .card-preview {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/9;
+        /* Если ваша картинка в формате 600×400, можно поставить 600/400 = 3/2 вместо 16/9 */
+        background-size: cover;
+        background-position: center;
+        background-image: url('@SelectedTemplate');
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    /* Название организации: примерно центрировано по вертикали, слева 10% */
+    .card-preview .org-text {
+        position: absolute;
+        left: 8%;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #ffffff;
+        font-size: 1.8rem;
+        font-weight: bold;
+        white-space: nowrap;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Вертикальный разделитель */
+    .card-preview .divider {
+        position: absolute;
+        top: 15%;
+        bottom: 15%;
+        left: 50%;
+        width: 2px;
+        background-color: rgba(255, 255, 255, 0.8);
+        transform: translateX(-50%);
+    }
+
+    /* Контейнер с контактами (правее разделителя) */
+    .card-preview .contacts {
+        position: absolute;
+        right: 8%;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    /* Каждый пункт контакта */
+    .card-preview .contact-item {
+        color: #ffffff;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Иконки FontAwesome */
+    .card-preview .contact-item i {
+        margin-right: 0.5rem;
+        font-size: 1.2rem;
+    }
+
+    /* При смене шаблона в C# — нужно обновить background-image. 
+       В Blazor мы можем пересоздать блок или пользоваться key, но здесь достаточно 
+       пересоздать background через встроенный стиль. */ 
+    keyframes changeBg {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    /* Миниатюры шаблонов */
+    .template-thumb {
+        border: 2px solid transparent;
+        border-radius: 4px;
+        transition: border-color 0.2s;
+    }
+
+    .template-thumb.selected-thumb {
+        border-color: #28a745; /* зелёный для выбранного */
+    }
+</style>
+
+@* 
+    JavaScript-функция для сохранения превью-блока в PNG. 
+    Метод html2canvas берёт элемент по ID и рендерит в canvas, затем скачивает.
+*@
+@code {
+    // Модель слотов (см. выше в разделе 2)
+    public class TextSlot
+    {
+        public string Key { get; set; }
+        public string Label { get; set; }
+        public double XPercent { get; set; }
+        public double YPercent { get; set; }
+        public int FontSizePx { get; set; }
+        public string Color { get; set; }
+        public string AdditionalCss { get; set; } = "";
+        public string TextAlign { get; set; } = "left";
+    }
+
+    public class TemplateDefinition
+    {
+        public string BackgroundImageUrl { get; set; }
+        public double AspectRatio { get; set; } // отношение высоты к ширине, например 9/16 = 0.5625
+        public List<TextSlot> Slots { get; set; } = new List<TextSlot>();
+    }
+
+    private void HandleChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int value))
+        {
+            if (value == 1)
+            {
+                Nav.NavigateTo("/businesscard");
+            }
+            else
+            {
+                Nav.NavigateTo("/BisnesShablon");
+            }
+        }
+    }
+
+    // В какой-нибудь «службе» или прямо в @code{} вашего компонента
+    private List<TemplateDefinition> AllTemplates = new()
+{
+    new TemplateDefinition
+    {
+        BackgroundImageUrl = "/images/template1.png",
+        Slots = new List<TextSlot>
+        {
+            new TextSlot
+            {
+                Key = "OrgName",
+                Label = "Название организации",
+                XPercent = 30,
+                YPercent = 50,
+                FontSizePx = 30,
+                Color = "#ffffff",
+                AdditionalCss = "font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);",
+                TextAlign = "left"
+            },
+            new TextSlot
+            {
+                Key = "Phone",
+                Label = "Телефон",
+                XPercent = 67,
+                YPercent = 39,
+                FontSizePx = 25,
+                Color = "#ffffff",
+                AdditionalCss = "font-weight: 500; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);",
+                TextAlign = "left"
+            },
+
+            new TextSlot
+            {
+                Key = "Location",
+                Label = "Местоположение",
+                XPercent = 70,
+                YPercent = 50,
+                FontSizePx = 25,
+                Color = "#ffffff",
+                AdditionalCss = "font-weight: 500; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);",
+                TextAlign = "left"
+            },
+
+            new TextSlot
+            {
+                Key = "Instagramm",
+                Label = "Инстаграм",
+                XPercent = 67,
+                YPercent = 61,
+                FontSizePx = 25,
+                Color = "#ffffff",
+                AdditionalCss = "font-weight: 500; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);",
+                TextAlign = "left"
+            }
+        }
+    },
+    new TemplateDefinition
+    {
+        BackgroundImageUrl = "/images/template2.png",
+        Slots = new List<TextSlot>
+        {
+            new TextSlot
+            {
+                Key = "FullName",
+                Label = "Имя и Фамилия",
+                XPercent = 50,
+                YPercent = 40,
+                FontSizePx = 30,
+                Color = "#dca6a6",  // розоватый цвет
+                AdditionalCss = "font-weight: 700;",
+                TextAlign = "center"
+            },
+            new TextSlot
+            {
+                Key = "Position",
+                Label = "Должность",
+                XPercent = 50,
+                YPercent = 55,
+                FontSizePx = 20,
+                Color = "#dca6a6",
+                AdditionalCss = "text-shadow: 1px 1px 2px rgba(0,0,0,0.3);",
+                TextAlign = "center"
+            },
+            new TextSlot
+            {
+                Key = "Contact",
+                Label = "Контакты",
+                XPercent = 50,
+                YPercent = 65,
+                FontSizePx = 18,
+                Color = "#dca6a6",  // розоватый цвет
+                AdditionalCss = "text-shadow: 1px 1px 2px rgba(0,0,0,0.3);",
+                TextAlign = "right"
+            }
+        }
+
+    },
+    new TemplateDefinition
+{
+    BackgroundImageUrl = "/images/template3.png",
+    Slots = new List<TextSlot>
+    {
+        new TextSlot
+        {
+            Key = "Name",
+            Label = "Имя",
+            XPercent = 30,
+            YPercent = 80,
+            FontSizePx = 70,
+            Color = "#ABABAB",  
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "right"
+        },
+
+        new TextSlot
+        {
+            Key = "Family",
+            Label = "Фамилия",
+            XPercent = 30,
+            YPercent = 88,
+            FontSizePx = 70,
+            Color = "#ABABAB", 
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "right"
+        },
+
+        new TextSlot
+        {
+            Key = "Contact",
+            Label = "Контакт",
+            XPercent = 50,
+            YPercent = 84,
+            FontSizePx = 50,
+            Color = "#7C7C7B",  
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "right"
+        },
+    }
+    },
+
+     new TemplateDefinition
+{
+    BackgroundImageUrl = "/images/template4.png",
+    Slots = new List<TextSlot>
+    {
+        new TextSlot
+        {
+            Key = "YourWebsite",
+            Label = "Ваш вебсайт",
+            XPercent = 50,
+            YPercent = 20,
+            FontSizePx = 40,
+            Color = "#000000",  
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "center"
+        },
+
+
+        new TextSlot
+        {
+            Key = "FIO",
+            Label = "Имя и фамилия",
+            XPercent = 50,
+            YPercent = 35,
+            FontSizePx = 70,
+            Color = "#000000",  
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "center"
+        },
+
+
+        new TextSlot
+        {
+            Key = "Contact",
+            Label = "Ваш контакт",
+            XPercent = 50,
+            YPercent = 50,
+            FontSizePx = 70,
+            Color = "#000000", 
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "center"
+        },
+
+
+    }
+    },
+     new TemplateDefinition
+{
+    BackgroundImageUrl = "/images/template5.png",
+    Slots = new List<TextSlot>
+    {
+
+        new TextSlot
+        {
+            Key = "FIO",
+            Label = "Название",
+            XPercent = 70,
+            YPercent = 40,
+            FontSizePx = 65,
+            Color = "#FFFFFF",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "center"
+        },
+
+
+        new TextSlot
+        {
+            Key = "Contact",
+            Label = "Контакт",
+            XPercent = 70,
+            YPercent = 50,
+            FontSizePx = 65,
+            Color = "#FFFFFF",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "center"
+        },
+
+
+    }
+    },
+     new TemplateDefinition
+{
+    BackgroundImageUrl = "/images/template6.png",
+    Slots = new List<TextSlot>
+    {
+
+        new TextSlot
+        {
+            Key = "Name",
+            Label = "Имя",
+            XPercent = 30,
+            YPercent = 30,
+            FontSizePx = 75,
+            Color = "#000000",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "left"
+        },
+
+
+        new TextSlot
+        {
+            Key = "FIO",
+            Label = "Фамилия",
+            XPercent = 30,
+            YPercent = 40,
+            FontSizePx = 75,
+            Color = "#000000",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "left"
+        },
+
+                new TextSlot
+        {
+            Key = "Contact",
+            Label = "Контакт",
+            XPercent = 30,
+            YPercent = 50,
+            FontSizePx = 55,
+            Color = "#000000",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "left"
+        },
+
+
+    }
+    }
+};
+
+    // Текущий выбранный шаблон
+    private TemplateDefinition SelectedTemplate { get; set; }
+
+    // Словарь: Key слота → введённое значение
+    private Dictionary<string, string> SlotValues { get; set; } = new();
+
+    // Вспомогательное поле: для вычисления padding-top (процент от ширины = отношение высоты к ширине * 100)
+    private string AspectRatioPadding => SelectedTemplate == null
+        ? "56.25" // просто заглушка (16:9)
+        : (SelectedTemplate.AspectRatio * 100.0).ToString("F2");
+
+    protected override void OnInitialized()
+    {
+        // По умолчанию сразу выберем первый шаблон
+        if (AllTemplates.Any())
+        {
+            SelectTemplate(AllTemplates[0]);
+        }
+    }
+
+    private void SelectTemplate(TemplateDefinition tmpl)
+    {
+        SelectedTemplate = tmpl;
+        SlotValues.Clear();
+
+        foreach (var slot in SelectedTemplate.Slots)
+        {
+            // Заполняем значением Label, т.е. сразу "Название организации" и "Телефон"
+            SlotValues[slot.Key] = slot.Label;
+        }
+    }
+
+
+    // Метод, вызываемый при нажатии «Сохранить как PNG»
+    private async Task SaveAsPng()
+    {
+        // Вызываем JS-функцию из _Host.cshtml
+        await JS.InvokeVoidAsync("downloadVisitCard", "#card-preview", "visitcard.png");
+    }
+
+
+
+}
