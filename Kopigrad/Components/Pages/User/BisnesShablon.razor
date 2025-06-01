@@ -31,6 +31,7 @@
 
 <div class="row">
     <!-- Левое меню: выбор шаблона + динамические поля -->
+    @* Левая колонка: выбор шаблона + динамические поля *@
     <div class="col-12 col-md-4 mb-4">
         <h5>Выберите шаблон:</h5>
         <div class="d-flex flex-wrap">
@@ -39,7 +40,7 @@
                 <div class="m-1">
                     <img src="@tmpl.BackgroundImageUrl"
                          class="img-thumbnail @(tmpl == SelectedTemplate ? "border-success border-2" : "")"
-                         style="width:100px; height: auto; cursor:pointer;"
+                         style="width:100px; height:auto; cursor:pointer;"
                          @onclick="@(() => SelectTemplate(tmpl))" />
                 </div>
             }
@@ -50,14 +51,33 @@
             <hr />
             <h5 class="mt-3">Заполните данные:</h5>
 
-            @* Для каждого текстового слота создаём поле ввода *@
+            @* Для каждого слота создаём одну строку с двумя колонками *@
             @foreach (var slot in SelectedTemplate.Slots)
             {
-                <div class="form-group mb-2">
-                    <label>@slot.Label</label>
-                    <input class="form-control"
-                           @bind="SlotValues[slot.Key]"
-                           placeholder="@slot.Label" />
+                <div class="form-group mb-3">
+                    <div class="row">
+                        @* Левая колонка: поле ввода текста *@
+                        <div class="col-6">
+                            <label>@slot.Label</label>
+                            <input class="form-control"
+                                   @bind="SlotValues[slot.Key]"
+                                   placeholder="@slot.Label" />
+                        </div>
+
+                        @* Правая колонка: выбор шрифта *@
+                        <div class="col-6">
+                            <label>Шрифт</label>
+                            <select class="form-select"
+                                    @bind="SlotFonts[slot.Key]">
+                                <option value="Arial">Arial</option>
+                                <option value="Tahoma">Tahoma</option>
+                                <option value="Verdana">Verdana</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Courier New">Courier New</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             }
 
@@ -94,19 +114,22 @@
                         @* Для каждого слота создаём блок <div> с абсолютно заданными координатами *@
                         @foreach (var slot in SelectedTemplate.Slots)
                         {
-                            @* Текущее значение текста: если нет – пустая строка *@
+                            // Получаем текущее значение текста и текущий шрифт (или "Arial", если словаря ещё нет)
                             var textValue = SlotValues.ContainsKey(slot.Key) ? SlotValues[slot.Key] : "";
+                            var fontFamily = SlotFonts.ContainsKey(slot.Key) ? SlotFonts[slot.Key] : "Arial";
+
                             <div class="text-slot"
                                  style="
                                     position: absolute;
                                     left: @($"{slot.XPercent}%");
                                     top: @($"{slot.YPercent}%");
-                                    transform: translate(-50%, -50%); /* чтобы центрировать текст по указанной точке */
+                                    transform: translate(-50%, -50%);
                                     font-size: @($"{slot.FontSizePx}px");
                                     color: @slot.Color;
                                     text-align: @slot.TextAlign;
+                                    font-family: '@fontFamily';
                                     @slot.AdditionalCss
-                                 ">
+                                         ">
                                 @textValue
                             </div>
                         }
@@ -226,6 +249,11 @@
 *@
 @code {
     // Модель слотов (см. выше в разделе 2)
+
+
+
+
+
     public class TextSlot
     {
         public string Key { get; set; }
@@ -263,59 +291,72 @@
     // В какой-нибудь «службе» или прямо в @code{} вашего компонента
     private List<TemplateDefinition> AllTemplates = new()
 {
-    new TemplateDefinition
+         new TemplateDefinition
+{
+    BackgroundImageUrl = "/images/template7.png",
+    Slots = new List<TextSlot>
     {
-        BackgroundImageUrl = "/images/template1.png",
-        Slots = new List<TextSlot>
+
+        new TextSlot
         {
-            new TextSlot
-            {
-                Key = "OrgName",
-                Label = "Название организации",
-                XPercent = 30,
-                YPercent = 50,
-                FontSizePx = 30,
-                Color = "#ffffff",
-                AdditionalCss = "font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);",
-                TextAlign = "left"
-            },
-            new TextSlot
-            {
-                Key = "Phone",
-                Label = "Телефон",
-                XPercent = 67,
-                YPercent = 39,
-                FontSizePx = 25,
-                Color = "#ffffff",
-                AdditionalCss = "font-weight: 500; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);",
-                TextAlign = "left"
-            },
+            Key = "Name",
+            Label = "Имя",
+            XPercent = 30,
+            YPercent = 40,
+            FontSizePx = 75,
+            Color = "#3E3D3D",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "left"
+        },
+                new TextSlot
+        {
+            Key = "Surmane",
+            Label = "Фамилия",
+            XPercent = 30,
+            YPercent = 50,
+            FontSizePx = 75,
+            Color = "#7A49DC",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "left"
+        },
 
-            new TextSlot
-            {
-                Key = "Location",
-                Label = "Местоположение",
-                XPercent = 70,
-                YPercent = 50,
-                FontSizePx = 25,
-                Color = "#ffffff",
-                AdditionalCss = "font-weight: 500; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);",
-                TextAlign = "left"
-            },
+                        new TextSlot
+        {
+            Key = "Phone",
+            Label = "Телефон",
+            XPercent = 70,
+            YPercent = 43,
+            FontSizePx = 35,
+            Color = "#9E94A4",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "left"
+        },
 
-            new TextSlot
-            {
-                Key = "Instagramm",
-                Label = "Инстаграм",
-                XPercent = 67,
-                YPercent = 61,
-                FontSizePx = 25,
-                Color = "#ffffff",
-                AdditionalCss = "font-weight: 500; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);",
-                TextAlign = "left"
-            }
-        }
-    },
+                                new TextSlot
+        {
+            Key = "Email",
+            Label = "Почта",
+            XPercent = 70,
+            YPercent = 48,
+            FontSizePx = 35,
+            Color = "#9E94A4",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "left"
+        },
+                                        new TextSlot
+        {
+            Key = "Adress",
+            Label = "Адресс",
+            XPercent = 70,
+            YPercent = 53,
+            FontSizePx = 35,
+            Color = "#9E94A4",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "left"
+        },
+
+    }
+     },
     new TemplateDefinition
     {
         BackgroundImageUrl = "/images/template2.png",
@@ -327,7 +368,7 @@
                 Label = "Имя и Фамилия",
                 XPercent = 50,
                 YPercent = 40,
-                FontSizePx = 30,
+                FontSizePx = 50,
                 Color = "#dca6a6",  // розоватый цвет
                 AdditionalCss = "font-weight: 700;",
                 TextAlign = "center"
@@ -338,7 +379,7 @@
                 Label = "Должность",
                 XPercent = 50,
                 YPercent = 55,
-                FontSizePx = 20,
+                FontSizePx = 40,
                 Color = "#dca6a6",
                 AdditionalCss = "text-shadow: 1px 1px 2px rgba(0,0,0,0.3);",
                 TextAlign = "center"
@@ -349,7 +390,7 @@
                 Label = "Контакты",
                 XPercent = 50,
                 YPercent = 65,
-                FontSizePx = 18,
+                FontSizePx = 35,
                 Color = "#dca6a6",  // розоватый цвет
                 AdditionalCss = "text-shadow: 1px 1px 2px rgba(0,0,0,0.3);",
                 TextAlign = "right"
@@ -511,7 +552,7 @@
             TextAlign = "left"
         },
 
-                new TextSlot
+        new TextSlot
         {
             Key = "Contact",
             Label = "Контакт",
@@ -524,9 +565,86 @@
         },
 
 
+
+    }
+
+    },
+
+         new TemplateDefinition
+{
+    BackgroundImageUrl = "/images/template8.png",
+    Slots = new List<TextSlot>
+    {
+
+        new TextSlot
+        {
+            Key = "Name",
+            Label = "Название компании",
+            XPercent = 70,
+            YPercent = 20,
+            FontSizePx = 45,
+            Color = "#FFF68F",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "center"
+        },
+
+
+        new TextSlot
+        {
+            Key = "FIO",
+            Label = "ФИО",
+            XPercent = 70,
+            YPercent = 30,
+            FontSizePx = 55,
+            Color = "#FFF68F",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "center"
+        },
+
+
+        new TextSlot
+        {
+            Key = "Dolgnist",
+            Label = "Должность",
+            XPercent = 70,
+            YPercent = 50,
+            FontSizePx = 35,
+            Color = "#FFF68F",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "center"
+        },
+      
+
+                new TextSlot
+        {
+            Key = "Phone",
+            Label = "Телефон",
+            XPercent = 70,
+            YPercent = 55,
+            FontSizePx = 35,
+            Color = "#FFF68F",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "center"
+        },
+
+                        new TextSlot
+        {
+            Key = "Adress",
+            Label = "Адресс",
+            XPercent = 70,
+            YPercent = 60,
+            FontSizePx = 35,
+            Color = "#FFF68F",
+            AdditionalCss = "font-weight: 700;",
+            TextAlign = "center"
+        },
     }
     }
+
 };
+
+    // Новый словарь: Key слота → выбранный font-family
+    private Dictionary<string, string> SlotFonts { get; set; } = new();
 
     // Текущий выбранный шаблон
     private TemplateDefinition SelectedTemplate { get; set; }
@@ -557,6 +675,9 @@
         {
             // Заполняем значением Label, т.е. сразу "Название организации" и "Телефон"
             SlotValues[slot.Key] = slot.Label;
+
+            // Шрифт по умолчанию = Arial (можете поменять на любой)
+            SlotFonts[slot.Key] = "Arial";
         }
     }
 
