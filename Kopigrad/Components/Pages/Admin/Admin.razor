@@ -16,17 +16,36 @@
 
 <div class="VhodAdmin">
     <h5 class="TextVhodAdmin">Email:</h5>
-    <input type="email" class="InputAdmin" />
+    <input type="email" @bind="email" class="InputAdmin" />
     <h5 class="TextVhodAdmin">Пароль:</h5>
-    <input type="password" class="InputAdmin" />
+    <input type="password" @bind="password" class="InputAdmin" />
     <button @onclick="onClickVhod" class="BittonAdminVhod">Войти</button>
     <a href="/Register" class="TextFindPassword">Зарегистироваться</a>
     <h5 class="TextFindPassword">Забыли пароль</h5>
+    <h2 class="TextFindPassword" style="color: red">@error</h2>
 </div>
 
 @code{
+    string error = "";
+    string email = "";
+    string password = "";
+
+    Classes.Autorisation.AutorisationClasses autorisationClasses = new Classes.Autorisation.AutorisationClasses();
 
     public void onClickVhod(){
-        Navigation.NavigateTo("/Servise");
+
+        string textEr = autorisationClasses.CheakPassword(email, password);
+
+        if(textEr.Length == 0)
+        {
+
+            Navigation.NavigateTo("/Servise");
+        }
+
+        else
+        {
+            error = textEr;
+        }
+
     }
 }
