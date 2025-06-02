@@ -2,6 +2,14 @@
 @page "/Static"
 @rendermode InteractiveServer
 @using MudBlazor
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Http
+@inject NavigationManager Navigation
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthStateProvider
 <head>
     <link rel="stylesheet" href="/users.css">
     <link rel="stylesheet" href="/admin.css">
@@ -227,8 +235,15 @@
     public string[] XAxisLabelsRequstOnline;
 
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated != true)
+        {
+            Navigation.NavigateTo("/Admin");
+            return;
+        }
 
         // Получаем начало текущего года (1 января текущего года)
         DateTime firstOfYear = new DateTime(DateTime.Today.Year, 1, 1);

@@ -1,14 +1,13 @@
 ﻿@page "/Admin"
-@layout Layout.Menu.MenuAdminVhod;
-@using Kopigrad.Components.Layout
-@inject Models.KopigradContext DbContext
+@page "/Admin/{ReturnUrl?}"
+@layout Layout.Menu.MenuAdminVhod
 @rendermode InteractiveServer
+
+@using Microsoft.AspNetCore.Components
 @inject NavigationManager Navigation
+@inject Classes.Autorisation.AutorisationClasses AuthService
+
 <PageTitle>Admin</PageTitle>
-<head>
-    <link rel="stylesheet" href="/users.css">
-    <link rel="stylesheet" href="/admin.css">
-</head>
 
 <div class="Banner">
     <h5 class="TextBanner">Панель админа</h5>
@@ -19,33 +18,37 @@
     <input type="email" @bind="email" class="InputAdmin" />
     <h5 class="TextVhodAdmin">Пароль:</h5>
     <input type="password" @bind="password" class="InputAdmin" />
-    <button @onclick="onClickVhod" class="BittonAdminVhod">Войти</button>
-    <a href="/Register" class="TextFindPassword">Зарегистироваться</a>
+    <button @onclick="OnClickVhod" class="BittonAdminVhod">Войти</button>
+    <a href="/Register" class="TextFindPassword">Зарегистрироваться</a>
     <h5 class="TextFindPassword">Забыли пароль</h5>
     <h2 class="TextFindPassword" style="color: red">@error</h2>
 </div>
 
-@code{
-    string error = "";
-    string email = "";
-    string password = "";
+@code {
+    [Parameter] public string? ReturnUrl { get; set; }
+    private string error = "";
+    private string email = "";
+    private string password = "";
 
-    Classes.Autorisation.AutorisationClasses autorisationClasses = new Classes.Autorisation.AutorisationClasses();
-
-    public void onClickVhod(){
-
-        string textEr = autorisationClasses.CheakPassword(email, password);
-
-        if(textEr.Length == 0)
+    private void OnClickVhod()
+    {
+        // 1) Локально проверяем пароль через AuthService
+        string checkResult = AuthService.CheakPassword(email, password);
+        if (!string.IsNullOrEmpty(checkResult))
         {
-
-            Navigation.NavigateTo("/Servise");
+            error = checkResult;
+            return;
         }
 
-        else
-        {
-            error = textEr;
-        }
+        // 2) Если локальная проверка прошла, перенаправляем браузер на наш минимальный API /doLogin
+        // передаём email, password и returnUrl
+        var url = $"/doLogin?email={Uri.EscapeDataString(email)}" +
+                  $"&password={Uri.EscapeDataString(password)}";
 
+        if (!string.IsNullOrEmpty(ReturnUrl))
+            url += $"&returnUrl={Uri.EscapeDataString(ReturnUrl)}";
+
+        // Простая навигация, чтобы браузер сделал обычный HTTP-GET на /doLogin
+        Navigation.NavigateTo(url, forceLoad: true);
     }
 }

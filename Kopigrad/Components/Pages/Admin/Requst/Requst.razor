@@ -1,6 +1,12 @@
 ﻿@page "/Requst"
 @rendermode InteractiveServer
-
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Http
+@inject NavigationManager Navigation
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthStateProvider
 
 <head>
     <link rel="stylesheet" href="/users.css">
@@ -253,8 +259,14 @@
     string error = "";
 
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated != true)
+        {
+            Navigation.NavigateTo("/Admin");
+            return;
+        }
         Classes.Admin.Servise.Order.OrderManager orderManager = new Classes.Admin.Servise.Order.OrderManager();
         statuses = orderManager.getStatus();
         allOrders = orderManager.GetOrders(); // ← сохраняем полный список

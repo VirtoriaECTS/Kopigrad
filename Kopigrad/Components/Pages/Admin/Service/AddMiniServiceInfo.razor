@@ -1,6 +1,16 @@
 ﻿@page "/AddMiniServiceInfo/{id:int}"
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
+
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Http
+
+@attribute [Authorize]
+
+@inject AuthenticationStateProvider AuthStateProvider
 <head>
     <link rel="stylesheet" href="/users.css">
     <link rel="stylesheet" href="/admin.css">
@@ -124,8 +134,14 @@
 
     List<Models.Material> viewmaterials = new List<Models.Material>();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated != true)
+        {
+            Navigation.NavigateTo("/Admin");
+            return;
+        }
         var managmentServise = new Classes.Admin.Servise.ManagmentServiseClasses();
         var managerMaterial = new Classes.Admin.Servise.ManagerMaterial();
 

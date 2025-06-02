@@ -1,17 +1,22 @@
 ﻿@page "/Servise"
-@layout Layout.Menu.MenuAdmin;
-@rendermode InteractiveServer
+@layout Layout.Menu.MenuAdmin
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Http
 @using Kopigrad.Models;
+@attribute [Authorize]
 
-
-
-
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IHttpContextAccessor HttpContextAccessor
 @inject NavigationManager Navigation
-<PageTitle>Admin</PageTitle>
+
+<PageTitle>Услуги</PageTitle>
 
 <head>
-    <link rel="stylesheet" href="/users.css">
-    <link rel="stylesheet" href="/admin.css">
+    <link rel="stylesheet" href="/users.css" />
+    <link rel="stylesheet" href="/admin.css" />
 </head>
 
 <div class="Banner">
@@ -22,13 +27,16 @@
     <div class="DivService">
         @foreach (var text in services)
         {
-
             <div @onclick="() => ClickInfoService(text.IdService)" class="divOneServise">
-                <button @onclick="() => ClickServiceChangeOne(text.IdService)" hidden="@buttonChange" class="ButtonChangeServise">
+                <button @onclick="() => ClickServiceChangeOne(text.IdService)"
+                        hidden="@buttonChange"
+                        class="ButtonChangeServise">
                     <img class="ImageButtonChange" src="Image/changeIcon.png" />
                 </button>
 
-                <button @onclick="() => ClickServiceDeleteOne(text.IdService)" hidden="@buttonDelete" class="ButtonDeleteServise">
+                <button @onclick="() => ClickServiceDeleteOne(text.IdService)"
+                        hidden="@buttonDelete"
+                        class="ButtonDeleteServise">
                     <img class="ImageButtonChange" src="Image/deleteIcon.png" />
                 </button>
 
@@ -42,7 +50,6 @@
     </div>
 </div>
 
-
 <div class="TextContainerMenuAdmin">
     <button class="ButtonDesingAdd" @onclick="AddProductClick">
         Добавить
@@ -52,82 +59,65 @@
         Изменить
     </button>
 
-    <button @onclick=ClickDeleteAll class="ButtonDesingDelete">
+    <button @onclick="ClickDeleteAll" class="ButtonDesingDelete">
         Удалить
     </button>
 </div>
 
 @code {
-
-    bool buttonChange = true;
-    bool buttonDelete = true;
-
-    private string? GetImageSrc(byte[] Image)
-    {
-
-        return Classes.All.ConvertImage.GetImageSrc(Image);
-    }
-
-
-    private List<Kopigrad.Models.Service> services = new List<Kopigrad.Models.Service>();
-    public void AddProductClick()
-    {
-        Navigation.NavigateTo("/ServiseAddProduct");
-    }
+    private bool buttonChange = true;
+    private bool buttonDelete = true;
+    private List<Models.Service> services = new();
 
     protected override async Task OnInitializedAsync()
     {
-        using (var context = new KopigradContext())
+        // Дополнительная проверка на случай, если Router не сработал
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated != true)
         {
-
-            services = context.Services.ToList();
+            Navigation.NavigateTo("/Admin");
+            return;
         }
 
+        using (var context = new KopigradContext())
+        {
+            services = context.Services.ToList();
+        }
     }
 
-    public void ClickChangeAll()
-    {
-        if (buttonChange) buttonChange = false;
-        else buttonChange = true;
-    }
+    private string? GetImageSrc(byte[] Image) =>
+        Classes.All.ConvertImage.GetImageSrc(Image);
 
-    public void ClickDeleteAll()
-    {
-        if (buttonDelete) buttonDelete = false;
-        else buttonDelete = true;
-    }
+    private void AddProductClick() =>
+        Navigation.NavigateTo("/ServiseAddProduct");
 
-    public void ClickServiceChangeOne(int id)
-    {
+    public void ClickChangeAll() =>
+        buttonChange = !buttonChange;
+
+    public void ClickDeleteAll() =>
+        buttonDelete = !buttonDelete;
+
+    public void ClickServiceChangeOne(int id) =>
         Navigation.NavigateTo($"/ChangeServise/{id}");
-    }
 
     public void ClickServiceDeleteOne(int id)
     {
-        Classes.Admin.Servise.ManagmentServiseClasses addServise = new Classes.Admin.Servise.ManagmentServiseClasses();
-
-        addServise.Delete(id);
+        var manager = new Classes.Admin.Servise.ManagmentServiseClasses();
+        manager.Delete(id);
 
         services.Clear();
         using (var context = new KopigradContext())
         {
-
             services = context.Services.ToList();
         }
 
-
         buttonDelete = true;
         StateHasChanged();
-
-
     }
 
     public void ClickInfoService(int id)
     {
         if (buttonChange && buttonDelete)
-        {
             Navigation.NavigateTo($"/AddInfoService/{id}");
-        }
-
     }
 }

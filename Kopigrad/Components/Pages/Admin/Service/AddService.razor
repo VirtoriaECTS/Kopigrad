@@ -2,6 +2,16 @@
 @layout Layout.Menu.MenuAdmin;
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
+
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Http
+
+@attribute [Authorize]
+
+@inject AuthenticationStateProvider AuthStateProvider
 <head>
     <link rel="stylesheet" href="/users.css">
     <link rel="stylesheet" href="/admin.css">
@@ -49,6 +59,18 @@
     private string nameServise;
 
     private string error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated != true)
+        {
+            Navigation.NavigateTo("/Admin");
+            return;
+        }
+
+        
+    }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {

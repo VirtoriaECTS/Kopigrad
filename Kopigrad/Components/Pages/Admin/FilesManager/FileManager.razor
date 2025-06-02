@@ -10,6 +10,15 @@
 @using System.Threading.Tasks
 @inject IWebHostEnvironment env
 
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Http
+@inject NavigationManager Navigation
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthStateProvider
+
 <h3>Управление файлами Excel</h3>
 
 @if (!string.IsNullOrEmpty(MessageText))
@@ -48,8 +57,16 @@ else
     string MessageText;
     string MessageCss;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated != true)
+        {
+            Navigation.NavigateTo("/Admin");
+            return;
+        }
+
         LoadFiles();
     }
 

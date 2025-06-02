@@ -1,7 +1,36 @@
-﻿<Router AppAssembly="typeof(Program).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Menu.MenuAdmin)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@inject NavigationManager Navigation
 
-    </Found>
-</Router>
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.Menu.MenuAdmin)">
+                <NotAuthorized>
+                    @{
+                        _shouldRedirect = true;
+                    }
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(Layout.Menu.MenuAdmin)">
+                <p>Страница не найдена.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+    private bool _shouldRedirect;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_shouldRedirect)
+        {
+            _shouldRedirect = false;
+            Navigation.NavigateTo("/", forceLoad: true);
+        }
+    }
+}

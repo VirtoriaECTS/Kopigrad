@@ -1,4 +1,12 @@
 ﻿@page "/ChangeServise/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Http
+@using Kopigrad.Models;
+@attribute [Authorize]
+
+@inject AuthenticationStateProvider AuthStateProvider
 @layout Layout.Menu.MenuAdmin;
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
@@ -87,9 +95,14 @@
         return Classes.All.ConvertImage.GetImageSrc(imageData);
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated != true)
+        {
+            Navigation.NavigateTo("/Admin");
+            return;
+        }
 
         var service = managment.Find(Convert.ToInt32(id));
 
