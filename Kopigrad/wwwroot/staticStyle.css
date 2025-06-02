@@ -73,3 +73,12 @@
     .picker-wrapper .mud-date-range-picker {
         width: 100% !important; /* Чтобы контрол лежал во всю ширину своей обёртки */
     }
+
+
+/* Выделяем особенный класс для обёртки вокруг MudChart */
+.chart-with-y-padding {
+    /* Оставляем свободное место слева, чтобы метки оси Y не обрезались */
+    padding-left: 50px; /* подберите высоту по меткам, у вас может быть длиннее ("10 000 ₽") */
+    /* Если нужно, можете добавить padding-right, padding-top, padding-bottom */
+    box-sizing: border-box; /* чтобы ширина контейнера считалась вместе с padding */
+}

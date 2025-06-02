@@ -55,6 +55,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddMudServices();
 
+
 var app = builder.Build();
 
 // Настроим приложение на прослушивание на всех интерфейсах на порту 5000

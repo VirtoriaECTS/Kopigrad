@@ -54,33 +54,154 @@
 
             <div class="inner-row">
                 <div class="chart-wrapper">
-@*                     <MudChart ChartType="ChartType.Line"
-                              ChartSeries="@Series"
-                              XAxisLabels="@XAxisLabels"
-                              Height="350"
-                              Width="100%"
-                              ChartOptions="options" /> *@
+                    <MudChart ChartType="ChartType.Donut" Width="300px" Height="300px" @bind-SelectedIndex="Index" InputData="@dataService" InputLabels="@labelsService"></MudChart>
                 </div>
 
                 <div class="picker-wrapper">
-                    <MudDateRangePicker PickerVariant="@_variant"
+                    <MudDateRangePicker DateRange="@_dateRangeService"
+                                        PickerVariant="@_variant"
                                         MaxDate="@_maxDate"
-                                        DateRangeChanged="OnDateRangeChanged"
+                                        DateRangeChanged="OnDateRangeChangedService"
                                         Margin="Margin.Dense" />
                 </div>
             </div>
         </div>
     </div>
+
 </div>
+<h5 class="TextCenter">Общая статистика</h5>
+<div class="chart-row">
+    <!-- Первая колонка -->
+    <div class="chart-cell">
+        <!-- Заголовок колонки -->
+        <h1 class="TextNameMiniService">Выручка</h1>
+
+        <!-- Внутренний flex-контейнер: слева график, справа календарь -->
+        <div class="inner-row">
+            <!-- Обёртка для графика -->
+            <div class="chart-wrapper">
+                <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="80%" CanHideSeries />
+            </div>
+
+            
+        </div>
+    </div>
+
+    <!-- Вторая колонка -->
+    <div class="chart-cell">
+        <h1 class="TextNameMiniService">Статистика принтеров</h1>
+
+        <div class="inner-row">
+            <div class="chart-wrapper">
+
+                <MudChart ChartType="ChartType.StackedBar" ChartSeries="@_series" @bind-SelectedIndex="_index" LegendPosition="@_legendPosition" XAxisLabels="@_xAxisLabels" Width="100%" Height="60%" AxisChartOptions="_axisChartOptions"></MudChart>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+   
+
 
 
 @code {
+    private int _index = -1; //default value cannot be 0 -> first selectedindex is 0.
+    private string _width = "650px";
+    private string _height = "350px";
+    private AxisChartOptions _axisChartOptions = new() { StackedBarWidthRatio = 0.5 };
+
+    private Position _legendPosition = Position.Bottom;
+
+    private List<ChartSeries> _series;
+
+    private string[] _xAxisLabels;
+    public void MethodStaticCountAll()
+    {
+        List<Classes.Data.DataCountPrint> dataCount = exel.getListCountAll();
+
+        _xAxisLabels = dataCount.Select(x => x.data).ToArray();
+
+        List<double> doubles = new List<double>();
+        List<double> xeroxs = new List<double>();
+        List<double> canonA = new List<double>();
+        List<double> canontmA = new List<double>();
+        List<double> risoA = new List<double>();
+        foreach(var item in dataCount)
+        {
+            
+            doubles.Add(item.kyocera.Sum());
+        }
+
+
+        foreach (var item in dataCount)
+        {
+            xeroxs.Add(item.xerox.Sum());
+        }
+
+
+        foreach (var item in dataCount)
+        {
+            canonA.Add(item.canon.Sum());
+        }
+
+
+        foreach (var item in dataCount)
+        {
+            canontmA.Add(item.canonTM.Sum());
+        }
+
+        foreach (var item in dataCount)
+        {
+            risoA.Add(item.riso.Sum());
+        }
+   
+         _series = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Kyocera 2035", Data = doubles.ToArray()},
+        new ChartSeries() { Name = "Xerox 8055", Data = xeroxs.ToArray()},
+                new ChartSeries() { Name = "Canon C3520i", Data = canonA.ToArray()},
+                        new ChartSeries() { Name = "Canon TM-300", Data = canontmA.ToArray()},
+                                new ChartSeries() { Name = "Riso EZ 200E", Data = risoA.ToArray()}
+
+    };
+        
+        
+
+
+        StateHasChanged();
+    }
+
+
+
+    //статистика доходов
+
+
+    public List<ChartSeries> Series = new List<ChartSeries>();
+    public string[] XAxisLabels = Enumerable
+        .Range(1, 31)               // последовательность 1, 2, …, 31
+        .Select(i => i.ToString())  // преобразуем каждое число в строку
+        .ToArray();
+
+    Random random = new Random();
+
+
+    //статистика услуг
+    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
+    int dataSize = 0;
+    public double[] dataService;
+    public string[] labelsService;
+
+    //статистика заявок онлайн
     private DateTime _maxDate = DateTime.Now.Date;
 
     private PickerVariant _variant = PickerVariant.Static;
     public DateRange _dateRange { get; set; }
+    public DateRange _dateRangeService { get; set; }
     private DateRange _dateRangeProduct { get; set; }
     Classes.Admin.StaticClasses.StaticClass stat = new Classes.Admin.StaticClasses.StaticClass();
+
+    Classes.Admin.StaticClasses.ExelFiles exel = new Classes.Admin.StaticClasses.ExelFiles();
 
     private void OnDateRangeChanged(DateRange dateRange)
     {
@@ -90,66 +211,110 @@
 
     }
 
+    private void OnDateRangeChangedService(DateRange dateRange)
+    {
+        _dateRangeService = dateRange; // Обновляем диапазон
+        Console.WriteLine($"Диапазон дат изменён: {_dateRange.Start?.ToShortDateString()} - {_dateRange.End?.ToShortDateString()}");
+        MethodStaticMaterial();
+
+    }
 
     private ChartOptions optionsRequstOnline = new ChartOptions();
     public List<ChartSeries> SeriesRequstOnline = new List<ChartSeries>()
     {
-        new ChartSeries() { Name = "Заявки", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70 } },
+        new ChartSeries()
     };
-    public string[] XAxisLabelsRequstOnline = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
+    public string[] XAxisLabelsRequstOnline;
 
 
     protected override void OnInitialized()
     {
 
+        // Получаем начало текущего года (1 января текущего года)
+        DateTime firstOfYear = new DateTime(DateTime.Today.Year, 1, 1);
+        DateTime today = DateTime.Today;
+
+        // Устанавливаем диапазоны сразу «с начала года до сегодня»
+        _dateRangeService = new DateRange(firstOfYear, today);
+        _dateRange = new DateRange(firstOfYear, today);
 
 
         optionsRequstOnline.InterpolationOption = InterpolationOption.NaturalSpline;
         optionsRequstOnline.YAxisFormat = "N0";
 
-        MethodStaticOnlineRequst();
+        // optionsMoney.YAxisFormat = "C2";
 
+            MethodStaticOnlineRequst();
 
+            MethodStaticMaterial();
 
-    }
+            MethodStaticMoney();
+        MethodStaticCountAll();
 
-    public void MethodStaticOnlineRequst()
-    {
-        // Получаем данные (дата + значение)
-        List<Classes.Data.DataStatic> dataStatic = stat.getStaticRequstOnline(_dateRange);
+        }
 
-        // Преобразуем в массивы для построения графика
-        double[] arrayData = dataStatic.Select(x => Convert.ToDouble(x.count)).ToArray();
-        double[] arrayPrice = dataStatic.Select(x => x.data).ToArray();
-        string[] xLabelArrat = dataStatic.Select(x => x.XAxisLabels.ToShortDateString()).ToArray();
+        public void MethodStaticOnlineRequst()
+        {
+            // Получаем данные (дата + значение)
+            List<Classes.Data.DataStatic> dataStatic = stat.getStaticRequstOnline(_dateRange);
 
-        // Очищаем предыдущую серию и добавляем новую
-        SeriesRequstOnline.Clear();
-        SeriesRequstOnline.Add(new ChartSeries()
+            // Преобразуем в массивы для построения графика
+            double[] arrayData = dataStatic.Select(x => Convert.ToDouble(x.count)).ToArray();
+            double[] arrayPrice = dataStatic.Select(x => x.data).ToArray();
+            string[] xLabelArrat = dataStatic.Select(x => x.XAxisLabels.ToShortDateString()).ToArray();
+
+            // Очищаем предыдущую серию и добавляем новую
+            SeriesRequstOnline.Clear();
+            SeriesRequstOnline.Add(new ChartSeries()
             {
                 Name = "Заявки",
                 Data = arrayData
             });
 
-        SeriesRequstOnline.Add(new ChartSeries()
+            SeriesRequstOnline.Add(new ChartSeries()
             {
                 Name = "Цена",
                 Data = arrayPrice
             });
 
-        // Заменяем XAxisLabels на новую подпись
-        XAxisLabelsRequstOnline = xLabelArrat;
+            // Заменяем XAxisLabels на новую подпись
+            XAxisLabelsRequstOnline = xLabelArrat;
 
-        // Если точек меньше 4, переключаемся на линейное соединение,
-        // иначе — на NaturalSpline
-        if (arrayData.Length < 4)
-            optionsRequstOnline.InterpolationOption = InterpolationOption.Straight;
-        else
-            optionsRequstOnline.InterpolationOption = InterpolationOption.NaturalSpline;
+            // Если точек меньше 4, переключаемся на линейное соединение,
+            // иначе — на NaturalSpline
+            if (arrayData.Length < 4)
+                optionsRequstOnline.InterpolationOption = InterpolationOption.Straight;
+            else
+                optionsRequstOnline.InterpolationOption = InterpolationOption.NaturalSpline;
 
+            StateHasChanged();
+        }
+
+        public void MethodStaticMaterial()
+        {
+            List<Classes.Data.DataDonats> dataDonats = stat.getStaticService(_dateRangeService);
+
+            dataSize = dataDonats.Count();
+            dataService = dataDonats.Select(x => Convert.ToDouble(x.count)).ToArray();
+            labelsService = dataDonats.Select(x => x.name).ToArray();
+
+        }
+
+
+        
+
+    public void MethodStaticMoney()
+    {
+        List<Classes.Data.DataStaticDohod> dataStatic = exel.getListDohod();
+        var newSeries = new List<ChartSeries>();
+        for (int s = 0; s < dataStatic.Count(); s++)
+        {
+            var series = new ChartSeries() { Name = $"{dataStatic[s].nameMonth}", Data = dataStatic[s].dohod.ToArray() };
+            
+            newSeries.Add(series);
+        }
+        Series = newSeries;
         StateHasChanged();
     }
-
-
 
 }

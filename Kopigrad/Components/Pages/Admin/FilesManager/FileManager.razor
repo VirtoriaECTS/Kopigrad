@@ -1,0 +1,150 @@
+﻿@page "/FileManager"
+@layout Layout.Menu.MenuAdmin
+@rendermode InteractiveServer
+
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Hosting
+@using System.IO
+@using System.Linq
+@using System.Collections.Generic
+@using System.Threading.Tasks
+@inject IWebHostEnvironment env
+
+<h3>Управление файлами Excel</h3>
+
+@if (!string.IsNullOrEmpty(MessageText))
+{
+    <div class="alert @MessageCss">@MessageText</div>
+}
+
+<div class="mb-3">
+    <label class="form-label">Загрузить файл Excel:</label>
+    <InputFile OnChange="OnInputFileChange" accept=".xlsx,.xls" class="form-control" />
+    <small class="form-text text-muted">Допустимые расширения: .xlsx, .xls</small>
+</div>
+
+@if (ExcelFiles.Count == 0)
+{
+    <p>Файлов не найдено.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var file in ExcelFiles)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="@($"/Dohod/{file}")" target="_blank">@file</a>
+                <button class="btn btn-sm btn-danger" @onclick="() => DeleteFile(file)">Удалить</button>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    // Список имён доступных Excel-файлов
+    List<string> ExcelFiles = new List<string>();
+
+    // Сообщение об ошибке/успехе и класс для Bootstrap-стилей
+    string MessageText;
+    string MessageCss;
+
+    protected override void OnInitialized()
+    {
+        LoadFiles();
+    }
+
+    // Метод для чтения всех .xls и .xlsx из папки wwwroot/Dohod
+    void LoadFiles()
+    {
+        var dohoddFolder = Path.Combine(env.WebRootPath, "Dohod");
+        if (!Directory.Exists(dohoddFolder))
+        {
+            Directory.CreateDirectory(dohoddFolder);
+        }
+
+        ExcelFiles = Directory.GetFiles(dohoddFolder)
+            .Where(f =>
+            {
+                var ext = Path.GetExtension(f).ToLower();
+                return ext == ".xls" || ext == ".xlsx";
+            })
+            .Select(f => Path.GetFileName(f))
+            .ToList();
+    }
+
+    // Обработчик события выбора файла через InputFile
+    async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        MessageText = "";
+        var file = e.File;
+        var fileName = file.Name;
+        var ext = Path.GetExtension(fileName).ToLower();
+
+        // Проверяем расширение
+        if (ext != ".xls" && ext != ".xlsx")
+        {
+            MessageText = "Только файлы Excel (.xls, .xlsx) разрешены.";
+            MessageCss = "alert-danger";
+            return;
+        }
+
+        var dohoddFolder = Path.Combine(env.WebRootPath, "Dohod");
+        var filePath = Path.Combine(dohoddFolder, fileName);
+
+        // Запрещаем загрузку, если файл с таким именем уже существует
+        if (File.Exists(filePath))
+        {
+            MessageText = "Файл с таким именем уже существует.";
+            MessageCss = "alert-danger";
+            return;
+        }
+
+        try
+        {
+            // Сохраняем файл в wwwroot/Dohod с оригинальным именем
+            using var fs = File.Create(filePath);
+            // Ограничение на максимальный размер — 10 МБ
+            await file.OpenReadStream(10 * 1024 * 1024).CopyToAsync(fs);
+
+            MessageText = "Файл успешно загружен.";
+            MessageCss = "alert-success";
+        }
+        catch (Exception ex)
+        {
+            MessageText = $"Ошибка при загрузке файла: {ex.Message}";
+            MessageCss = "alert-danger";
+        }
+
+        LoadFiles();
+    }
+
+    // Удаляет файл по имени и обновляет список
+    void DeleteFile(string fileName)
+    {
+        MessageText = "";
+        var dohoddFolder = Path.Combine(env.WebRootPath, "Dohod");
+        var filePath = Path.Combine(dohoddFolder, fileName);
+
+        if (File.Exists(filePath))
+        {
+            try
+            {
+                File.Delete(filePath);
+                MessageText = "Файл удален.";
+                MessageCss = "alert-success";
+            }
+            catch (Exception ex)
+            {
+                MessageText = $"Ошибка при удалении файла: {ex.Message}";
+                MessageCss = "alert-danger";
+            }
+        }
+        else
+        {
+            MessageText = "Файл не найден.";
+            MessageCss = "alert-warning";
+        }
+
+        LoadFiles();
+    }
+}

@@ -1,4 +1,6 @@
 ﻿using Kopigrad.Components.Classes.Data;
+using Kopigrad.Models;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using System.Linq;
 
@@ -89,5 +91,50 @@ namespace Kopigrad.Components.Classes.Admin.StaticClasses
 
            
         }
+
+
+        public List<Classes.Data.DataDonats> getStaticService(DateRange dateRange)
+        {
+
+            using var context = new KopigradContext();
+
+            // Базовый запрос на выборку названий сервисов через навигации
+            var query = context.Orders
+                .Include(o => o.IdTableMiniServiceNavigation)
+                    .ThenInclude(t => t.IdMiniServiceNavigation)
+                        .ThenInclude(m => m.IdServiceNavigation)
+                .Select(o => new
+                {
+                    // Сразу извлекаем дату заказа и имя сервиса
+                    Date = o.DataOrder.Date,
+                    ServiceName = o.IdTableMiniServiceNavigation
+                                 .IdMiniServiceNavigation
+                                 .IdServiceNavigation
+                                 .NameService
+                });
+
+            // Если передан диапазон, фильтруем заказы по датам
+            if (dateRange != null && dateRange.Start.HasValue && dateRange.End.HasValue)
+            {
+                DateTime start = dateRange.Start.Value.Date;
+                DateTime end = dateRange.End.Value.Date;
+                query = query.Where(x => x.Date >= start && x.Date <= end);
+            }
+
+            // Собираем все имена сервисов из отфильтрованного набора
+            var names = query
+                .Select(x => x.ServiceName)
+                .ToList();
+
+            // Группируем по имени и считаем количество
+            var dataStatics = names
+                .GroupBy(n => n)
+                .Select(g => new DataDonats(g.Key, g.Count()))
+                .ToList();
+
+            return dataStatics;
+
+        }
+
     }
 }
