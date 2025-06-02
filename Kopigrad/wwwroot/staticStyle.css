@@ -1,0 +1,75 @@
+﻿@font-face {
+    font-family: 'DaysFronts';
+    src: url('/Fronts/DAYS.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+/* Заголовок страницы */
+.TextCenter {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.75rem;
+    font-family: DaysFronts;
+}
+
+/* Flex-контейнер для двух колонок */
+.chart-row {
+    display: flex;
+    justify-content: center; /* Выравниваем колонки по центру */
+    gap: 2rem; /* Расстояние между колонками */
+    flex-wrap: wrap; /* На узких экранах колонки переходят в стопку */
+    margin-bottom: 2rem;
+}
+
+/* Каждая колонка: заголовок сверху + внутренняя обёртка (график+календарь) */
+.chart-cell {
+    flex: 1 1 45%; /* До 45% ширины контейнера, но не меньше min-width */
+    min-width: 320px; /* Минимальная ширина колонки */
+    display: flex;
+    flex-direction: column; /* Вертикально: заголовок сверху, потом .inner-row */
+    align-items: center; /* Все вложенные элементы будут центрированы по горизонтали */
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+/* Заголовок внутри колонки */
+.TextNameMiniService {
+    margin: 0;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+    font-family: DaysFronts;
+}
+
+/* Обёртка, содержащая график и календарь рядом (flex-row) */
+.inner-row {
+    display: flex;
+    align-items: flex-start; /* Выравниваем элементов по верхнему краю */
+    justify-content: center; /* Центрируем смесь графика и календаря внутри колонки */
+    gap: 1rem; /* Отступ между графиком и календарём */
+    width: 100%; /* Занимаем всю ширину .chart-cell */
+}
+
+/* Размеры для области с графиком */
+.chart-wrapper {
+    flex: 0 1 65%; /* График займёт до 65% от ширины inner-row, но не менее контента */
+    max-width: 600px; /* Но не шире 600px */
+}
+
+    .chart-wrapper .mud-chart {
+        width: 100% !important; /* График во всю ширину chart-wrapper */
+        max-width: 100%;
+    }
+
+/* Размеры для области с датапикером */
+.picker-wrapper {
+    flex: 0 1 30%; /* Календарь займёт до 30% ширины inner-row */
+    max-width: 300px; /* Но не шире 300px */
+}
+
+    .picker-wrapper .mud-date-range-picker {
+        width: 100% !important; /* Чтобы контрол лежал во всю ширину своей обёртки */
+    }

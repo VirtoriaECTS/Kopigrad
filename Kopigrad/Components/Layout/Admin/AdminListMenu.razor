@@ -6,6 +6,7 @@
     <h5 @onclick="Material" class="TextMenu">Материалы</h5>
     <h5 @onclick="Requst" class="TextMenu">Заявки</h5>
     <h5 @onclick="Pdf" class="TextMenu">PDF расчет</h5>
+    <h5 @onclick="Static" class="TextMenu">Статистика</h5>
 </div>
 
 @code{
@@ -27,5 +28,11 @@
     public void Material ()
     {
         Navigation.NavigateTo("/AddMaterial");
+    }
+
+
+    public void Static()
+    {
+        Navigation.NavigateTo("/Static");
     }
 }

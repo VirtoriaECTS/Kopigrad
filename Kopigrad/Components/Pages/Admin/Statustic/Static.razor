@@ -1,0 +1,155 @@
+﻿
+@page "/Static"
+@rendermode InteractiveServer
+@using MudBlazor
+<head>
+    <link rel="stylesheet" href="/users.css">
+    <link rel="stylesheet" href="/admin.css">
+    <link rel="stylesheet" href="/staticStyle.css">
+</head>
+
+<div class="Banner">
+    <h5 class="TextBanner">Стастистика</h5>
+</div>
+
+
+
+<div>
+    <!-- Заголовок страницы -->
+    <h5 class="TextCenter">Онлайн заказы</h5>
+
+    <div class="chart-row">
+        <!-- Первая колонка -->
+        <div class="chart-cell">
+            <!-- Заголовок колонки -->
+            <h1 class="TextNameMiniService">Заявки онлайн</h1>
+
+            <!-- Внутренний flex-контейнер: слева график, справа календарь -->
+            <div class="inner-row">
+                <!-- Обёртка для графика -->
+                <div class="chart-wrapper">
+                    <MudChart ChartType="ChartType.Line"
+                              ChartSeries="@SeriesRequstOnline"
+                              XAxisLabels="@XAxisLabelsRequstOnline"
+                              Height="350"
+                              Width="100%"
+                              ChartOptions="optionsRequstOnline" />
+                </div>
+
+                <!-- Обёртка для календаря -->
+                <div class="picker-wrapper">
+                    <MudDateRangePicker DateRange="@_dateRange"
+                                        DateRangeChanged="OnDateRangeChanged"
+                                        PickerVariant="@_variant"
+                                        MaxDate="@_maxDate"
+                                        Margin="Margin.Dense" />
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Вторая колонка -->
+        <div class="chart-cell">
+            <h1 class="TextNameMiniService">Востребованность каждой услуги</h1>
+
+            <div class="inner-row">
+                <div class="chart-wrapper">
+@*                     <MudChart ChartType="ChartType.Line"
+                              ChartSeries="@Series"
+                              XAxisLabels="@XAxisLabels"
+                              Height="350"
+                              Width="100%"
+                              ChartOptions="options" /> *@
+                </div>
+
+                <div class="picker-wrapper">
+                    <MudDateRangePicker PickerVariant="@_variant"
+                                        MaxDate="@_maxDate"
+                                        DateRangeChanged="OnDateRangeChanged"
+                                        Margin="Margin.Dense" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private DateTime _maxDate = DateTime.Now.Date;
+
+    private PickerVariant _variant = PickerVariant.Static;
+    public DateRange _dateRange { get; set; }
+    private DateRange _dateRangeProduct { get; set; }
+    Classes.Admin.StaticClasses.StaticClass stat = new Classes.Admin.StaticClasses.StaticClass();
+
+    private void OnDateRangeChanged(DateRange dateRange)
+    {
+        _dateRange = dateRange; // Обновляем диапазон
+        Console.WriteLine($"Диапазон дат изменён: {_dateRange.Start?.ToShortDateString()} - {_dateRange.End?.ToShortDateString()}");
+        MethodStaticOnlineRequst();
+
+    }
+
+
+    private ChartOptions optionsRequstOnline = new ChartOptions();
+    public List<ChartSeries> SeriesRequstOnline = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Заявки", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70 } },
+    };
+    public string[] XAxisLabelsRequstOnline = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
+
+
+    protected override void OnInitialized()
+    {
+
+
+
+        optionsRequstOnline.InterpolationOption = InterpolationOption.NaturalSpline;
+        optionsRequstOnline.YAxisFormat = "N0";
+
+        MethodStaticOnlineRequst();
+
+
+
+    }
+
+    public void MethodStaticOnlineRequst()
+    {
+        // Получаем данные (дата + значение)
+        List<Classes.Data.DataStatic> dataStatic = stat.getStaticRequstOnline(_dateRange);
+
+        // Преобразуем в массивы для построения графика
+        double[] arrayData = dataStatic.Select(x => Convert.ToDouble(x.count)).ToArray();
+        double[] arrayPrice = dataStatic.Select(x => x.data).ToArray();
+        string[] xLabelArrat = dataStatic.Select(x => x.XAxisLabels.ToShortDateString()).ToArray();
+
+        // Очищаем предыдущую серию и добавляем новую
+        SeriesRequstOnline.Clear();
+        SeriesRequstOnline.Add(new ChartSeries()
+            {
+                Name = "Заявки",
+                Data = arrayData
+            });
+
+        SeriesRequstOnline.Add(new ChartSeries()
+            {
+                Name = "Цена",
+                Data = arrayPrice
+            });
+
+        // Заменяем XAxisLabels на новую подпись
+        XAxisLabelsRequstOnline = xLabelArrat;
+
+        // Если точек меньше 4, переключаемся на линейное соединение,
+        // иначе — на NaturalSpline
+        if (arrayData.Length < 4)
+            optionsRequstOnline.InterpolationOption = InterpolationOption.Straight;
+        else
+            optionsRequstOnline.InterpolationOption = InterpolationOption.NaturalSpline;
+
+        StateHasChanged();
+    }
+
+
+
+}

@@ -53,7 +53,7 @@ builder.Services.AddSingleton<MailSender>();
 
 builder.Services.AddAuthorization();
 
-
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 
