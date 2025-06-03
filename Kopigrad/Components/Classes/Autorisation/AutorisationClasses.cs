@@ -30,6 +30,28 @@ namespace Kopigrad.Components.Classes.Autorisation
         }
 
 
+        public void changePassword(string email, string password)
+        {
+            using (var context = new KopigradContext())
+            {
+                Classes.Autorisation.Hash hash = new Classes.Autorisation.Hash();
+                hash.Create(password);
+                string hashpawword = hash.HashValue;
+                string salt = hash.Salt;
+
+
+                var user = context.Users.Where(x => x.Email == email).FirstOrDefault();
+
+                user.HashPassworld = hashpawword;
+                user.Salt = salt;
+
+                
+
+
+                context.SaveChanges();
+            }
+        }
+
 
         public string CheakPassword(string email, string password)
         {

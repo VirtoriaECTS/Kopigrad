@@ -4,6 +4,8 @@
 @inject Models.KopigradContext DbContext
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
+@inject Classes.Admin.Servise.MailSender EmailService
+@inject IJSRuntime JS
 <PageTitle>Admin</PageTitle>
 <head>
     <link rel="stylesheet" href="/users.css">
@@ -14,18 +16,126 @@
     <h5 class="TextBanner">Панель админа</h5>
 </div>
 
-<div class="VhodAdmin">
-    <h5 class="TextVhodAdmin">Имя:</h5>
-    <input  @bind="name" class="InputAdmin" />
-    <h5 class="TextVhodAdmin">Email:</h5>
-    <input type="email" @bind="email" class="InputAdmin" />
-    <h5 class="TextVhodAdmin">Пароль:</h5>
-    <input type="password" @bind="password" class="InputAdmin" />
-    <h5 class="TextVhodAdmin">Секретный пароль:</h5>
-    <input type="password" @bind="SecretPassword" class="InputAdmin" />
-    <button @onclick="onClickVhod"  class="BittonAdminVhod">Зарегистироваться</button>
-    <a href="/Admin" class="TextFindPassword">Назад</a>
-    <h2 class="TextFindPassword" style="color: red">@error</h2>
+<style>
+    .form-wrapper {
+        margin-top: 40px;
+        max-width: 420px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 30px;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0,0,0,0.05);
+        background-color: #fff;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        font-weight: bold;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #999;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .form-button {
+        background-color: #222;
+        color: white;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s ease;
+    }
+
+        .form-button:hover {
+            background-color: #444;
+        }
+
+    .form-link {
+        display: inline-block;
+        margin-top: 16px;
+        text-decoration: underline;
+        color: #000;
+    }
+
+    .success {
+        color: green;
+        font-weight: bold;
+    }
+
+    .error {
+        color: red;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="form-wrapper">
+    <div class="form-group">
+        <label class="form-label">Имя:</label>
+        <input @bind="name" class="form-input" />
+    </div>
+
+    @if (!isConfirmed)
+    {
+        <div class="form-group">
+            <label class="form-label">Email:</label>
+            <div class="form-row">
+                <input class="form-input" @bind="email" />
+                <button type="button" class="form-button" @onclick="SendCode">Отправить код</button>
+            </div>
+            <p>@status</p>
+        </div>
+
+        @if (codeSent)
+        {
+            <div class="form-group">
+                <label class="form-label">Код подтверждения:</label>
+                <div class="form-row">
+                    <input @bind="enteredCode" class="form-input" />
+                    <button type="button" class="form-button" @onclick="CheckCode">Подтвердить</button>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="success">✅ @email подтверждён!</p>
+    }
+
+    <div class="form-group">
+        <label class="form-label">Пароль:</label>
+        <input type="password" @bind="password" class="form-input" />
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Секретный пароль:</label>
+        <input type="password" @bind="SecretPassword" class="form-input" />
+    </div>
+
+    <div class="form-group">
+        <button @onclick="onClickVhod" disabled="@disableButton" class="form-button" style="width: 100%;">Зарегистрироваться</button>
+    </div>
+
+    <a href="/Admin" class="form-link">Назад</a>
+    <h2 class="error">@error</h2>
 </div>
 
 
@@ -36,7 +146,14 @@
     string email = "";
     string password = "";
     string SecretPassword = "";
+    private bool codeSent = false;
+    string status = "";
 
+    private bool isConfirmed = false;
+    private string sentCode;
+    private string enteredCode;
+
+    bool disableButton = true;
     Classes.Autorisation.AutorisationClasses autorisationClasses = new Classes.Autorisation.AutorisationClasses();
 
     public void onClickVhod()
@@ -44,5 +161,52 @@
 
         autorisationClasses.register(name, email, password, SecretPassword);
         Navigation.NavigateTo("/Admin");
+    }
+
+
+    private async Task SendCode(MouseEventArgs e)
+    {
+
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            status = "Введите email.";
+            return;
+        }
+
+        // Генерируем код и сохраняем
+        var rnd = new Random();
+        sentCode = rnd.Next(100000, 999999).ToString();
+
+        try
+        {
+            await EmailService.SendEmailAsync(email, "Код подтверждения", $"Ваш код: {sentCode}");
+            status = "Код отправлен!";
+            codeSent = true;
+
+            // Сохраняем в localStorage
+            await JS.InvokeVoidAsync("saveState", "email", email);
+            await JS.InvokeVoidAsync("saveState", "sentCode", sentCode);
+            await JS.InvokeVoidAsync("saveState", "codeSent", "true");
+        }
+        catch (Exception ex)
+        {
+            status = $"Ошибка отправки письма: {ex.Message}";
+        }
+    }
+
+
+    private void CheckCode()
+    {
+        if (enteredCode == sentCode)
+        {
+            isConfirmed = true;
+            status = "Email успешно подтверждён!";
+            disableButton = false;
+        }
+        else
+        {
+            status = "Неверный код.";
+        }
     }
 }

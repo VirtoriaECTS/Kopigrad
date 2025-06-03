@@ -90,6 +90,12 @@ app.UseAuthorization();
 // Middleware для Anti-Forgery
 app.UseAntiforgery();
 
+app.MapGet("/doLogout", async (HttpContext httpContext) =>
+{
+    await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    httpContext.Response.Redirect("/");
+});
+
 // Минимальный API-эндпоинт для логина
 app.MapGet("/doLogin", async (HttpContext httpContext, AutorisationClasses authService) =>
 {
