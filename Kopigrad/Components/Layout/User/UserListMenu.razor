@@ -1,50 +1,74 @@
-﻿
-@inject NavigationManager Navigation
-
+﻿@inject NavigationManager Navigation
 @rendermode InteractiveServer
+
 <div class="Vertical">
     <div class="TextContainerMenuAdmin">
-        @for (int i = 0; i < services.Count / 2; i++)
+        @foreach (var svc in firstHalf)
         {
-
-
-            <h5 @onclick="() => ClickService(services[i].IdService)" class="TextMenuUser">@services[i].NameService</h5>
-
+            <h5 @onclick="() => ClickService(svc.IdService)"
+                class="TextMenuUser">
+                @svc.NameService
+            </h5>
         }
     </div>
 
     <div class="TextContainerMenuAdmin">
-        @for (int i = (services.Count / 2); i < services.Count; i++)
+        @foreach (var svc in secondHalf)
         {
-
-            <h5 @onclick="() => ClickService(services[i].IdService)" class="TextMenuUser">@services[i].NameService</h5>
-
+            <h5 @onclick="() => ClickService(svc.IdService)"
+                class="TextMenuUser">
+                @svc.NameService
+            </h5>
         }
     </div>
-
 </div>
 
+<style>
+    .Vertical {
+        display: flex;
+        gap: 10px;
+    }
 
-
-@code {
-    List<Models.Service> services = new List<Models.Service>();
-    int seredina = 0;
-
-    protected override async Task OnInitializedAsync()
-    {
-        using (var context = new Models.KopigradContext())
-        {
-
-            services = context.Services.ToList();
-            seredina = services.Count / 2;
-        }
+    .TextContainerMenuAdmin {
+        flex: 1;
+        position: relative;
 
     }
 
+    .TextMenuUser {
+        margin: 6px 0;
+        cursor: pointer;
+        position: relative;
+        z-index: 1;
+    }
 
-    public void ClickService(int idService)
+        .TextMenuUser:hover {
+            color: #E83939;
+        }
+</style>
+
+@code {
+    private List<Models.Service> services = new();
+    private List<Models.Service> firstHalf = new();
+    private List<Models.Service> secondHalf = new();
+
+    protected override void OnInitialized()
+    {
+        using var context = new Models.KopigradContext();
+
+        // 1) Сначала отсортируем все services по IdService для предсказуемого порядка
+        services = context.Services
+                          .OrderBy(s => s.IdService)
+                          .ToList();
+
+        // 2) Разбиваем на две половины
+        int mid = services.Count / 2;
+        firstHalf = services.Take(mid).ToList();
+        secondHalf = services.Skip(mid).ToList();
+    }
+
+    private void ClickService(int idService)
     {
         Navigation.NavigateTo($"/InfoService/{idService}");
     }
-
 }
