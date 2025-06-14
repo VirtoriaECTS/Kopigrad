@@ -3,10 +3,7 @@
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Authentication.Cookies
-@using Microsoft.AspNetCore.Http
 @inject NavigationManager Navigation
-@attribute [Authorize]
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IWebHostEnvironment env
 
@@ -15,225 +12,149 @@
     <link rel="stylesheet" href="/admin.css">
 </head>
 
-
-<head>
-    <link rel="stylesheet" href="users.css">
-</head>
-
-
 <div class="Banner">
-    <h5 class="TextBanner">PDF расчет</h5>
+    <h5 class="TextBanner">PDF расчёт</h5>
 </div>
 
-<div class="divUsersColumn">
+<div class="pdf-layout">
+    <div class="left-panel">
+        <InputFile OnChange="HandleFileSelected" accept=".pdf" />
 
-
-    <table style="width: 45vw; margin: 5vw 5vw 5vw 5vw;">
-        <tr>
-            <td>
-                <InputFile  OnChange="HandleFileSelected" accept=".pdf" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @if (!string.IsNullOrEmpty(pdfFilePath))
-                {
-                    <h4 class="TextCalculator">Просмотр PDF:</h4>
-                    <object data="@pdfFilePath" type="application/pdf" width="100%" height="600px">
-                        <p>
-                            Ваш браузер не поддерживает PDF.
-                            <a href="@pdfFilePath">Скачать PDF</a>.
-                        </p>
-                    </object>
-                }
-            </td>
-        </tr>
-    </table>
+        @if (!string.IsNullOrEmpty(pdfFilePath))
+        {
+            <h4 class="TextCalculator">Просмотр PDF:</h4>
+            <object data="@pdfFilePath" type="application/pdf" width="100%" height="600px">
+                <p>Ваш браузер не поддерживает PDF. <a href="@pdfFilePath">Скачать PDF</a>.</p>
+            </object>
+        }
+    </div>
 
     @if (!string.IsNullOrEmpty(pdfFilePath))
     {
-        <table class="custom-table" style="width: 45vw; margin: 5vw;">
-            <tr>
-                <td><h3 class="TextCalculator">Номер страницы</h3></td>
-                <td><h3 class="TextCalculator">Размер</h3></td>
-                <td><h3 class="TextCalculator">Выбор услуги</h3></td>
-                <td><h3 class="TextCalculator">Выбор колонки</h3></td>
-                <td><h3 class="TextCalculator">Выбор материала</h3></td>
-                <td><h3 class="TextCalculator">Цена</h3></td>
-            </tr>
+        <div class="right-panel">
+            <select class="print-type" @onchange="OnColorChange">
+                <option value="1" selected>Цветная печать</option>
+                <option value="2" >Черно - белая печать</option>
+            </select>
 
-            @for (int i = 0; i < pageFormats.Count; i++)
-            {
-                var currentIndex = i;
-                <tr>
-                    <td><h3 class="TextTableUser">@(i + 1)</h3></td>
-                    <td><h3 class="TextTableUser">@pageFormats[i]</h3></td>
-
-                    <td>
-                        <select class="SelectedPdf" @onchange="@(e => OnMiniServiceChanged(e, currentIndex))">
-                            <option disabled selected>Выберите</option>
-                            @foreach (var serviceMini in miniservices)
-                            {
-                                <option value="@serviceMini.IdMiniService">@serviceMini.NameMiniServise</option>
-                            }
-                        </select>
-                    </td>
-
-                    <td>
-                        <select @onchange="@(e => OnColumsChanged(e, currentIndex))">
-                            <option disabled selected>Выберите</option>
-                            @foreach (var colums in colums.Where(x => x.IdMiniService == idMiniServices[currentIndex]))
-                            {
-                                <option value="@colums.IdColumnNames">@colums.NameColumn</option>
-                            }
-                        </select>
-                    </td>
-
-                    <td>
-                        <select @onchange="@(e => OnMaterialChanged(e, currentIndex))">
-                            <option disabled selected>Выберите</option>
-                            @foreach (var material in materials.Where(m => m.Tableminiservices.Any(t => t.IdMiniService == idMiniServices[currentIndex])))
-                            {
-                                <option value="@material.IdMaterial">@material.NameMaterial</option>
-                            }
-                        </select>
-                    </td>
-
-                    <td><h5 class="TextTableUser">@Prices[currentIndex]</h5></td>
-                </tr>
-            }
-
-            @if (Prices != null)
-            {
-                <h5 class="TextCalculator">Итого: @Prices.Sum()</h5>
-            }
-        </table>
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>Номер страницы</th>
+                        <th>Размер</th>
+                        <th>Стоимость</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < pageFormats.Count; i++)
+                    {
+                        <tr>
+                            <td>@(i + 1) страница</td>
+                            <td>@pageFormats[i]</td>
+                            <td>@Prices[i] рублей</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <h5 class="TextCalculator">Итог: @Prices.Sum() рублей</h5>
+            <p class="history-link">История</p>
+        </div>
     }
-
-   
-
-
-
-
-
 </div>
 
 <style>
-    .custom-table, .custom-table th, .custom-table td {
+    .pdf-layout {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 2vw;
+        justify-content: space-around;
+        margin: 2vw;
+    }
+
+    .left-panel {
+        flex: 1;
+        min-width: 300px;
+        max-width: 45vw;
+    }
+
+    .right-panel {
+        flex: 1;
+        min-width: 300px;
+        max-width: 45vw;
         border: 1px solid black;
+        padding: 1rem;
+        border-radius: 5px;
+    }
+
+    .print-type {
+        width: 100%;
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .summary-table {
+        width: 100%;
         border-collapse: collapse;
     }
 
-        .custom-table td, .custom-table th {
-            padding: 10px;
+        .summary-table th, .summary-table td {
+            border: 1px solid black;
+            padding: 0.5rem;
             text-align: center;
         }
 
-    .custom-table {
-        width: 100%;
+    .history-link {
+        margin-top: 1rem;
+        text-decoration: underline;
+        color: #333;
+        cursor: pointer;
     }
-
-        .custom-table h3, .custom-table h5 {
-            margin: 0;
-        }
-
-        .custom-table select {
-            width: 100%;
-        }
 </style>
 
-
-
-
 @code {
-
     private string? pdfFilePath;
+    public List<string> pageFormats = new();
+    public List<Classes.Data.DataSize> dataSizes = new();
 
-
-    public List<string> pageFormats = new List<string>();
-
-    public List<Classes.Data.DataSize> dataSizes = new List<Classes.Data.DataSize>();
-
-
-    //отследить id
     int[] idMiniServices;
     int[] idColums;
     int[] idMaterial;
     decimal[] Prices;
 
-    //для combobox
-    List<Models.Miniservice> miniservices = new List<Models.Miniservice>();
-    List<Models.Material> materials = new List<Models.Material>();
-    List<Models.Columnname> colums = new List<Models.Columnname>();
 
-
-
-    Dictionary<string, decimal> formatPricesNonColors = new Dictionary<string, decimal>
-{
-    { "A4", 5.00m },
-    { "A3", 7.50m },
-    { "A2", 5.00m },
-    { "A1", 7.50m },
-    { "A0", 5.00m },
-    { "Неизвестный формат", 0.00m }
-
-};
-
-
-    Dictionary<string, decimal> formatPricesColors = new Dictionary<string, decimal>
-{
-    { "A4", 5.00m },
-    { "A3", 7.50m },
-    { "A2", 5.00m },
-    { "A1", 7.50m },
-    { "A0", 5.00m },
-    { "Неизвестный формат", 0.00m }
-};
-
+    List<Models.Miniservice> miniservices = new();
+    List<Models.Material> materials = new();
+    List<Models.Columnname> colums = new();
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.Identity?.IsAuthenticated != true)
+        if (!authState.User.Identity?.IsAuthenticated ?? true)
         {
             Navigation.NavigateTo("/Admin");
             return;
         }
-        Classes.Admin.Servise.ManagmentMiniService managmentMiniService = new Classes.Admin.Servise.ManagmentMiniService();
-        miniservices = managmentMiniService.getMiniServiceToPdf();
-
-        colums = managmentMiniService.getAllColums();
-        materials = managmentMiniService.getAllMaterial();
-
-
-
+        var manager = new Classes.Admin.Servise.ManagmentMiniService();
+        miniservices = manager.getMiniServiceToPdf();
+        colums = manager.getAllColums();
+        materials = manager.getAllMaterial();
     }
-
-    Classes.Admin.Servise.ConvertPdfonPrice convertFormat = new Classes.Admin.Servise.ConvertPdfonPrice();
-
 
     void OnMiniServiceChanged(ChangeEventArgs e, int index)
     {
-        Classes.Admin.Servise.ManagmentMiniService managment = new Classes.Admin.Servise.ManagmentMiniService();
-
         if (int.TryParse(e.Value?.ToString(), out int selectedId))
         {
             idMiniServices[index] = selectedId;
-
-            if (idMaterial[index] != 0)
-            {
-                getPrice(index);
-            }
-
+            if (idMaterial[index] != 0) getPrice(index);
         }
     }
 
     void OnColumsChanged(ChangeEventArgs e, int index)
     {
         if (int.TryParse(e.Value?.ToString(), out int selectedId))
-        {
             idColums[index] = selectedId;
-        }
     }
 
     void OnMaterialChanged(ChangeEventArgs e, int index)
@@ -241,94 +162,72 @@
         if (int.TryParse(e.Value?.ToString(), out int selectedId))
         {
             idMaterial[index] = selectedId;
+            if (idColums[index] != 0) getPrice(index);
         }
-
-        if(idColums[index] != 0)
-        {
-            getPrice(index);
-        }
-
     }
 
-
-    public void getPrice(int index)
+    void OnColorChange(ChangeEventArgs e)
     {
-        Classes.Admin.Servise.ConvertPdfonPrice convert = new Classes.Admin.Servise.ConvertPdfonPrice();
-        double wight = dataSizes[index].weight;
-        double height = dataSizes[index].heuiht;
-        Prices[index] = convert.getPriceNormal(idMiniServices[index], idColums[index], idMaterial[index], pageFormats[index], wight, height);
+        var convert = new Classes.Admin.Servise.ConvertPdfonPrice();
+        if (int.TryParse(e.Value?.ToString(), out int selectedId))
+        {
+            if(selectedId == 1)
+            {
+                Prices = convert.getPriceNormalDiplom(80, dataSizes);
+            }
+            else
+            {
+                Prices = convert.getPriceNormalDiplom(100, dataSizes);
+            }
+        }
+
+        StateHasChanged();
     }
 
-    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    void getPrice(int index)
+    {
+        var convert = new Classes.Admin.Servise.ConvertPdfonPrice();
+        double w = dataSizes[index].weight, h = dataSizes[index].heuiht;
+        Prices[index] = convert.getPriceNormal(idMiniServices[index], idColums[index], idMaterial[index], pageFormats[index], w, h);
+    }
+
+    async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
         var file = e.File;
-
         var uploadsPath = Path.Combine(env.WebRootPath, "uploads");
         Directory.CreateDirectory(uploadsPath);
 
         var fileName = Path.GetFileName(file.Name);
         var fullPath = Path.Combine(uploadsPath, fileName);
-
-        // Записываем файл на сервер
         using (var fs = new FileStream(fullPath, FileMode.Create))
-        {
             await file.OpenReadStream(long.MaxValue).CopyToAsync(fs);
-        }
-
 
         pdfFilePath = $"uploads/{fileName}";
+        await Task.Delay(500);
 
-
-        // Немного ждём, чтобы файл стал доступен
-        await Task.Delay(500); // 500 миллисекунд
-
-        bool cheak = true;
-
-        while (cheak)
+        bool ready = false;
+        while (!ready)
         {
             try
             {
-                // Открываем PDF-документ
-                using (var document = PdfReader.Open(fullPath, PdfDocumentOpenMode.ReadOnly))
+                using var document = PdfReader.Open(fullPath, PdfDocumentOpenMode.ReadOnly);
+                foreach (var page in document.Pages)
                 {
-                    int i = 1;
-                    foreach (var page in document.Pages)
-                    {
-                        // Получаем размер страницы
-                        var width = page.Width;
-                        var height = page.Height;
-
-
-
-                        // Определяем формат и добавляем его
-                        var format = convertFormat.GetPaperFormat(width, height);
-                        pageFormats.Add($"{format}");
-                        Classes.Data.DataSize item = new Classes.Data.DataSize(width, height);
-                        dataSizes.Add(item);
-                        i++;
-                    }
+                    var format = new Classes.Admin.Servise.ConvertPdfonPrice().GetPaperFormat(page.Width, page.Height);
+                    pageFormats.Add(format);
+                    dataSizes.Add(new Classes.Data.DataSize(page.Width, page.Height));
                 }
-
-
-
-                cheak = false;
+                ready = true;
             }
-            catch (IOException ex)
-            {
-                Console.WriteLine($"Ошибка при открытии файла: {ex.Message}");
-            }
+            catch (IOException ex) { Console.WriteLine($"PDF загрузка: {ex.Message}"); }
         }
 
-        int count = pageFormats.Count();
-
+        int count = pageFormats.Count;
         idMiniServices = new int[count];
         idColums = new int[count];
         idMaterial = new int[count];
         Prices = new decimal[count];
-
-
+        var convert = new Classes.Admin.Servise.ConvertPdfonPrice();
+        Prices = convert.getPriceNormalDiplom(80, dataSizes);
     }
-
-  
-
 }

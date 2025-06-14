@@ -1,4 +1,6 @@
-﻿using Kopigrad.Models;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.InkML;
+using Kopigrad.Models;
 
 namespace Kopigrad.Components.Classes.Admin.Servise
 {
@@ -61,7 +63,27 @@ namespace Kopigrad.Components.Classes.Admin.Servise
 
 
 
+        public decimal[] getPriceNormalDiplom(int priceMetr, List<Classes.Data.DataSize> dataSizes)
+        {
+            List<decimal> decimals = new List<decimal>();
 
+            for(int i = 0; i < dataSizes.Count; i++)
+            {
+                decimal metrPog = (decimal)(dataSizes[i].heuiht / 1000);
+
+                decimal metr = Math.Round(metrPog, 1);
+
+                decimal price = priceMetr * metr;
+                decimals.Add(price);
+
+            }
+
+
+            return decimals.ToArray();
+
+
+
+        }
 
 
 
