@@ -57,7 +57,7 @@
                 </tbody>
             </table>
             <h5 class="TextCalculator">Итог: @Prices.Sum() рублей</h5>
-            <p class="history-link">История</p>
+            <a href="/Pagepdf" class="history-link">История</a>
         </div>
     }
 </div>
@@ -127,7 +127,7 @@
     List<Models.Miniservice> miniservices = new();
     List<Models.Material> materials = new();
     List<Models.Columnname> colums = new();
-
+    string name = "";
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -181,6 +181,7 @@
             }
         }
 
+        convert.Save(name, dataSizes, Prices);
         StateHasChanged();
     }
 
@@ -197,6 +198,7 @@
         var uploadsPath = Path.Combine(env.WebRootPath, "uploads");
         Directory.CreateDirectory(uploadsPath);
 
+
         var fileName = Path.GetFileName(file.Name);
         var fullPath = Path.Combine(uploadsPath, fileName);
         using (var fs = new FileStream(fullPath, FileMode.Create))
@@ -204,7 +206,7 @@
 
         pdfFilePath = $"uploads/{fileName}";
         await Task.Delay(500);
-
+        name = file.Name;
         bool ready = false;
         while (!ready)
         {
@@ -229,5 +231,6 @@
         Prices = new decimal[count];
         var convert = new Classes.Admin.Servise.ConvertPdfonPrice();
         Prices = convert.getPriceNormalDiplom(80, dataSizes);
+        convert.Save(name, dataSizes, Prices);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.InkML;
+using Kopigrad.Components.Pages.Admin.Pdf;
 using Kopigrad.Models;
 
 namespace Kopigrad.Components.Classes.Admin.Servise
@@ -85,8 +86,85 @@ namespace Kopigrad.Components.Classes.Admin.Servise
 
         }
 
+        public void Save(string name, List<Classes.Data.DataSize> dataSizes, decimal[] Prices)
+        {
+            using (var context = new KopigradContext())
+            {
+                var story = context.Storypdfs.FirstOrDefault(x => x.NameFile == name);
+                if (story != null)
+                {
+                    int idStory = story.IdStory;
+
+                    story.AllPrice = (double)Prices.Sum();
+                    context.SaveChanges();
+
+                    var pages = context.Pagepdfs.Where(x => x.IdStory == idStory).ToList();
+
+                    foreach (var page in pages)
+                    {
+                        context.Pagepdfs.Remove(page);
+                    }
+                    context.SaveChanges();
+
+                    for (int i = 0; i < dataSizes.Count; i++)
+                    {
+                        var pagepdf = new Models.Pagepdf
+                        {
+                            IdStory = idStory,
+                            Size = GetPaperFormat(dataSizes[i].weight, dataSizes[i].heuiht),
+                            Price = (double)Prices[i]
+                        };
+                        context.Pagepdfs.Add(pagepdf); // ✅ ДОБАВЛЯЕМ!
+                    }
+
+                    context.SaveChanges(); // ✅ сохраняем все добавленные страницы за один вызов
+                }
+                else
+                {
+                    var storypdf = new Models.Storypdf
+                    {
+                        NameFile = name,
+                        AllPrice = (double)Prices.Sum()
+                    };
+                    context.Storypdfs.Add(storypdf); // ✅ ДОБАВЛЯЕМ!
+                    context.SaveChanges(); // чтобы получить IdStory
+
+                    int idStory = storypdf.IdStory;
+
+                    for (int i = 0; i < dataSizes.Count; i++)
+                    {
+                        var pagepdf = new Models.Pagepdf
+                        {
+                            IdStory = idStory,
+                            Size = GetPaperFormat(dataSizes[i].weight, dataSizes[i].heuiht),
+                            Price = (double)Prices[i]
+                        };
+                        context.Pagepdfs.Add(pagepdf); // ✅ ДОБАВЛЯЕМ!
+                    }
+
+                    context.SaveChanges(); // сохраняем добавленные страницы
+                }
+            }
+        }
 
 
+
+        public List<Models.Storypdf> getStortPdf()
+        {
+            using (var context = new KopigradContext())
+            {
+                return context.Storypdfs.ToList();
+            }
+        }
+
+
+        public List<Models.Pagepdf> getPagePdf()
+        {
+            using (var context = new KopigradContext())
+            {
+                return context.Pagepdfs.ToList();
+            }
+        }
 
     }
 }

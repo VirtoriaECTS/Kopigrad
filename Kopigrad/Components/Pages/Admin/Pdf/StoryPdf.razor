@@ -1,0 +1,127 @@
+﻿
+@page "/Pagepdf"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IWebHostEnvironment env
+
+
+@inherits LayoutComponentBase
+
+<div class="pdf-history-container">
+    @if (PdfHistories != null && PdfHistories.Any())
+    {
+        @foreach (var story in PdfHistories)
+        {
+            <div class="story-card">
+                <div class="story-header">
+                    <h3>@story.NameFile</h3>
+                    <span class="price">Общая стоимость: @story.AllPrice.ToString("0.00") ₽</span>
+                </div>
+
+                <div class="pages-list">
+                    @(count = 1)
+                    @foreach (var item in Pdfstranica.Where(x => x.IdStory == story.IdStory))
+                    {
+
+                        <div class="page-item">
+                            <span>Страница: @count</span>
+                            <span>Размер: @item.Size</span>
+                            <span>Цена: @item.Price.ToString("0.00") ₽</span>
+                        </div>
+                        @(count ++)
+                        
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>История пуста.</p>
+    }
+</div>
+
+<style>
+    .pdf-history-container {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.story-card {
+    background-color: #f9f9f9;
+    padding: 1.2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.story-card:hover {
+    transform: scale(1.01);
+}
+
+.story-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.story-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.price {
+    font-weight: bold;
+    color: #4a4a4a;
+}
+
+.pages-list {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.8rem;
+}
+
+.page-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+</style>
+@code {
+    public List<Models.Storypdf> PdfHistories;
+    public List<Models.Pagepdf> Pdfstranica;
+    int count = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (!authState.User.Identity?.IsAuthenticated ?? true)
+        {
+            Navigation.NavigateTo("/Admin");
+            return;
+        }
+        var convert = new Classes.Admin.Servise.ConvertPdfonPrice();
+
+
+        PdfHistories = convert.getStortPdf();
+        Pdfstranica = convert.getPagePdf();
+
+        StateHasChanged();
+
+    }
+}

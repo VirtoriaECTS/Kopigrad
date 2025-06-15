@@ -82,15 +82,10 @@
 
 
 <div class="divUsersColumn">
-
-  
     <div class="ColumnUserCalculatorAmdButton">
         <h5 class="NameMiniService">Рассчитать стоимость</h5>
-
         <div class="DivCalculator">
-
             <h5 class="TextCalculator">Наименование</h5>
-
             <select class="SelectedUser" @onchange="OnMiniServiceChanged">
                 <option disabled selected>Выберите услугу</option>
                 @foreach (var name in infoMinis)
@@ -99,58 +94,49 @@
                 }
             </select>
 
-
-
             <h5 class="TextCalculator">@bottomCategory</h5>
-
             <select class="SelectedUser" @onchange="OnMaterialChanged">
                 @foreach (var material in selectedMaterials)
                 {
-                    <option value="@material.IdMaterial">@material.NameMaterial</option> <!-- или другое поле -->
+                    <option value="@material.IdMaterial">@material.NameMaterial</option>
                 }
             </select>
-
-
 
             @if (topCategory != "Тираж")
             {
                 <h5 class="TextCalculator">@topCategory</h5>
-
                 <select class="SelectedUser" @onchange="OnHeaderChanged">
                     @foreach (var header in selectedHeader)
                     {
-                        <option value="@header.IdColumnNames">@header.NameColumn</option> <!-- или другое поле -->
+                        <option value="@header.IdColumnNames">@header.NameColumn</option>
                     }
                 </select>
-
             }
-
 
             <h5 class="TextCalculator">Количество</h5>
             <input type="number" @bind="count" class="inputUser" />
 
             <button @onclick="ClickFindAllPrice" class="ButtonUsers">Узнать стоимость</button>
             <h5 class="TextCalculator">@price</h5>
-
-
-
         </div>
     </div>
 
-
     <div class="ColumnUserCalculatorAmdButton">
         <h5 class="NameMiniService">Оформить заявку</h5>
-
         <a href="https://wa.me/79025876697" target="_blank">
             <button class="ButtonUsers">Написать на WhatsApp</button>
         </a>
         <button class="ButtonUsers" @onclick="ClickRequst">Отправить заявку</button>
-        @if(id == 6)
+        @if (id == 6)
         {
             <button class="ButtonUsers" @onclick="ClickGenerate">Конструтор визиток</button>
         }
     </div>
 </div>
+
+
+
+
 
 
 @code {
