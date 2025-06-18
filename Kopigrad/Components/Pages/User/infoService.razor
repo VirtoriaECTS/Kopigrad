@@ -81,12 +81,13 @@
 </div>
 
 
-<div class="divUsersColumn">
-    <div class="ColumnUserCalculatorAmdButton">
-        <h5 class="NameMiniService">Рассчитать стоимость</h5>
-        <div class="DivCalculator">
-            <h5 class="TextCalculator">Наименование</h5>
-            <select class="SelectedUser" @onchange="OnMiniServiceChanged">
+<div class="user-interface">
+    <!-- Колонка с калькулятором -->
+    <div class="user-column">
+        <h5 class="block-title">Рассчитать стоимость</h5>
+        <div class="calculator">
+            <label class="field-label">Наименование</label>
+            <select class="user-select" @onchange="OnMiniServiceChanged">
                 <option disabled selected>Выберите услугу</option>
                 @foreach (var name in infoMinis)
                 {
@@ -94,8 +95,8 @@
                 }
             </select>
 
-            <h5 class="TextCalculator">@bottomCategory</h5>
-            <select class="SelectedUser" @onchange="OnMaterialChanged">
+            <label class="field-label">@bottomCategory</label>
+            <select class="user-select" @onchange="OnMaterialChanged">
                 @foreach (var material in selectedMaterials)
                 {
                     <option value="@material.IdMaterial">@material.NameMaterial</option>
@@ -104,8 +105,8 @@
 
             @if (topCategory != "Тираж")
             {
-                <h5 class="TextCalculator">@topCategory</h5>
-                <select class="SelectedUser" @onchange="OnHeaderChanged">
+                <label class="field-label">@topCategory</label>
+                <select class="user-select" @onchange="OnHeaderChanged">
                     @foreach (var header in selectedHeader)
                     {
                         <option value="@header.IdColumnNames">@header.NameColumn</option>
@@ -113,29 +114,101 @@
                 </select>
             }
 
-            <h5 class="TextCalculator">Количество</h5>
-            <input type="number" @bind="count" class="inputUser" />
+            <label class="field-label">Количество</label>
+            <input type="number" @bind="count" class="user-input" />
 
-            <button @onclick="ClickFindAllPrice" class="ButtonUsers">Узнать стоимость</button>
-            <h5 class="TextCalculator">@price</h5>
+            <button class="user-button" @onclick="ClickFindAllPrice">Узнать стоимость</button>
+            <div class="price-output">@price</div>
         </div>
     </div>
 
-    <div class="ColumnUserCalculatorAmdButton">
-        <h5 class="NameMiniService">Оформить заявку</h5>
+    <!-- Колонка с заявкой -->
+    <div class="user-column">
+        <h5 class="block-title">Оформить заявку</h5>
         <a href="https://wa.me/79025876697" target="_blank">
-            <button class="ButtonUsers">Написать на WhatsApp</button>
+            <button class="user-button">Написать на WhatsApp</button>
         </a>
-        <button class="ButtonUsers" @onclick="ClickRequst">Отправить заявку</button>
+        <button class="user-button" @onclick="ClickRequst">Отправить заявку</button>
         @if (id == 6)
         {
-            <button class="ButtonUsers" @onclick="ClickGenerate">Конструтор визиток</button>
+            <button class="user-button" @onclick="ClickGenerate">Конструктор визиток</button>
         }
     </div>
 </div>
 
 
 
+<style>
+    .user-interface {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 40px;
+        justify-content: center;
+        padding: 30px;
+        box-sizing: border-box;
+    }
+
+    .user-column {
+        flex: 1 1 320px;
+        max-width: 400px;
+        border: 2px solid black;
+        border-radius: 12px;
+        padding: 20px;
+        box-sizing: border-box;
+        background-color: white;
+    }
+
+    .block-title {
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .field-label {
+        font-weight: bold;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .user-select,
+    .user-input {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid black;
+        border-radius: 8px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+
+    .user-button {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+        font-weight: bold;
+        color: white;
+        background-color: black;
+        border: none;
+        border-radius: 999px;
+        margin-top: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .user-button:hover {
+            background-color: #333;
+        }
+
+    .price-output {
+        margin-top: 10px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+
+</style>
 
 
 

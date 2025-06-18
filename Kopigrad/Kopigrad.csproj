@@ -50,4 +50,10 @@
     </Resource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\favicon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

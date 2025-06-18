@@ -35,7 +35,7 @@ builder.Services.AddControllers();
 
 // Чтобы иметь доступ к HttpContext внутри компонентов
 builder.Services.AddHttpContextAccessor();
-builder.WebHost.UseUrls("http://0.0.0.0:5000");
+//builder.WebHost.UseUrls("http://0.0.0.0:5000");
 // DbContext
 builder.Services.AddDbContext<KopigradContext>(options =>
 {
