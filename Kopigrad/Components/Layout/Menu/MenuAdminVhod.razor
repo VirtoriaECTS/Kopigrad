@@ -1,63 +1,11 @@
 ﻿@inherits LayoutComponentBase
 
+<link rel="stylesheet" href="/userFooters.css">
 
 <div class="main-container">
     <Kopigrad.Components.Layout.All.NavMenu />
+
     @Body
+    <div class="content"></div>
 
-    <div class="content">
-
-
-    </div>
-    <footer class="footer">
-
-        <div>
-            <h1 class="TextShapkaTwoLower">+7 (902) 587-66-97</h1>
-            <h1 class="TextShapkaTwoLower">+7 (343) 20-666-97</h1>
-            <h1 class="TextShapkaTwoLower">сopygrad96@mail.ru</h1>
-        </div>
-
-        <div class="logo-container">
-            <img class="LogoImage" src="/Image/logoKopigrad.png" />
-        </div>
-
-
-
-
-        <div>
-            <h1 class="TextShapkaTwoLowerAdress">Белореченская улица, 17к1, Екатеринбург, Свердловская область, 620102</h1>
-        </div>
-
-    </footer>
 </div>
-
-<style>
-    .logo-container {
-        position: absolute;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%; /* Растягиваем контейнер, чтобы логотип был по центру */
-    }
-    .main-container {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-
-    .content {
-        flex: 1;
-    }
-
-    .footer {
-        width: 100vw;
-        background: #E83939;
-        color: white;
-        text-align: center;
-        padding: 10px;
-        height: 3.5vw;
-        display: flex; /* Включаем Flexbox */
-        justify-content: space-between; /* Расставляем элементы по горизонтали */
-        align-items: center; /* Выравниваем элементы по вертикали */
-    }
-</style>

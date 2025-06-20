@@ -1,12 +1,35 @@
 ﻿@inject NavigationManager Navigation
 @rendermode InteractiveServer
 
+<link rel="stylesheet" href="/menuusers.css">
+<!-- Гамбургер кнопка -->
+<div class="HamburgerBtn" @onclick="ToggleMenu" aria-label="Toggle menu" role="button" tabindex="0">
+    <div></div>
+    <div></div>
+    <div></div>
+</div>
+
+<!-- Сайдбар меню -->
+<div class="SidebarMenu @(isMenuOpen ? "active" : "")">
+    <div class="TextContainerMenuAdmin">
+        @foreach (var svc in services)
+        {
+            <h5 @onclick="() => OnMenuClick(svc.IdService)" class="TextMenuUser">
+                @svc.NameService
+            </h5>
+        }
+    </div>
+</div>
+
+<!-- Подложка для закрытия меню при клике вне -->
+<div class="Overlay @(isMenuOpen ? "active" : "")" @onclick="ToggleMenu"></div>
+
+<!-- Обычное меню для ПК -->
 <div class="Vertical">
     <div class="TextContainerMenuAdmin">
         @foreach (var svc in firstHalf)
         {
-            <h5 @onclick="() => ClickService(svc.IdService)"
-                class="TextMenuUser">
+            <h5 @onclick="() => ClickService(svc.IdService)" class="TextMenuUser">
                 @svc.NameService
             </h5>
         }
@@ -15,42 +38,42 @@
     <div class="TextContainerMenuAdmin">
         @foreach (var svc in secondHalf)
         {
-            <h5 @onclick="() => ClickService(svc.IdService)"
-                class="TextMenuUser">
+            <h5 @onclick="() => ClickService(svc.IdService)" class="TextMenuUser">
                 @svc.NameService
             </h5>
         }
     </div>
 </div>
 
-<style>
-    .Vertical {
-        display: flex;
-        gap: 10px;
-    }
 
-    .TextContainerMenuAdmin {
-        flex: 1;
-        position: relative;
-
-    }
-
-    .TextMenuUser {
-        margin: 6px 0;
-        cursor: pointer;
-        position: relative;
-        z-index: 1;
-    }
-
-        .TextMenuUser:hover {
-            color: #E83939;
-        }
-</style>
 
 @code {
     private List<Models.Service> services = new();
     private List<Models.Service> firstHalf = new();
     private List<Models.Service> secondHalf = new();
+
+    private void OnSelectChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int idService))
+        {
+            Navigation.NavigateTo($"/InfoService/{idService}");
+        }
+    }
+
+    private bool isMenuOpen = false;
+
+    private void ToggleMenu()
+    {
+        isMenuOpen = !isMenuOpen;
+    }
+
+    private void OnMenuClick(int idService)
+    {
+        isMenuOpen = false; // Закрываем меню после выбора
+        Navigation.NavigateTo($"/InfoService/{idService}");
+    }
+
+
 
     protected override void OnInitialized()
     {

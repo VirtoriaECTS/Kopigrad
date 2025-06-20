@@ -7,13 +7,32 @@
 @inject NavigationManager Navigation
 @inject Classes.Autorisation.AutorisationClasses AuthService
 
-<PageTitle>Admin</PageTitle>
-
 <div class="Banner">
     <h5 class="TextBanner">Панель админа</h5>
 </div>
 
+
 <style>
+    .Banner {
+        margin: 0vw 0vw;
+        background-image: url('/Image/backBanner.png'); /* Фон */
+        background-size: cover; /* Растягиваем изображение */
+        background-position: center; /* Центрируем */
+        width: 100vw;
+        height: 3.5vw;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center; /* Горизонтальное центрирование */
+        align-items: center; /* Вертикальное центрирование */
+    }
+
+    .TextBanner {
+        font-size: 2vw;
+        font-family: DaysFronts;
+        color: white;
+        text-align: center;
+    }
 
     .form-wrapper {
         margin-top: 60px;

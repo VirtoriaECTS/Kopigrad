@@ -97,6 +97,7 @@
 
             <label class="field-label">@bottomCategory</label>
             <select class="user-select" @onchange="OnMaterialChanged">
+                <option value="" disabled selected hidden>-- выберите материал --</option>
                 @foreach (var material in selectedMaterials)
                 {
                     <option value="@material.IdMaterial">@material.NameMaterial</option>
@@ -107,6 +108,7 @@
             {
                 <label class="field-label">@topCategory</label>
                 <select class="user-select" @onchange="OnHeaderChanged">
+                    <option value="" disabled selected hidden>выберите @topCategory</option>
                     @foreach (var header in selectedHeader)
                     {
                         <option value="@header.IdColumnNames">@header.NameColumn</option>

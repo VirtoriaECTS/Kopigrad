@@ -23,6 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\menuusers.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="Codecamp.MudBlazor" Version="6.0.14.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
@@ -51,7 +55,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\favicon.png">
+    <Content Update="wwwroot\icons.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

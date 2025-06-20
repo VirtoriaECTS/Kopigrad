@@ -1,0 +1,99 @@
+﻿@font-face {
+    font-family: 'DaysFronts';
+    src: url('/Fronts/DAYS.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #E83939;
+    color: white;
+    padding: 20px 5vw;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+
+    .footer-column.left {
+        align-items: flex-start;
+    }
+
+    .footer-column.center {
+        align-items: center;
+    }
+
+    .footer-column.right {
+        align-items: flex-end;
+        gap: 10px;
+        flex-direction: row;
+    }
+
+.footer-text {
+    font-size: clamp(1rem, 1.5vw, 1.3rem);
+    font-weight: 500;
+    font-family: DaysFronts;
+}
+
+.logo-image {
+    height: 60px;
+    width: auto;
+}
+
+.contact-icon {
+    height: 90px; /* Было 30px — теперь в 3 раза больше */
+    width: 90px;
+    object-fit: contain;
+    filter: brightness(0) invert(1); /* делает иконки белыми */
+    transition: transform 0.2s ease;
+    margin-left: 10px;
+}
+
+    .contact-icon:hover {
+        transform: scale(1.1);
+    }
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    .footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 15px;
+        padding: 20px 20px;
+        font-family: DaysFronts;
+    }
+
+    .footer-column {
+        align-items: center !important;
+    }
+
+        .footer-column.right {
+            flex-direction: row;
+            justify-content: center;
+        }
+
+    .footer-text {
+        font-size: 1.1rem;
+    }
+
+    .logo-image {
+        height: 50px;
+    }
+
+    .contact-icon {
+        height: 30px;
+        width: 30px;
+        margin-left: 5px;
+    }
+}
+

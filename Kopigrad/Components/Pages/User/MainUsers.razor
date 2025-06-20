@@ -7,6 +7,7 @@
     <head>
         <link rel="stylesheet" href="/users.css">
         <link rel="stylesheet" href="/admin.css">
+        <link rel="stylesheet" href="/ServiceUser.css">
     </head>
 
 
@@ -19,24 +20,21 @@
 
 
 <h5 class="TextCenter">Наши услуги</h5>
-<div class="CenterDiv">
-    <div class="DivService">
+<div class="services-wrapper">
+    <div class="services-container">
         @foreach (var text in services)
         {
-
-            <div @onclick="() => ClickService(text.IdService)" class="divOneServise">
-
-
-
-                <img class="ImageStyleServiseAll" src="@GetImageSrc(text.Image)" alt="Изображение" />
-
-                <h1 class="TextServise">
-                    @text.NameService
-                </h1>
+            <div @onclick="() => ClickService(text.IdService)" class="service-item">
+                <div class="image-wrapper">
+                    <img class="service-image" src="@GetImageSrc(text.Image)" alt="Изображение" />
+                </div>
+                <h1 class="service-text">@text.NameService</h1>
             </div>
         }
     </div>
 </div>
+
+
 
 @* <div class="DivSenter">
     <div style="width:560px;height:800px;overflow:hidden;position:relative; text-align: center;">

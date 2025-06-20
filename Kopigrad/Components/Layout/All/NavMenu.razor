@@ -1,46 +1,43 @@
 ﻿@rendermode InteractiveServer
 
 <head>
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="/userFooters.css">
 </head>
 
 
 
-    <div class="footer">
-
-    <div class="hotisontal">
-        <div>
-            <h1 class="TextShapka">+7 (902) 587-66-97</h1>
-            <h1 class="TextShapkaTwo">+7 (343) 20-666-97</h1>
-        </div>
-
-         <div class="lineWhite"></div>
-
-         <div>
-            <h1 class="TextShapka">сopygrad96@mail.ru</h1>
-            <h1 class="TextShapkaTwo">Белореченская 17/1</h1>
-         </div>
-
+<div class="footer">
+    <div class="footer-column left">
+        <div class="footer-text">+7 (902) 587-66-97</div>
+        <div class="footer-text">+7 (343) 20-666-97</div>
+        <div class="footer-text">copygrad96@mail.ru</div>
+        <div class="footer-text">Белореченская 17/1</div>
     </div>
 
-
-
-
-    <div class="logo-container">
-        <img class="LogoImage" src="/Image/logoKopigrad.png" />
+    <div class="footer-column center">
+        <img class="logo-image" src="/Image/logoKopigrad.png" alt="Копиград логотип" />
     </div>
 
+    <div class="footer-column right">
+        <!-- Иконка Email -->
+        <a href="mailto:copygrad96@mail.ru" target="_blank" title="Написать на почту">
+            <img class="contact-icon" src="/Image/email.png" alt="Почта" />
+        </a>
 
+        <!-- Иконка WhatsApp -->
+        <a href="https://wa.me/79025876697" target="_blank" title="Написать в WhatsApp">
+            <img class="contact-icon" src="/Image/watsap.png" alt="WhatsApp" />
+        </a>
 
-    <div >
-        <img class="ContactImage" src="/Image/email.png" alt="Написать электронное письмо" />
-        <img class="ContactImage" src="/Image/watsap.png" />
-        <img class="ContactImage" src="/Image/telegram.png" />
+        <!-- Иконка Telegram -->
+        <a href="https://t.me/copygrad" target="_blank" title="Открыть Telegram">
+            <img class="contact-icon" src="/Image/telegram.png" alt="Telegram" />
+        </a>
     </div>
+</div>
 
-    </div>
 
-<style>
+@* <style>
     .logo-container {
         position: absolute;
         display: flex;
@@ -66,4 +63,4 @@
         justify-content: space-between; /* Расставляем элементы по горизонтали */
         align-items: center; /* Выравниваем элементы по вертикали */
     }
-</style>
+</style> *@
