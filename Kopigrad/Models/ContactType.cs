@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Kopigrad.Models;
 
-public partial class ContactType
+public partial class Contacttype
 {
     public int ContactTypeId { get; set; }
 

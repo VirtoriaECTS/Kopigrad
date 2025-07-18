@@ -1,4 +1,4 @@
-﻿using Kopigrad.Migrations;
+﻿
 using Kopigrad.Models;
 using System.Collections.Generic;
 

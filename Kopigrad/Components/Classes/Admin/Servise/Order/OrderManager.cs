@@ -33,7 +33,7 @@ namespace Kopigrad.Components.Classes.Admin.Servise.Order
 
 
 
-        public List<Models.ContactType> GetStatusType()
+        public List<Models.Contacttype> GetStatusType()
         {
             using (var context = new Models.KopigradContext())
             {

@@ -22,7 +22,7 @@ namespace Kopigrad.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.HasCharSet(modelBuilder, "utf8mb4");
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+            //MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("Kopigrad.Models.Columnname", b =>
                 {
@@ -50,21 +50,23 @@ namespace Kopigrad.Migrations
                     b.ToTable("columnnames", (string)null);
                 });
 
-            modelBuilder.Entity("Kopigrad.Models.Efmigrationshistory", b =>
+            modelBuilder.Entity("Kopigrad.Models.ContactType", b =>
                 {
-                    b.Property<string>("MigrationId")
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)");
+                    b.Property<int>("ContactTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int(11)");
 
-                    b.Property<string>("ProductVersion")
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ContactTypeId"));
+
+                    b.Property<string>("ContactTypeName")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar(32)");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
-                    b.HasKey("MigrationId")
+                    b.HasKey("ContactTypeId")
                         .HasName("PRIMARY");
 
-                    b.ToTable("__efmigrationshistory", (string)null);
+                    b.ToTable("ContactType", (string)null);
                 });
 
             modelBuilder.Entity("Kopigrad.Models.Material", b =>
@@ -131,25 +133,44 @@ namespace Kopigrad.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdOrder"));
 
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("ContactTypeId")
+                        .HasColumnType("int(11)");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("int(11)");
+
                     b.Property<DateTime>("DataOrder")
                         .HasColumnType("datetime");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<int>("IdStatus")
                         .HasColumnType("int(11)")
                         .HasColumnName("idStatus");
 
-                    b.Property<string>("Name")
+                    b.Property<int>("IdTableMiniService")
+                        .HasColumnType("int(11)")
+                        .HasColumnName("idTableMiniService");
+
+                    b.Property<string>("NameUser")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("IdOrder")
                         .HasName("PRIMARY");
 
+                    b.HasIndex(new[] { "ContactTypeId" }, "fk_contacttype");
+
                     b.HasIndex(new[] { "IdStatus" }, "idStatus");
+
+                    b.HasIndex(new[] { "IdTableMiniService" }, "idx_idTableMiniService");
 
                     b.ToTable("order", (string)null);
                 });
@@ -163,29 +184,17 @@ namespace Kopigrad.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdOrderItems"));
 
-                    b.Property<int>("Count")
-                        .HasColumnType("int(11)");
-
-                    b.Property<string>("Description")
+                    b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("IdOrder")
                         .HasColumnType("int(11)");
 
-                    b.Property<int>("IdTableMiniService")
-                        .HasColumnType("int(11)")
-                        .HasColumnName("idTableMiniService");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int(11)");
-
                     b.HasKey("IdOrderItems")
                         .HasName("PRIMARY");
 
                     b.HasIndex(new[] { "IdOrder" }, "IdRequst");
-
-                    b.HasIndex(new[] { "IdTableMiniService" }, "IdViewCategory");
 
                     b.ToTable("orderitems", (string)null);
                 });
@@ -393,13 +402,29 @@ namespace Kopigrad.Migrations
 
             modelBuilder.Entity("Kopigrad.Models.Order", b =>
                 {
+                    b.HasOne("Kopigrad.Models.ContactType", "ContactType")
+                        .WithMany("Orders")
+                        .HasForeignKey("ContactTypeId")
+                        .IsRequired()
+                        .HasConstraintName("fk_contacttype");
+
                     b.HasOne("Kopigrad.Models.Status", "IdStatusNavigation")
                         .WithMany("Orders")
                         .HasForeignKey("IdStatus")
                         .IsRequired()
                         .HasConstraintName("order_ibfk_1");
 
+                    b.HasOne("Kopigrad.Models.Tableminiservice", "IdTableMiniServiceNavigation")
+                        .WithMany("Orders")
+                        .HasForeignKey("IdTableMiniService")
+                        .IsRequired()
+                        .HasConstraintName("fk_order_tableminiservice");
+
+                    b.Navigation("ContactType");
+
                     b.Navigation("IdStatusNavigation");
+
+                    b.Navigation("IdTableMiniServiceNavigation");
                 });
 
             modelBuilder.Entity("Kopigrad.Models.Orderitem", b =>
@@ -407,18 +432,11 @@ namespace Kopigrad.Migrations
                     b.HasOne("Kopigrad.Models.Order", "IdOrderNavigation")
                         .WithMany("Orderitems")
                         .HasForeignKey("IdOrder")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("orderitems_ibfk_1");
-
-                    b.HasOne("Kopigrad.Models.Tableminiservice", "IdTableMiniServiceNavigation")
-                        .WithMany("Orderitems")
-                        .HasForeignKey("IdTableMiniService")
-                        .IsRequired()
-                        .HasConstraintName("orderitems_ibfk_2");
+                        .HasConstraintName("fk_orderitems_order");
 
                     b.Navigation("IdOrderNavigation");
-
-                    b.Navigation("IdTableMiniServiceNavigation");
                 });
 
             modelBuilder.Entity("Kopigrad.Models.Pagepdf", b =>
@@ -464,6 +482,11 @@ namespace Kopigrad.Migrations
                     b.Navigation("Tableminiservices");
                 });
 
+            modelBuilder.Entity("Kopigrad.Models.ContactType", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
             modelBuilder.Entity("Kopigrad.Models.Material", b =>
                 {
                     b.Navigation("Tableminiservices");
@@ -498,7 +521,7 @@ namespace Kopigrad.Migrations
 
             modelBuilder.Entity("Kopigrad.Models.Tableminiservice", b =>
                 {
-                    b.Navigation("Orderitems");
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

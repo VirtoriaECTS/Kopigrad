@@ -38,18 +38,8 @@ namespace Kopigrad.Components.Classes.Admin.Servise
                 var tableminiService = context.Tableminiservices.Where(x => x.IdTableMiniService == order.IdTableMiniService).FirstOrDefault();
                 var material = context.Materials.Where(x => x.IdMaterial == tableminiService.IdMaterial).FirstOrDefault();
 
-                int countMaterialAll = material.Count;
-                material.Count = countMaterialAll - order.Count;
-
-                if(material.Count < 0)
-                {
-                    return "Недостаточно материалов для выполнения заказа";
-                }
-                else
-                {
-                    context.SaveChanges();
-                    return "";
-                }
+                context.SaveChanges();
+                return "";
             }
         }
     }

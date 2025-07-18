@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Kopigrad.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreate1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,17 +16,17 @@ namespace Kopigrad.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "__efmigrationshistory",
+                name: "ContactType",
                 columns: table => new
                 {
-                    MigrationId = table.Column<string>(type: "varchar(150)", maxLength: 150, nullable: false, collation: "utf8mb4_general_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ProductVersion = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false, collation: "utf8mb4_general_ci")
+                    ContactTypeId = table.Column<int>(type: "int(11)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ContactTypeName = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, collation: "utf8mb4_general_ci")
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PRIMARY", x => x.MigrationId);
+                    table.PrimaryKey("PRIMARY", x => x.ContactTypeId);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_general_ci");
@@ -151,31 +151,6 @@ namespace Kopigrad.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_general_ci");
 
             migrationBuilder.CreateTable(
-                name: "order",
-                columns: table => new
-                {
-                    IdOrder = table.Column<int>(type: "int(11)", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "text", nullable: false, collation: "utf8mb4_general_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Email = table.Column<string>(type: "text", nullable: false, collation: "utf8mb4_general_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    idStatus = table.Column<int>(type: "int(11)", nullable: false),
-                    DataOrder = table.Column<DateTime>(type: "datetime", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PRIMARY", x => x.IdOrder);
-                    table.ForeignKey(
-                        name: "order_ibfk_1",
-                        column: x => x.idStatus,
-                        principalTable: "status",
-                        principalColumn: "idStatus");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .Annotation("Relational:Collation", "utf8mb4_general_ci");
-
-            migrationBuilder.CreateTable(
                 name: "pagepdf",
                 columns: table => new
                 {
@@ -254,31 +229,63 @@ namespace Kopigrad.Migrations
                 .Annotation("Relational:Collation", "utf8mb4_general_ci");
 
             migrationBuilder.CreateTable(
+                name: "order",
+                columns: table => new
+                {
+                    IdOrder = table.Column<int>(type: "int(11)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Contact = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, collation: "utf8mb4_general_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NameUser = table.Column<string>(type: "text", nullable: false, collation: "utf8mb4_general_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    idStatus = table.Column<int>(type: "int(11)", nullable: false),
+                    DataOrder = table.Column<DateTime>(type: "datetime", nullable: false),
+                    ContactTypeId = table.Column<int>(type: "int(11)", nullable: false),
+                    idTableMiniService = table.Column<int>(type: "int(11)", nullable: false),
+                    Count = table.Column<int>(type: "int(11)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PRIMARY", x => x.IdOrder);
+                    table.ForeignKey(
+                        name: "fk_contacttype",
+                        column: x => x.ContactTypeId,
+                        principalTable: "ContactType",
+                        principalColumn: "ContactTypeId");
+                    table.ForeignKey(
+                        name: "fk_order_tableminiservice",
+                        column: x => x.idTableMiniService,
+                        principalTable: "tableminiservice",
+                        principalColumn: "idTableMiniService");
+                    table.ForeignKey(
+                        name: "order_ibfk_1",
+                        column: x => x.idStatus,
+                        principalTable: "status",
+                        principalColumn: "idStatus");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .Annotation("Relational:Collation", "utf8mb4_general_ci");
+
+            migrationBuilder.CreateTable(
                 name: "orderitems",
                 columns: table => new
                 {
                     idOrderItems = table.Column<int>(type: "int(11)", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     IdOrder = table.Column<int>(type: "int(11)", nullable: false),
-                    idTableMiniService = table.Column<int>(type: "int(11)", nullable: false),
-                    Description = table.Column<string>(type: "longtext", nullable: false, collation: "utf8mb4_general_ci")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Price = table.Column<int>(type: "int(11)", nullable: false),
-                    Count = table.Column<int>(type: "int(11)", nullable: false)
+                    FilePath = table.Column<string>(type: "longtext", nullable: false, collation: "utf8mb4_general_ci")
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PRIMARY", x => x.idOrderItems);
                     table.ForeignKey(
-                        name: "orderitems_ibfk_1",
+                        name: "fk_orderitems_order",
                         column: x => x.IdOrder,
                         principalTable: "order",
-                        principalColumn: "IdOrder");
-                    table.ForeignKey(
-                        name: "orderitems_ibfk_2",
-                        column: x => x.idTableMiniService,
-                        principalTable: "tableminiservice",
-                        principalColumn: "idTableMiniService");
+                        principalColumn: "IdOrder",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .Annotation("Relational:Collation", "utf8mb4_general_ci");
@@ -294,19 +301,24 @@ namespace Kopigrad.Migrations
                 column: "idService");
 
             migrationBuilder.CreateIndex(
+                name: "fk_contacttype",
+                table: "order",
+                column: "ContactTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "idStatus",
                 table: "order",
                 column: "idStatus");
 
             migrationBuilder.CreateIndex(
+                name: "idx_idTableMiniService",
+                table: "order",
+                column: "idTableMiniService");
+
+            migrationBuilder.CreateIndex(
                 name: "IdRequst",
                 table: "orderitems",
                 column: "IdOrder");
-
-            migrationBuilder.CreateIndex(
-                name: "IdViewCategory",
-                table: "orderitems",
-                column: "idTableMiniService");
 
             migrationBuilder.CreateIndex(
                 name: "idStory",
@@ -333,9 +345,6 @@ namespace Kopigrad.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "__efmigrationshistory");
-
-            migrationBuilder.DropTable(
                 name: "orderitems");
 
             migrationBuilder.DropTable(
@@ -348,10 +357,13 @@ namespace Kopigrad.Migrations
                 name: "order");
 
             migrationBuilder.DropTable(
-                name: "tableminiservice");
+                name: "storypdf");
 
             migrationBuilder.DropTable(
-                name: "storypdf");
+                name: "ContactType");
+
+            migrationBuilder.DropTable(
+                name: "tableminiservice");
 
             migrationBuilder.DropTable(
                 name: "status");

@@ -23,7 +23,7 @@ public partial class Order
 
     public decimal Price { get; set; }
 
-    public virtual ContactType ContactType { get; set; } = null!;
+    public virtual Contacttype ContactType { get; set; } = null!;
 
     public virtual Status IdStatusNavigation { get; set; } = null!;
 

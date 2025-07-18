@@ -19,5 +19,7 @@ public partial class Miniservice
 
     public virtual Service IdServiceNavigation { get; set; } = null!;
 
+    public virtual ICollection<Material> Materials { get; set; } = new List<Material>();
+
     public virtual ICollection<Tableminiservice> Tableminiservices { get; set; } = new List<Tableminiservice>();
 }

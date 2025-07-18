@@ -5,22 +5,22 @@ using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
 namespace Kopigrad.Models;
 
-public partial class KopigradContext : DbContext
+public partial class CopygradContext : DbContext
 {
-    public KopigradContext()
+    public CopygradContext()
     {
     }
 
-    public KopigradContext(DbContextOptions<KopigradContext> options)
+    public CopygradContext(DbContextOptions<CopygradContext> options)
         : base(options)
     {
     }
 
     public virtual DbSet<Columnname> Columnnames { get; set; }
 
-    public virtual DbSet<Contacttype> ContactTypes { get; set; }
+    public virtual DbSet<Contacttype> Contacttypes { get; set; }
 
-
+    public virtual DbSet<Efmigrationshistory> Efmigrationshistories { get; set; }
 
     public virtual DbSet<Material> Materials { get; set; }
 
@@ -44,7 +44,7 @@ public partial class KopigradContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=localhost;port=3306;database=copygrad;user=root;password=;", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.11.11-mariadb"));
+        => optionsBuilder.UseMySql("server=localhost;port=3306;database=copygrad;user=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.4.32-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -80,12 +80,21 @@ public partial class KopigradContext : DbContext
         {
             entity.HasKey(e => e.ContactTypeId).HasName("PRIMARY");
 
-            entity.ToTable("ContactType");
+            entity.ToTable("contacttype");
 
             entity.Property(e => e.ContactTypeId).HasColumnType("int(11)");
             entity.Property(e => e.ContactTypeName).HasMaxLength(255);
         });
 
+        modelBuilder.Entity<Efmigrationshistory>(entity =>
+        {
+            entity.HasKey(e => e.MigrationId).HasName("PRIMARY");
+
+            entity.ToTable("__efmigrationshistory");
+
+            entity.Property(e => e.MigrationId).HasMaxLength(150);
+            entity.Property(e => e.ProductVersion).HasMaxLength(32);
+        });
 
         modelBuilder.Entity<Material>(entity =>
         {
@@ -93,9 +102,18 @@ public partial class KopigradContext : DbContext
 
             entity.ToTable("material");
 
+            entity.HasIndex(e => e.IdMiniService, "idMiniService");
+
             entity.Property(e => e.IdMaterial).HasColumnType("int(11)");
-            entity.Property(e => e.IdMiniService).HasColumnType("int(11)");
+            entity.Property(e => e.IdMiniService)
+                .HasColumnType("int(11)")
+                .HasColumnName("idMiniService");
             entity.Property(e => e.NameMaterial).HasColumnName("nameMaterial");
+
+            entity.HasOne(d => d.IdMiniServiceNavigation).WithMany(p => p.Materials)
+                .HasForeignKey(d => d.IdMiniService)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("material_ibfk_1");
         });
 
         modelBuilder.Entity<Miniservice>(entity =>
