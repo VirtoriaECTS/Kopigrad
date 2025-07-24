@@ -59,23 +59,24 @@
                         {
                             <!-- Выбор материала -->
                             int indexMaterial = (i - 1);
-                            <select @bind="materialIds[indexMaterial]" class="InputTable">
-                                <option value="0">-- Выберите материал --</option>
-                                @foreach (var material in viewmaterials)
-                                {
-                                    <option value="@material.IdMaterial">@material.NameMaterial</option>
-                                }
-                            </select>
+                            <input @bind="materialString[indexMaterial]"
+                                   @bind:event="oninput"
+                                   class="InputTable"
+                                   placeholder="Название материала" />
                         }
+
                         else if (i > 0 && j > 0)
                         {
                             <!-- Цена -->
                             int indexPriceI = (i - 1);
                             int indexPriceJ = (j - 1);
                             <input type="number"
+                                   step="any"
                                    @bind="priceList[indexPriceI][indexPriceJ]"
                                    @bind:event="oninput"
-                                   class="InputTable" placeholder="Цена" />
+                                   class="InputTable"
+                                   placeholder="Цена" />
+
                         }
                     </td>
                 }
@@ -126,13 +127,13 @@
     bool showSavedData = false;
 
     List<string> headerValues = new List<string>();
-    List<int> materialIds = new List<int>();
+
     List<List<decimal>> priceList = new List<List<decimal>>();
 
 
 
 
-    List<Models.Material> viewmaterials = new List<Models.Material>();
+    List<string> materialString = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -146,7 +147,7 @@
         var managerMaterial = new Classes.Admin.Servise.ManagerMaterial();
 
         nameBanner = managmentServise.GetName(Convert.ToInt32(id));
-        viewmaterials = managerMaterial.GetList();
+
 
         if (headerValues == null)
             headerValues = new List<string>();
@@ -157,13 +158,14 @@
         }
 
 
-        if (materialIds == null)
-            materialIds = new List<int>();
+        if (materialString == null)
+            materialString = new List<string>();
 
-        while (materialIds.Count < trSum - 1)
+        while (materialString.Count < trSum - 1)
         {
-            materialIds.Add(0);
+            materialString.Add(string.Empty);
         }
+
 
 
         if(priceList.Count < trSum - 1)
@@ -189,7 +191,7 @@
     async Task SaveChanges()
     {
         Classes.Admin.Servise.ManagmentMiniService managment = new Classes.Admin.Servise.ManagmentMiniService();
-        managment.Add(Convert.ToInt32(id), nameMiniService, topCategory, bottomCategory, headerValues, materialIds.Distinct().ToList(), priceList);
+        managment.Add(Convert.ToInt32(id), nameMiniService, topCategory, bottomCategory, headerValues, materialString, priceList);
 
 
         Navigation.NavigateTo($"/AddInfoService/{id}");
@@ -214,7 +216,7 @@
 
         trSum++;
 
-        materialIds.Add(0);
+        materialString.Add("");
         errorMessage = "";
         await InvokeAsync(StateHasChanged);
     }
@@ -223,7 +225,7 @@
     {
         if (trSum > 2)
         {
-            materialIds.RemoveAt(materialIds.Count - 1);
+            materialString.RemoveAt(materialString.Count - 1);
             priceList.RemoveAt(priceList.Count - 1);
 
 

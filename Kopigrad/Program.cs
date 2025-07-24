@@ -41,7 +41,7 @@ builder.Services.AddDbContext<KopigradContext>(options =>
 {
     options.UseMySql(
         //"server=62.76.233.55;port=3306;database=kopigrad;user=blazoruser;password=newpassword123;",
-        "server=localhost;port=3306;database=copygrad;user=root;password=;",
+        "server=localhost;port=3306;database=copygrad;user=root;password=111111",
         new MySqlServerVersion(new Version(10, 4, 32)),
         mysqlOptions => mysqlOptions.EnableRetryOnFailure()
     );

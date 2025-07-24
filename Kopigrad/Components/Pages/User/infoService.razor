@@ -45,9 +45,12 @@
                             {
                                 <!-- Выбор материала -->
                                 int indexMaterial = (i - 1);
+                                <h5 style="font-weight: bold;" class="TextTableUser">
+                                    @viewmaterials.FirstOrDefault(x => x.IdMaterial == info.materialIds[indexMaterial])?.NameMaterial
+                                </h5>
 
 
-                                <h5 class="TextTableUser">@viewmaterials.Where(x => x.IdMaterial == info.materialIds[indexMaterial]).Select(x => x.NameMaterial).First().</h5>
+                               @*  <h5 class="TextTableUser">@viewmaterials.Where(x => x.IdMaterial == info.materialIds[indexMaterial]).Select(x => x.NameMaterial).First().</h5> *@
                             }
                             else if (i > 0 && j > 0)
                             {

@@ -11,7 +11,7 @@ namespace Kopigrad.Components.Classes.Admin.Servise
 
 
 
-        public void Add(int idService, string nameMiniService, string TopName, string BottomName, List<string> NameColumns, List<int> Materials, List<List<decimal>> Prices)
+        public void Add(int idService, string nameMiniService, string TopName, string BottomName, List<string> NameColumns, List<string> MaterialsString, List<List<decimal>> Prices)
         {
 
             int idMiniService = AddMiniService(idService, nameMiniService, TopName, BottomName);
@@ -29,11 +29,13 @@ namespace Kopigrad.Components.Classes.Admin.Servise
             }
             int i = 0;
             int j = 0;
-            foreach (int material in Materials)
+            foreach (string material in MaterialsString)
             {
-               foreach(int idColums in idColumsId)
+                int idMaterial = addMaterial(material, idMiniService);
+                foreach (int idColums in idColumsId)
                 {
-                    AddTableMiniServie(idMiniService, material, idColums, Prices[i][j]);
+
+                    AddTableMiniServie(idMiniService, idMaterial, idColums, Prices[i][j]);
                     j++;
                 }
                 i++;
@@ -44,6 +46,21 @@ namespace Kopigrad.Components.Classes.Admin.Servise
 
         }
 
+        public int addMaterial(string material, int idMiniService)
+        {
+            using (var context = new KopigradContext())
+            {
+                var materilNew = new Material
+                {
+                    IdMiniService = idMiniService,
+                    NameMaterial = material,
+                };
+
+                context.Materials.Add(materilNew);
+                context.SaveChanges();
+                return materilNew.IdMaterial;
+            }
+        }
 
         public int AddMiniService(int idService, string nameMiniService, string TopName, string BottomName)
         {
