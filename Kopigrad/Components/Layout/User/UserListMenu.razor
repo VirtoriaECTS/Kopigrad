@@ -29,18 +29,18 @@
     <div class="TextContainerMenuAdmin">
         @foreach (var svc in firstHalf)
         {
-            <h5 @onclick="() => ClickService(svc.IdService)" class="TextMenuUser">
+            <div @onclick="() => ClickService(svc.IdService)" class="TextMenuUser">
                 @svc.NameService
-            </h5>
+            </div>
         }
     </div>
 
     <div class="TextContainerMenuAdmin">
         @foreach (var svc in secondHalf)
         {
-            <h5 @onclick="() => ClickService(svc.IdService)" class="TextMenuUser">
+            <div @onclick="() => ClickService(svc.IdService)" class="TextMenuUser">
                 @svc.NameService
-            </h5>
+            </div>
         }
     </div>
 </div>
@@ -80,7 +80,7 @@
         using var context = new Models.KopigradContext();
 
         // 1) Сначала отсортируем все services по IdService для предсказуемого порядка
-        services = context.Services
+         services = context.Services
                           .OrderBy(s => s.IdService)
                           .ToList();
 

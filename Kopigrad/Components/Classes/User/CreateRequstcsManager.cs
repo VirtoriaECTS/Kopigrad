@@ -29,13 +29,28 @@ namespace Kopigrad.Components.Classes.User
             Console.WriteLine($"[INFO] Заказ создан с IdOrder: {id}");
             AddOrderItemsTable(id, filePaths);
         }
-
         public int AddOrderTable(string name, int contactType, string contact, int idTable, int count, decimal price)
         {
             DateTime currentDate = DateTime.Now;
 
             using (var context = new KopigradContext())
             {
+                // Загружаем связанные сущности
+                var contactTypeEntity = context.Contacttypes.Find(contactType);
+                var statusEntity = context.Statuses.Find(3);
+                var tableMiniServiceEntity = context.Tableminiservices.Find(idTable);
+
+                // Выводим информацию в консоль для отладки
+                Console.WriteLine($"ContactTypeEntity is {(contactTypeEntity == null ? "null" : "found")}");
+                Console.WriteLine($"StatusEntity is {(statusEntity == null ? "null" : "found")}");
+                Console.WriteLine($"TableMiniServiceEntity is {(tableMiniServiceEntity == null ? "null" : "found")}");
+
+                // Проверка, чтобы избежать NullReferenceException
+                if (contactTypeEntity == null || statusEntity == null || tableMiniServiceEntity == null)
+                {
+                    throw new Exception("Одна или несколько связанных сущностей не найдены.");
+                }
+
                 var newOrder = new Order()
                 {
                     NameUser = name,
@@ -45,7 +60,12 @@ namespace Kopigrad.Components.Classes.User
                     DataOrder = currentDate,
                     IdTableMiniService = idTable,
                     Count = count,
-                    Price = price
+                    Price = price,
+
+                    // Навигационные свойства
+                    ContactType = contactTypeEntity,
+                    IdStatusNavigation = statusEntity,
+                    IdTableMiniServiceNavigation = tableMiniServiceEntity
                 };
 
                 context.Orders.Add(newOrder);
@@ -56,6 +76,8 @@ namespace Kopigrad.Components.Classes.User
                 return newOrder.IdOrder;
             }
         }
+
+
 
         public void AddOrderItemsTable(int order, List<string> filePaths)
         {

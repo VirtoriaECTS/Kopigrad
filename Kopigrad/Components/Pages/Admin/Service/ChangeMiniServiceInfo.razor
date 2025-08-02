@@ -62,13 +62,10 @@
                         {
                             <!-- Выбор материала -->
                             int indexMaterial = (i - 1);
-                            <select @bind="materialIds[indexMaterial]" class="InputTable">
-                                <option value="0">-- Выберите материал --</option>
-                                @foreach (var material in viewmaterials)
-                                {
-                                    <option value="@material.IdMaterial">@material.NameMaterial</option>
-                                }
-                            </select>
+                            <input @bind="materialString[indexMaterial]"
+                                   @bind:event="oninput"
+                                   class="InputTable"
+                                   placeholder="Название материала" />
                         }
                         else if (i > 0 && j > 0)
                         {
@@ -133,7 +130,7 @@
     bool showSavedData = false;
 
     List<string> headerValues = new List<string>();
-    List<int> materialIds = new List<int>();
+    List<string> materialString = new List<string>();
     List<List<decimal>> priceList = new List<List<decimal>>();
 
 
@@ -165,7 +162,7 @@
         viewmaterials = managerMaterial.GetList();
 
         headerValues = managmentMiniService.GetNameColums(idMiniService);
-        materialIds = managmentMiniService.GetMaterial(idMiniService).Select(x => x.IdMaterial).Distinct().ToList();
+        materialString = managmentMiniService.GetMaterial(idMiniService).Select(x => x.NameMaterial).Distinct().ToList(); //???????
         priceList = managmentMiniService.GetPrice(idMiniService, headerValues.Count);
 
         trSum = priceList.Count + 1;
@@ -178,7 +175,7 @@
     async Task SaveChanges()
     {
         Classes.Admin.Servise.ManagmentMiniService managment = new Classes.Admin.Servise.ManagmentMiniService();
-        managment.Change(Convert.ToInt32(id), nameMiniService, topCategory, bottomCategory, headerValues, materialIds.Distinct().ToList(), priceList);
+        managment.Change(Convert.ToInt32(id), nameMiniService, topCategory, bottomCategory, headerValues, materialString.ToList(), priceList);
 
 
         Navigation.NavigateTo($"/AddInfoService/{idService}");
@@ -203,7 +200,7 @@
 
         trSum++;
 
-        materialIds.Add(0);
+        materialString.Add("0");
         errorMessage = "";
         await InvokeAsync(StateHasChanged);
     }
@@ -212,7 +209,7 @@
     {
         if (trSum > 2)
         {
-            materialIds.RemoveAt(materialIds.Count - 1);
+            materialString.RemoveAt(materialString.Count - 1);
             priceList.RemoveAt(priceList.Count - 1);
 
 

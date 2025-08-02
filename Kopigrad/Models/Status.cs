@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Kopigrad.Models;
-
-public partial class Status
+namespace Kopigrad.Models
 {
-    public int IdStatus { get; set; }
+    public partial class Status
+    {
+        public Status()
+        {
+            Orders = new HashSet<Order>();
+        }
 
-    public string NameStatus { get; set; } = null!;
+        public int IdStatus { get; set; }
+        public string NameStatus { get; set; } = null!;
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+        public virtual ICollection<Order> Orders { get; set; }
+    }
 }

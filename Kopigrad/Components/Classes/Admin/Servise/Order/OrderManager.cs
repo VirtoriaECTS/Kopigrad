@@ -37,7 +37,7 @@ namespace Kopigrad.Components.Classes.Admin.Servise.Order
         {
             using (var context = new Models.KopigradContext())
             {
-                return context.ContactTypes.ToList();
+                return context.Contacttypes.ToList();
             }
         }
 

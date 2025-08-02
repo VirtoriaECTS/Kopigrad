@@ -1,4 +1,4 @@
-﻿Вы сказали:
+﻿
 @page "/CreateRequest"
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
@@ -217,13 +217,51 @@
         }
 
 </style>
+
+
+<h5 >
+    сервис 
+    @idService
+</h5>
+
+<h5>
+    мини сервис
+    @idServiceMini
+</h5>
+
+<h5>
+    количество
+    @count
+</h5>
+
+
+
+<h5>
+    колонка
+    @idColumn
+</h5>
+
+<h5>
+    материал
+    @idMaterial
+</h5>
+
+
+
+<h5>
+    цена
+    @price
+</h5>
+
+<h5>
+    @click
+</h5>
 @code {
     private void OnFormSubmit()
     {
         // Ничего не делаем, просто предотвращаем стандартную отправку формы
     }
-
-    //email
+    string click = "не нажала";    //email
     private string emailCopygrad = "vikmolotova@gmail.com";
     private string email;
     private string status;
@@ -454,6 +492,7 @@
     // Загрузка файлов на сервер
     private async Task SubmitAsync()
     {
+        click = "нажала";
         try
         {
             filePaths.Clear();

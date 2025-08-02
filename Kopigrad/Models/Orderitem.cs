@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Kopigrad.Models;
-
-public partial class Orderitem
+namespace Kopigrad.Models
 {
-    public int IdOrderItems { get; set; }
+    public partial class Orderitem
+    {
+        public int IdOrderItems { get; set; }
+        public int IdOrder { get; set; }
+        public string FilePath { get; set; } = null!;
 
-    public int IdOrder { get; set; }
-
-    public string FilePath { get; set; } = null!;
-
-    public virtual Order IdOrderNavigation { get; set; } = null!;
+        public virtual Order IdOrderNavigation { get; set; } = null!;
+    }
 }

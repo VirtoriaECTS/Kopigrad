@@ -240,38 +240,75 @@ namespace Kopigrad.Components.Classes.Admin.Servise
         }
 
 
-        public void Change(int idMiniService, string nameMiniService, string TopName, string BottomName, List<string> NameColumns, List<int> Material, List<List<decimal>> Prices)
+        public void Change(int idMiniService, string nameMiniService, string topName, string bottomName,
+                               List<string> nameColumns, List<string> materialsString, List<List<decimal>> prices)
         {
-
-            ChangeMiniService(idMiniService, nameMiniService, TopName, BottomName);
-
-            RealyDelete(idMiniService);
-
-            List<int> idColumsId = new List<int>();
-
-
-
-            foreach (string namecolumn in NameColumns)
+            using (var context = new KopigradContext())
             {
-                int id = AddColumnNames(idMiniService, namecolumn);
-                idColumsId.Add(id);
-            }
-            int i = 0;
-            int j = 0;
-            foreach (int material in Material)
-            {
-                foreach (int idColums in idColumsId)
+                // 1. Обновляем основной объект Miniservice
+                var miniService = context.Miniservices.FirstOrDefault(x => x.IdMiniService == idMiniService);
+                if (miniService == null)
+                    return;
+
+                miniService.NameMiniServise = nameMiniService;
+                miniService.TopName = topName;
+                miniService.BottomName = bottomName;
+                context.SaveChanges();
+
+                // 2. Удаляем старые заголовки, материалы и таблицу
+                var oldColumns = context.Columnnames.Where(c => c.IdMiniService == idMiniService).ToList();
+                var oldMaterials = context.Materials.Where(m => m.IdMiniService == idMiniService).ToList();
+                var oldPrices = context.Tableminiservices.Where(t => t.IdMiniService == idMiniService).ToList();
+
+                context.Columnnames.RemoveRange(oldColumns);
+                context.Materials.RemoveRange(oldMaterials);
+                context.Tableminiservices.RemoveRange(oldPrices);
+                context.SaveChanges();
+
+                // 3. Добавляем новые заголовки и сохраняем их ID
+                List<int> idColumns = new List<int>();
+                foreach (var column in nameColumns)
                 {
-                    AddTableMiniServie(idMiniService, material, idColums, Prices[i][j]);
-                    j++;
+                    var newCol = new Columnname
+                    {
+                        IdMiniService = idMiniService,
+                        NameColumn = column
+                    };
+                    context.Columnnames.Add(newCol);
+                    context.SaveChanges();
+                    idColumns.Add(newCol.IdColumnNames);
                 }
-                i++;
-                j = 0;
+
+                // 4. Добавляем материалы и цены
+                for (int i = 0; i < materialsString.Count; i++)
+                {
+                    var material = new Material
+                    {
+                        IdMiniService = idMiniService,
+                        NameMaterial = materialsString[i]
+                    };
+                    context.Materials.Add(material);
+                    context.SaveChanges();
+
+                    int idMaterial = material.IdMaterial;
+
+                    for (int j = 0; j < idColumns.Count; j++)
+                    {
+                        var tableEntry = new Tableminiservice
+                        {
+                            IdMiniService = idMiniService,
+                            IdMaterial = idMaterial,
+                            IdColumnName = idColumns[j],
+                            Price = prices[i][j]
+                        };
+                        context.Tableminiservices.Add(tableEntry);
+                    }
+                    context.SaveChanges();
+                }
             }
-
-
-
         }
+
+
         public void ChangeMiniService(int idMiniService, string nameMiniService, string TopName, string BottomName) 
         {
             using (var context = new KopigradContext())

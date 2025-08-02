@@ -8,12 +8,23 @@ namespace Kopigrad.Components.Classes.Admin.Servise
         {
             using (var context = new KopigradContext())
             {
-                decimal priceOne = context.Tableminiservices.Where(x => x.IdMiniService == idMiniService).Where(x => x.IdMaterial == idMaterial).Where(x => x.IdColumnName == idColumnName).Select(x => x.Price).First();
-                decimal price = priceOne * count;
-                
+                decimal? priceOne = context.Tableminiservices
+                    .Where(x => x.IdMiniService == idMiniService)
+                    .Where(x => x.IdMaterial == idMaterial)
+                    .Where(x => x.IdColumnName == idColumnName)
+                    .Select(x => (decimal?)x.Price)  // Чтобы FirstOrDefault возвращал nullable decimal
+                    .FirstOrDefault();
+
+                if (priceOne == null)
+                {
+                    // Обработка случая, когда цена не найдена
+                    throw new InvalidOperationException("Price not found for given parameters.");
+                }
+
+                decimal price = priceOne.Value * count;
                 return price;
             }
-
         }
+
     }
 }
