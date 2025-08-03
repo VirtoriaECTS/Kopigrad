@@ -29,7 +29,7 @@
     <div class="TextContainerMenuAdmin">
         @foreach (var svc in firstHalf)
         {
-            <div @onclick="() => ClickService(svc.IdService)" class="TextMenuUser">
+            <div @onclick="() => ClickService(svc.IdService)" class="TextMenuUser2">
                 @svc.NameService
             </div>
         }
@@ -38,7 +38,7 @@
     <div class="TextContainerMenuAdmin">
         @foreach (var svc in secondHalf)
         {
-            <div @onclick="() => ClickService(svc.IdService)" class="TextMenuUser">
+            <div @onclick="() => ClickService(svc.IdService)" class="TextMenuUser2">
                 @svc.NameService
             </div>
         }
